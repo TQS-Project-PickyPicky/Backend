@@ -1,4 +1,4 @@
-name: PickyPicky CI/CD
+name: PickyPicky Pull Request Checker
 
 on:
   pull_request:
