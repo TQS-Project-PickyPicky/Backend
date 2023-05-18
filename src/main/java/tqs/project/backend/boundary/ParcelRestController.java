@@ -1,7 +1,7 @@
-package ies.project.backend.boundary;
+package tqs.project.backend.boundary;
 
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class CollectionPointRestController {
+public class ParcelRestController {
 }

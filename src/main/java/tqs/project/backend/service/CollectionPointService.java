@@ -1,4 +1,4 @@
-package ies.project.backend.service;
+package tqs.project.backend.service;
 
 import org.springframework.stereotype.Service;
 
