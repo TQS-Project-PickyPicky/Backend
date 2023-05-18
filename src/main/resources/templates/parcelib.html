@@ -4,15 +4,16 @@
   <title>ACP Page</title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
 </head>
 <body>
     <header class="p-3 mb-3 border-bottom">
         <div class="container">
           <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-            <a href="acp.html" class="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none">
+            <div onclick="Clicked()" class="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none">
               <h2>ACP Page</h2>
-            </a>
+            </div>
 
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
               <!--<li><a href="#" class="nav-link px-2 link-secondary">Overview</a></li>
@@ -40,7 +41,7 @@
         </div>
     </header>
 
-    <h2 style="text-align: center;padding-top: 30px;">Parcel AS213YDHJ223</h2>
+    <h2 th:text="'Parcel ' + ${parcel.id}" style="text-align: center;padding-top: 30px;"></h2>
     <div style="width: 1000px; margin: 0 auto;">
       <p style="text-align: justify; padding-top: 50px;"><b>Description:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia,
         molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum
@@ -52,18 +53,64 @@
         quia. Quo neque error repudiandae fuga? Ipsa laudantium molestias eos 
         sapiente officiis modi at sunt excepturi expedita sint? Sed quibusdam
         recusandae alias error harum maxime adipisci amet laborum.</p>
-      <p><b>Status:</b> <button class="btn btn-info rounded-pill" style="width: 105px;" type="button">In Business</button> </p>
-      <div>
-        <button class="btn btn-outline-secondary" type="button" style="width:15%;margin-left:35%;">Check-Out</button>
-        <button class="btn btn-outline-secondary" type="button" style="width:15%;margin-right:32.5%;">Return</button>
+      <p th:switch="${parcel.status.toString()}"><b>Status: </b>
+        <button th:case="IN_TRANSIT" class="btn btn-primary rounded-pill" style="width: 105px;" type="button">In Transit</button>
+        <button th:case="DELIVERED" class="btn btn-success rounded-pill" style="width: 105px;" type="button">Delivered</button>
+        <button th:case="COLLECTED" class="btn btn-info rounded-pill" style="width: 105px;" type="button">Collected</button>
+        <button th:case="PLACED" class="btn btn-secondary rounded-pill" style="width: 105px;" type="button">Placed</button>
+        <button th:case="RETURNED" class="btn btn-danger rounded-pill" style="width: 105px;" type="button">Returned</button>
+      </p>
+      <p th:if="${parcel.status.toString() == 'IN_TRANSIT'}"><b>ETA:</b>
+        <span th:if="${parcel.eta == 0}">Today</span>
+        <span th:unless="${parcel.eta == 0}" th:text="${parcel.id} + ' days'"></span>
+      </p>
+      <div th:switch="${parcel.status.toString()}">
+        <div th:case="DELIVERED">
+          <form method="POST" th:action="@{/acp/parcel/return(id=${parcel.id})}">
+            <button class="btn btn-outline-secondary" type="button" style="width:15%;margin-left:35%;" data-bs-toggle="modal" data-bs-target="#exampleModalCenter" >Check-Out</button>
+            <button class="btn btn-outline-secondary" type="submit" style="width:15%;margin-right:32.5%;">Return</button>
+          </form>
+        </div>
+        <!--<button th:case="IN_TRANSIT" th:onclick="${collectionPointService.checkIn(parcel.id)}" th:onClick="refreshPage()" class="btn btn-outline-secondary" type="button" style="width:10%;
+      margin-left:45%;
+      margin-right:45%;">Check-In</button>-->
+        <div th:case="IN_TRANSIT">
+          <form method="POST" th:action="@{/acp/parcel/checkin(id=${parcel.id})}">
+              <input type="submit" style="width:10%;margin-left:45%;margin-right:45%;" value="Check-In" class="btn btn-outline-secondary" />
+          </form>
+        </div>
       </div>
-      
     </div>
-    
 
-
-
-    
-    
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">X</span>
+            </button>
+          </div>
+          <form method="POST" th:action="@{/acp/parcel/checkout}">
+            <div class="modal-body">
+              <p>
+                <label for="name">Token: </label>
+                <input type="text" name="name" id="name" th:name="token"/>
+                <input hidden type="text" name="name" id="id" th:name="id" th:value="${parcel.id}"/>
+              </p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 </body>
+<script>
+  function Clicked() {
+    window.location.href = "/acp";
+  }
+</script>
 </html>

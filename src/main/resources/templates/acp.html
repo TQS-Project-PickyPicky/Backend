@@ -55,12 +55,23 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td style="text-align:center; vertical-align: middle;"><a href="parcelir.html" style="text-decoration: none; color: black;">HFAS31294120</a></td>
+              <tr th:each="item:${parcels}">
+                  <td th:text="${item.id}" th:some-field="${item.id}" onclick="rowClicked(this.getAttribute('some-field'))" style="text-align:center; vertical-align: middle;"></td>
+                  <div th:switch="${item.status.toString()}">
+                      <td th:case="IN_TRANSIT" style="text-align:center; vertical-align: middle;"><button class="btn btn-primary rounded-pill" style="width: 105px;" type="button">In Transit</button></td>
+                      <td th:case="DELIVERED" style="text-align:center; vertical-align: middle;"><button class="btn btn-success rounded-pill" style="width: 105px;" type="button">Delivered</button></td>
+                      <td th:case="COLLECTED" style="text-align:center; vertical-align: middle;"><button class="btn btn-info rounded-pill" style="width: 105px;" type="button">Collected</button></td>
+                      <td th:case="PLACED" style="text-align:center; vertical-align: middle;"><button class="btn btn-secondary rounded-pill" style="width: 105px;" type="button">Placed</button></td>
+                      <td th:case="RETURNED" style="text-align:center; vertical-align: middle;"><button class="btn btn-danger rounded-pill" style="width: 105px;" type="button">Returned</button></td>
+                  </div>
+
+              </tr>
+
+              <!--  <td style="text-align:center; vertical-align: middle;"><a href="parcelir.html" style="text-decoration: none; color: black;">HFAS31294120</a></td>
                 <td style="text-align:center; vertical-align: middle;"><button class="btn btn-primary rounded-pill" style="width: 105px;" type="button">In Route</button></td>
               </tr>
               <tr>
-                <td style="text-align:center; vertical-align: middle;"><a href="parceld.html" style="text-decoration: none; color: black;">JOASDI031292</a></td> 
+                <td style="text-align:center; vertical-align: middle;"><a href="parceld.html" style="text-decoration: none; color: black;">JOASDI031292</a></td>
                 <td style="text-align:center; vertical-align: middle;"><button class="btn btn-success rounded-pill" style="width: 105px;" type="button">Delivered</button></td>
               </tr>
               <tr>
@@ -70,10 +81,16 @@
               <tr>
                 <td style="text-align:center; vertical-align: middle;"><a href="parcels.html" style="text-decoration: none; color: black;">FSJDK213JWDK</a></td>
                 <td style="text-align:center; vertical-align: middle;"><button class="btn btn-secondary rounded-pill" style="width: 105px;" type="button">Storage</button></td>
-              </tr>
+              </tr>-->
             </tbody>
         </table>
     </div>
     
 </body>
+
+<script>
+    function rowClicked(id) {
+        window.location.href = "/acp/parcel?id=" + id;
+    }
+</script>
 </html>
