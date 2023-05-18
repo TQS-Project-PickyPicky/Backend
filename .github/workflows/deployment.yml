@@ -3,8 +3,6 @@ name: PickyPicky CI/CD
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   tests-and-sonar:
