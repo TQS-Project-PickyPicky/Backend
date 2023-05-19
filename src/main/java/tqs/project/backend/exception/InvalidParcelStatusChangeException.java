@@ -1,8 +1,9 @@
 package tqs.project.backend.exception;
 
-public class InvalidParcelStatusChangeException extends RuntimeException {
+import tqs.project.backend.data.parcel.ParcelStatus;
 
-    public InvalidParcelStatusChangeException(String message) {
-        super(message);
+public class InvalidParcelStatusChangeException extends RuntimeException {
+    public InvalidParcelStatusChangeException(ParcelStatus oldStatus, ParcelStatus newStatus) {
+        super(String.format("Invalid status change from %s to %s", oldStatus.toString(), newStatus.toString()));
     }
 }
