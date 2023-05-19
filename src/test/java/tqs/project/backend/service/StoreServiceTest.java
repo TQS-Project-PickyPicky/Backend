@@ -41,13 +41,15 @@ class StoreServiceTest {
     @BeforeEach
     void setUp() {
         // Create entities for mock database
-        Parcel parcel1 = new Parcel(1, 111111, "Anna", "anna@mail.com", 111000111, 111000222, LocalDate.of(2023, 5, 19), ParcelStatus.PLACED, null, null);
-        Parcel parcel2 = new Parcel(2, 222222, "Bob", "bob@mail.com", 222000111, 222000222, LocalDate.of(2023, 5, 19), ParcelStatus.DELIVERED, null, null);
+        Store store1 = new Store(1, "Mock Store 1", new ArrayList<>());
+        Store store2 = new Store(2, "Mock Store 2", new ArrayList<>());
+
+        Parcel parcel1 = new Parcel(1, 111111, "Anna", "anna@mail.com", 111000111, 111000222, LocalDate.of(2023, 5, 19), ParcelStatus.PLACED, store1, null);
+        Parcel parcel2 = new Parcel(2, 222222, "Bob", "bob@mail.com", 222000111, 222000222, LocalDate.of(2023, 5, 19), ParcelStatus.DELIVERED, store1, null);
 
         List<Parcel> allParcels = List.of(parcel1, parcel2);
 
-        Store store1 = new Store(1, "Mock Store 1", allParcels);
-        Store store2 = new Store(2, "Mock Store 2", new ArrayList<>());
+        store1.setParcels(allParcels);
 
         // Create expectations
         when(parcelRepository.findById(1))
