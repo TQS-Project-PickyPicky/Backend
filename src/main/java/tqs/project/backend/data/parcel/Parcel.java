@@ -18,9 +18,15 @@ public class Parcel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+    private Integer token;
+    private String clientName;
+    private String clientEmail;
+    private Integer clientPhone;
+    private Integer clientMobilePhone;
+    private LocalDate expectedArrival;
+    private ParcelStatus status;
     @ManyToOne
     private Store store;
     @ManyToOne
     private CollectionPoint collectionPoint;
-    private ParcelStatus Status;
 }
