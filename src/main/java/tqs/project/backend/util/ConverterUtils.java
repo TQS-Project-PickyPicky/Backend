@@ -10,6 +10,9 @@ import java.time.LocalDate;
 
 public class ConverterUtils {
 
+    private ConverterUtils() {
+    }
+
     public static ParcelDto fromParcelToParcelDto(Parcel parcel) {
         return new ParcelDto(
                 parcel.getId(),
