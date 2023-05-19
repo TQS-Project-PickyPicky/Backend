@@ -13,11 +13,9 @@ import java.util.List;
 public class StoreService {
 
     private final StoreRepository storeRepository;
-    private final ParcelRepository parcelRepository;
 
-    public StoreService(StoreRepository storeRepository, ParcelRepository parcelRepository) {
+    public StoreService(StoreRepository storeRepository) {
         this.storeRepository = storeRepository;
-        this.parcelRepository = parcelRepository;
     }
 
     public Store getStore(Integer id) {
