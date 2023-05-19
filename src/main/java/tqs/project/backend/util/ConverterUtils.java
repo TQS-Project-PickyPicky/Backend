@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 public class ConverterUtils {
 
-    public static ParcelDto fromParcel(Parcel parcel) {
+    public static ParcelDto fromParcelToParcelDto(Parcel parcel) {
         return new ParcelDto(
                 parcel.getId(),
                 parcel.getToken(),
@@ -21,11 +21,10 @@ public class ConverterUtils {
                 parcel.getExpectedArrival().toString(),
                 parcel.getStatus().toString(),
                 parcel.getStore().getId(),
-                parcel.getCollectionPoint().getId()
-        );
+                parcel.getCollectionPoint().getId());
     }
 
-    public static Parcel toParcel(ParcelDto parcelDto, StoreRepository storeRepository, CollectionPointRepository collectionPointRepository) {
+    public static Parcel fromParcelDtoToParcel(ParcelDto parcelDto, StoreRepository storeRepository, CollectionPointRepository collectionPointRepository) {
         return new Parcel(
                 parcelDto.getId(),
                 parcelDto.getToken(),
@@ -36,7 +35,6 @@ public class ConverterUtils {
                 LocalDate.parse(parcelDto.getExpectedArrival()),
                 ParcelStatus.valueOf(parcelDto.getStatus()),
                 storeRepository.findById(parcelDto.getStoreId()).orElse(null),
-                collectionPointRepository.findById(parcelDto.getCollectionPointId()).orElse(null)
-        );
+                collectionPointRepository.findById(parcelDto.getCollectionPointId()).orElse(null));
     }
 }
