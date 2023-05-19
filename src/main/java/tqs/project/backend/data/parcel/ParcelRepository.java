@@ -1,4 +1,4 @@
-package ies.project.backend.data.parcel;
+package tqs.project.backend.data.parcel;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

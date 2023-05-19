@@ -1,4 +1,4 @@
-package ies.project.backend.data.store;
+package tqs.project.backend.data.store;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -1,6 +1,7 @@
-package ies.project.backend.data.store;
+package tqs.project.backend.data.store;
 
-import ies.project.backend.data.parcel.Parcel;
+import lombok.AllArgsConstructor;
+import tqs.project.backend.data.parcel.Parcel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Store {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

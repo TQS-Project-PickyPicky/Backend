@@ -1,8 +1,8 @@
-package ies.project.backend.data.collection_point;
+package tqs.project.backend.data.collection_point;
 
 import javax.persistence.*;
 
-import ies.project.backend.data.parcel.Parcel;
+import tqs.project.backend.data.parcel.Parcel;
 import lombok.*;
 
 import java.util.List;
@@ -12,6 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class CollectionPoint {
 
     @Id
