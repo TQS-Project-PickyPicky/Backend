@@ -104,7 +104,7 @@ class ParcelServiceTest {
     }
 
     @Test
-    void givenNewParcel_whenCreateParcel_thenReturnParcel() {
+    void givenNewParcel_whenCreateParcel_thenReturnCreatedParcel() {
         String clientName = "Charlie";
         String clientEmail = "charlie@mail.com";
         Integer clientPhone = 333000111;
@@ -211,7 +211,7 @@ class ParcelServiceTest {
     }
 
     @Test
-    void whenDeleteInvalidParcel_thenThrowParcelNotFoundException() {
+    void whenDeleteNonExistingParcel_thenThrowParcelNotFoundException() {
         assertThatThrownBy(() -> service.deleteParcel(3))
                 .isInstanceOf(ParcelNotFoundException.class)
                 .hasMessageContaining("Parcel with id 3 not found");
