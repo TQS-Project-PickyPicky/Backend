@@ -1,4 +1,4 @@
-package ies.project.backend.data.collection_point;
+package tqs.project.backend.data.collection_point;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
