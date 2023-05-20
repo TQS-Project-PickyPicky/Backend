@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -58,17 +59,17 @@ class ParcelRestControllerTest {
                 .thenThrow(new ParcelNotFoundException(3));
         when(parcelService.getAllParcels())
                 .thenReturn(allParcels);
-        when(parcelService.createParcel(any(String.class), any(String.class), any(Integer.class), any(Integer.class), any(LocalDate.class), any(Integer.class), any(Integer.class)))
+        when(parcelService.createParcel(any(String.class), any(String.class), any(Integer.class), any(Integer.class), any(LocalDate.class), eq(1), eq(1)))
                 .thenAnswer((Answer<Parcel>) invocation -> new Parcel(3, 333333, invocation.getArgument(0), invocation.getArgument(1), invocation.getArgument(2), invocation.getArgument(3), invocation.getArgument(4), ParcelStatus.PLACED, store, collectionPoint));
-        when(parcelService.updateParcel(1, new Parcel(null, null, "Anna 2", "anna@mail.com", 111000111, 111000222, LocalDate.of(2023, 5, 19), ParcelStatus.DELIVERED, null, collectionPoint), null))
-                .thenAnswer((Answer<Parcel>) invocation -> new Parcel(1, 111111, invocation.<Parcel>getArgument(1).getClientName(), invocation.<Parcel>getArgument(1).getClientEmail(), invocation.<Parcel>getArgument(1).getClientPhone(), invocation.<Parcel>getArgument(1).getClientMobilePhone(), invocation.<Parcel>getArgument(1).getExpectedArrival(), invocation.<Parcel>getArgument(1).getStatus(), store, invocation.<Parcel>getArgument(1).getCollectionPoint()));
-        when(parcelService.updateParcel(1, new Parcel(null, null, "Anna", "anna@mail.com", 111000111, 111000222, LocalDate.of(2023, 5, 19), ParcelStatus.RETURNED, null, collectionPoint), null))
+        when(parcelService.updateParcel(eq(1), any(Parcel.class), eq(null)))
+                .thenAnswer((Answer<Parcel>) invocation -> new Parcel(1, 111111, invocation.<Parcel>getArgument(1).getClientName(), invocation.<Parcel>getArgument(1).getClientEmail(), invocation.<Parcel>getArgument(1).getClientPhone(), invocation.<Parcel>getArgument(1).getClientMobilePhone(), invocation.<Parcel>getArgument(1).getExpectedArrival(), invocation.<Parcel>getArgument(1).getStatus(), store, collectionPoint));
+        when(parcelService.updateParcel(eq(1), any(Parcel.class), eq(111111)))
                 .thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.DELIVERED, ParcelStatus.RETURNED));
-        when(parcelService.updateParcel(1, new Parcel(null, null, "Anna", "anna@mail.com", 111000111, 111000222, LocalDate.of(2023, 5, 19), ParcelStatus.COLLECTED, null, collectionPoint), 222222))
+        when(parcelService.updateParcel(eq(1), any(Parcel.class), eq(222222)))
                 .thenThrow(new IncorrectParcelTokenException(222222, 1));
-        when(parcelService.updateParcel(eq(2), any(Parcel.class), any(Integer.class)))
+        when(parcelService.updateParcel(eq(2), any(Parcel.class), eq(null)))
                 .thenThrow(new RuntimeException());
-        when(parcelService.updateParcel(eq(3), any(Parcel.class), any(Integer.class)))
+        when(parcelService.updateParcel(eq(3), any(Parcel.class), eq(null)))
                 .thenThrow(new ParcelNotFoundException(3));
         when(parcelService.deleteParcel(1))
                 .thenReturn(parcel1);
@@ -161,12 +162,12 @@ class ParcelRestControllerTest {
                 .body("{\"clientName\": \"Charlie\", \"clientEmail\": \"charlie@mail.com\", " +
                         "\"clientPhone\": 333000111, \"clientMobilePhone\": 333000222, " +
                         "\"expectedArrival\": \"2023-05-19\", \"storeId\": 1, \"collectionPointId\": 1}")
-           .when()
+            .when()
                 .post("/api/parcels")
-           .then()
+            .then()
                 .statusCode(201)
-                .body("id", is(Integer.class))
-                .body("token", is(Integer.class))
+                .body("id", instanceOf(Integer.class))
+                .body("token", instanceOf(Integer.class))
                 .body("clientName", is("Charlie"))
                 .body("clientEmail", is("charlie@mail.com"))
                 .body("clientPhone", is(333000111))
@@ -184,7 +185,7 @@ class ParcelRestControllerTest {
                 .contentType("application/json")
                 .body("{\"clientName\": \"Anna 2\", \"clientEmail\": \"anna@mail.com\", " +
                         "\"clientPhone\": 111000111, \"clientMobilePhone\": 111000222, " +
-                        "\"expectedArrival\": \"2023-05-19\", \"status\": \"DELIVERED\", \"collectionPointId\": 1}")
+                        "\"expectedArrival\": \"2023-05-19\", \"status\": \"DELIVERED\"}")
             .when()
                 .put("/api/parcels/1")
             .then()
@@ -208,21 +209,21 @@ class ParcelRestControllerTest {
                 .contentType("application/json")
                 .body("{\"clientName\": \"Anna\", \"clientEmail\": \"anna@mail.com\", " +
                         "\"clientPhone\": 111000111, \"clientMobilePhone\": 111000222, " +
-                        "\"expectedArrival\": \"2023-05-19\", \"status\": \"RETURNED\", \"collectionPointId\": 1}")
+                        "\"expectedArrival\": \"2023-05-19\", \"status\": \"RETURNED\"}")
             .when()
-                .put("/api/parcels/1")
+                .put("/api/parcels/1?token=111111")
             .then()
                 .statusCode(400);
     }
 
     @Test
-    void givenParcelWithStatusDelivered_whenUpdateParcelToCollectedWithInvalidToken_thenReturn401() {
+    void givenParcelWithStatusDelivered_whenPutParcelToCollectedWithInvalidToken_thenReturn401() {
         RestAssuredMockMvc
             .given()
                 .contentType("application/json")
                 .body("{\"clientName\": \"Anna\", \"clientEmail\": \"anna@mail.com\", " +
                         "\"clientPhone\": 111000111, \"clientMobilePhone\": 111000222, " +
-                        "\"expectedArrival\": \"2023-05-19\", \"status\": \"COLLECTED\", \"collectionPointId\": 1}")
+                        "\"expectedArrival\": \"2023-05-19\", \"status\": \"COLLECTED\"}")
             .when()
                 .put("/api/parcels/1?token=222222")
             .then()
@@ -236,7 +237,7 @@ class ParcelRestControllerTest {
                 .contentType("application/json")
                 .body("{\"clientName\": \"Bob 2\", \"clientEmail\": \"bob@mail.com\", " +
                         "\"clientPhone\": 222000111, \"clientMobilePhone\": 222000222, " +
-                        "\"expectedArrival\": \"2023-05-19\", \"status\": \"DELIVERED\", \"collectionPointId\": 1}")
+                        "\"expectedArrival\": \"2023-05-19\", \"status\": \"DELIVERED\"}")
             .when()
                 .put("/api/parcels/2")
             .then()
@@ -247,9 +248,10 @@ class ParcelRestControllerTest {
     void givenNonExistingParcel_whenPutParcel_thenReturn404() {
         RestAssuredMockMvc
             .given()
+                .contentType("application/json")
                 .body("{\"clientName\": \"Charlie 3\", \"clientEmail\": \"charlie@mail.com\", " +
                         "\"clientPhone\": 333000111, \"clientMobilePhone\": 333000222, " +
-                        "\"expectedArrival\": \"2023-05-19\", \"status\": \"IN_TRANSIT\", \"collectionPointId\": 1}")
+                        "\"expectedArrival\": \"2023-05-19\", \"status\": \"IN_TRANSIT\"}")
             .when()
                 .put("/api/parcels/3")
             .then()
@@ -266,7 +268,7 @@ class ParcelRestControllerTest {
                 .statusCode(200)
                 .body("id", is(1))
                 .body("token", is(111111))
-                .body("clientName", is("Anna 2"))
+                .body("clientName", is("Anna"))
                 .body("clientEmail", is("anna@mail.com"))
                 .body("clientPhone", is(111000111))
                 .body("clientMobilePhone", is(111000222))
