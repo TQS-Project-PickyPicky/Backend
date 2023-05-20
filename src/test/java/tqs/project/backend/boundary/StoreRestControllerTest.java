@@ -39,7 +39,7 @@ class StoreRestControllerTest {
         RestAssuredMockMvc.mockMvc(mvc);
         // Create entities for mock database
         Store store1 = new Store(1, "Mock Store 1", new ArrayList<>());
-        Store store2 = new Store(2, "Mock Store 2", new ArrayList<>());
+        Store store2 = new Store(2, "Mock Store 2", new ArrayList<>()); // Will be used to test general exceptions
 
         List<Store> allStores = List.of(store1, store2);
 
@@ -58,7 +58,7 @@ class StoreRestControllerTest {
         when(storeService.getStore(1))
                 .thenReturn(store1);
         when(storeService.getStore(2))
-                .thenReturn(store2);
+                .thenThrow(new RuntimeException());
         when(storeService.getStore(3))
                 .thenThrow(new StoreNotFoundException(3));
         when(storeService.getAllStores())
@@ -68,13 +68,13 @@ class StoreRestControllerTest {
         when(storeService.updateStore(eq(1), any(Store.class)))
                 .thenAnswer((Answer<Store>) invocation -> new Store(1, invocation.<Store>getArgument(1).getName(), store1.getParcels()));
         when(storeService.updateStore(eq(2), any(Store.class)))
-                .thenAnswer((Answer<Store>) invocation -> new Store(2, invocation.<Store>getArgument(1).getName(), store2.getParcels()));
+                .thenThrow(new RuntimeException());
         when(storeService.updateStore(eq(3), any(Store.class)))
                 .thenThrow(new StoreNotFoundException(3));
         when(storeService.deleteStore(1))
                 .thenReturn(store1);
         when(storeService.deleteStore(2))
-                .thenReturn(store2);
+                .thenThrow(new RuntimeException());
         when(storeService.deleteStore(3))
                 .thenThrow(new StoreNotFoundException(3));
     }
@@ -86,10 +86,10 @@ class StoreRestControllerTest {
     @Test
     void whenGetExistingStore_thenReturn200() {
         RestAssuredMockMvc
-                .given()
-                .when()
+            .given()
+            .when()
                 .get("/api/stores/1")
-                .then()
+            .then()
                 .statusCode(200)
                 .body("id", is(1))
                 .body("name", is("Mock Store 1"))
@@ -99,22 +99,32 @@ class StoreRestControllerTest {
     }
 
     @Test
+    void whenGetProblematicStore_thenReturn500() {
+        RestAssuredMockMvc
+            .given()
+            .when()
+                .get("/api/stores/2")
+            .then()
+                .statusCode(500);
+    }
+
+    @Test
     void whenGetNonExistingStore_thenReturn404() {
         RestAssuredMockMvc
-                .given()
-                .when()
+            .given()
+            .when()
                 .get("/api/stores/3")
-                .then()
+            .then()
                 .statusCode(404);
     }
 
     @Test
     void whenGetAllStores_thenReturn200() {
         RestAssuredMockMvc
-                .given()
-                .when()
+            .given()
+            .when()
                 .get("/api/stores")
-                .then()
+            .then()
                 .statusCode(200)
                 .body("size()", is(2))
                 .body("[0].id", is(1))
@@ -130,12 +140,12 @@ class StoreRestControllerTest {
     @Test
     void givenNewStore_whenPostStore_thenReturn201() {
         RestAssuredMockMvc
-                .given()
+            .given()
                 .contentType("application/json")
                 .body("{\"name\": \"Mock Store 3\"}")
-                .when()
+            .when()
                 .post("/api/stores")
-                .then()
+            .then()
                 .statusCode(201)
                 .body("id", is(3))
                 .body("name", is("Mock Store 3"))
@@ -145,12 +155,12 @@ class StoreRestControllerTest {
     @Test
     void givenExistingStore_whenPutStore_thenReturn200() {
         RestAssuredMockMvc
-                .given()
+            .given()
                 .contentType("application/json")
                 .body("{\"name\": \"Mock Store 1.1\"}")
-                .when()
+            .when()
                 .put("/api/stores/1")
-                .then()
+            .then()
                 .statusCode(200)
                 .body("id", is(1))
                 .body("name", is("Mock Store 1.1"))
@@ -160,24 +170,36 @@ class StoreRestControllerTest {
     }
 
     @Test
+    void givenProblematicStore_whenPutStore_thenReturn500() {
+        RestAssuredMockMvc
+            .given()
+                .contentType("application/json")
+                .body("{\"name\": \"Mock Store 2.1\"}")
+            .when()
+                .put("/api/stores/2")
+            .then()
+                .statusCode(500);
+    }
+
+    @Test
     void givenNonExistingStore_whenPutStore_thenReturn404() {
         RestAssuredMockMvc
-                .given()
+            .given()
                 .contentType("application/json")
                 .body("{\"name\": \"Mock Store 3.1\"}")
-                .when()
+            .when()
                 .put("/api/stores/3")
-                .then()
+            .then()
                 .statusCode(404);
     }
 
     @Test
     void whenDeleteExistingStore_thenReturn200() {
         RestAssuredMockMvc
-                .given()
-                .when()
+            .given()
+            .when()
                 .delete("/api/stores/1")
-                .then()
+            .then()
                 .statusCode(200)
                 .body("id", is(1))
                 .body("name", is("Mock Store 1"))
@@ -187,22 +209,32 @@ class StoreRestControllerTest {
     }
 
     @Test
+    void whenDeleteProblematicStore_thenReturn500() {
+        RestAssuredMockMvc
+            .given()
+            .when()
+                .delete("/api/stores/2")
+            .then()
+                .statusCode(500);
+    }
+
+    @Test
     void whenDeleteNonExistingStore_thenReturn404() {
         RestAssuredMockMvc
-                .given()
-                .when()
+            .given()
+            .when()
                 .delete("/api/stores/3")
-                .then()
+            .then()
                 .statusCode(404);
     }
 
     @Test
     void whenGetAllExistingStoreParcels_thenReturn200() {
         RestAssuredMockMvc
-                .given()
-                .when()
+            .given()
+            .when()
                 .get("/api/stores/1/parcels")
-                .then()
+            .then()
                 .statusCode(200)
                 .body("size()", is(2))
                 .body("[0].id", is(1))
@@ -210,12 +242,22 @@ class StoreRestControllerTest {
     }
 
     @Test
+    void whenGetAllProblematicStoreParcels_thenReturn500() {
+        RestAssuredMockMvc
+            .given()
+            .when()
+                .get("/api/stores/2/parcels")
+            .then()
+                .statusCode(500);
+    }
+
+    @Test
     void whenGetAllNonExistingStoreParcels_thenReturn404() {
         RestAssuredMockMvc
-                .given()
-                .when()
+            .given()
+            .when()
                 .get("/api/stores/3/parcels")
-                .then()
+            .then()
                 .statusCode(404);
     }
 }
