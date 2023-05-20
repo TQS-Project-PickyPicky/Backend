@@ -8,6 +8,7 @@ import tqs.project.backend.data.parcel.ParcelStatus;
 import tqs.project.backend.data.store.Store;
 import tqs.project.backend.data.store.StoreDto;
 import tqs.project.backend.data.store.StoreRepository;
+import tqs.project.backend.data.store.StoreUpdateDto;
 
 import java.time.LocalDate;
 import java.util.stream.Collectors;
@@ -56,6 +57,13 @@ public class ConverterUtils {
         return new Store(
                 storeDto.getId(),
                 storeDto.getName(),
-                parcelRepository.findAllById(storeDto.getParcelIds()));
+                parcelRepository.findAllById(storeDto.getParcelsId()));
+    }
+
+    public static Store fromStoreUpdateDtoToStore(StoreUpdateDto storeUpdateDto) {
+        return new Store(
+                null,
+                storeUpdateDto.getName(),
+                null);
     }
 }
