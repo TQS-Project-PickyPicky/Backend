@@ -4,6 +4,7 @@ import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -20,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @WebMvcTest(StoreRestController.class)
@@ -60,6 +63,20 @@ class StoreRestControllerTest {
                 .thenThrow(new StoreNotFoundException(3));
         when(storeService.getAllStores())
                 .thenReturn(allStores);
+        when(storeService.createStore(any(String.class)))
+                .thenAnswer((Answer<Store>) invocation -> new Store(3, invocation.getArgument(0), new ArrayList<>()));
+        when(storeService.updateStore(eq(1), any(Store.class)))
+                .thenAnswer((Answer<Store>) invocation -> new Store(1, invocation.<Store>getArgument(1).getName(), store1.getParcels()));
+        when(storeService.updateStore(eq(2), any(Store.class)))
+                .thenAnswer((Answer<Store>) invocation -> new Store(2, invocation.<Store>getArgument(1).getName(), store2.getParcels()));
+        when(storeService.updateStore(eq(3), any(Store.class)))
+                .thenThrow(new StoreNotFoundException(3));
+        when(storeService.deleteStore(1))
+                .thenReturn(store1);
+        when(storeService.deleteStore(2))
+                .thenReturn(store2);
+        when(storeService.deleteStore(3))
+                .thenThrow(new StoreNotFoundException(3));
     }
 
     @AfterEach
@@ -69,123 +86,123 @@ class StoreRestControllerTest {
     @Test
     void whenGetExistingStore_thenReturn200() {
         RestAssuredMockMvc
-            .given()
-            .when()
+                .given()
+                .when()
                 .get("/api/stores/1")
-            .then()
+                .then()
                 .statusCode(200)
                 .body("id", is(1))
                 .body("name", is("Mock Store 1"))
-                .body("parcels.size()", is(2))
-                .body("parcels[0]", is(1))
-                .body("parcels[1]", is(2));
+                .body("parcelsId.size()", is(2))
+                .body("parcelsId[0]", is(1))
+                .body("parcelsId[1]", is(2));
     }
 
     @Test
     void whenGetNonExistingStore_thenReturn404() {
         RestAssuredMockMvc
-            .given()
-            .when()
+                .given()
+                .when()
                 .get("/api/stores/3")
-            .then()
+                .then()
                 .statusCode(404);
     }
 
     @Test
     void whenGetAllStores_thenReturn200() {
         RestAssuredMockMvc
-            .given()
-            .when()
+                .given()
+                .when()
                 .get("/api/stores")
-            .then()
+                .then()
                 .statusCode(200)
                 .body("size()", is(2))
                 .body("[0].id", is(1))
                 .body("[0].name", is("Mock Store 1"))
-                .body("[0].parcels.size()", is(2))
-                .body("[0].parcels[0]", is(1))
-                .body("[0].parcels[1]", is(2))
+                .body("[0].parcelsId.size()", is(2))
+                .body("[0].parcelsId[0]", is(1))
+                .body("[0].parcelsId[1]", is(2))
                 .body("[1].id", is(2))
                 .body("[1].name", is("Mock Store 2"))
-                .body("[1].parcels.size()", is(0));
+                .body("[1].parcelsId.size()", is(0));
     }
 
     @Test
     void givenNewStore_whenPostStore_thenReturn201() {
         RestAssuredMockMvc
-            .given()
+                .given()
                 .contentType("application/json")
                 .body("{\"name\": \"Mock Store 3\"}")
-            .when()
+                .when()
                 .post("/api/stores")
-            .then()
+                .then()
                 .statusCode(201)
-                .body("id", is(Integer.class))
+                .body("id", is(3))
                 .body("name", is("Mock Store 3"))
-                .body("parcels.size()", is(0));
+                .body("parcelsId.size()", is(0));
     }
 
     @Test
     void givenExistingStore_whenPutStore_thenReturn200() {
         RestAssuredMockMvc
-            .given()
+                .given()
                 .contentType("application/json")
                 .body("{\"name\": \"Mock Store 1.1\"}")
-            .when()
+                .when()
                 .put("/api/stores/1")
-            .then()
+                .then()
                 .statusCode(200)
                 .body("id", is(1))
                 .body("name", is("Mock Store 1.1"))
-                .body("parcels.size()", is(2))
-                .body("parcels[0]", is(1))
-                .body("parcels[1]", is(2));
+                .body("parcelsId.size()", is(2))
+                .body("parcelsId[0]", is(1))
+                .body("parcelsId[1]", is(2));
     }
 
     @Test
     void givenNonExistingStore_whenPutStore_thenReturn404() {
         RestAssuredMockMvc
-            .given()
+                .given()
                 .contentType("application/json")
                 .body("{\"name\": \"Mock Store 3.1\"}")
-            .when()
+                .when()
                 .put("/api/stores/3")
-            .then()
+                .then()
                 .statusCode(404);
     }
 
     @Test
     void whenDeleteExistingStore_thenReturn200() {
         RestAssuredMockMvc
-            .given()
-            .when()
+                .given()
+                .when()
                 .delete("/api/stores/1")
-            .then()
+                .then()
                 .statusCode(200)
                 .body("id", is(1))
                 .body("name", is("Mock Store 1"))
-                .body("parcels.size()", is(2))
-                .body("parcels[0]", is(1))
-                .body("parcels[1]", is(2));
+                .body("parcelsId.size()", is(2))
+                .body("parcelsId[0]", is(1))
+                .body("parcelsId[1]", is(2));
     }
 
     @Test
     void whenDeleteNonExistingStore_thenReturn404() {
         RestAssuredMockMvc
-            .given()
-            .when()
+                .given()
+                .when()
                 .delete("/api/stores/3")
-            .then()
+                .then()
                 .statusCode(404);
     }
 
     @Test
-    void whenGetAllStoreParcels_thenReturn200() {
+    void whenGetAllExistingStoreParcels_thenReturn200() {
         RestAssuredMockMvc
-            .given()
-            .when()
+                .given()
+                .when()
                 .get("/api/stores/1/parcels")
-            .then()
+                .then()
                 .statusCode(200)
                 .body("size()", is(2))
                 .body("[0].id", is(1))
@@ -193,25 +210,12 @@ class StoreRestControllerTest {
     }
 
     @Test
-    void givenNewParcel_whenPostStoreParcel_thenReturn201() {
+    void whenGetAllNonExistingStoreParcels_thenReturn404() {
         RestAssuredMockMvc
-            .given()
-                .contentType("application/json")
-                .body("{\"clientName\": \"Charlie\", \"clientEmail\": \"charlie@mail.com\", " +
-                        "\"clientPhone\": 333000111, \"clientMobilePhone\": 333000222, " +
-                        "\"expectedArrival\": \"2023-05-19\", \"storeId\": 1, \"collectionPointId\": 1}")
-            .when()
-                .post("/api/stores/1/parcels")
-            .then()
-                .statusCode(201)
-                .body("id", is(Integer.class))
-                .body("token", is(Integer.class))
-                .body("clientName", is("Charlie"))
-                .body("clientEmail", is("charlie@mail.com"))
-                .body("clientPhone", is(333000111))
-                .body("clientMobilePhone", is(333000222))
-                .body("expectedArrival", is("2023-05-19"))
-                .body("status", is("PLACED"))
-                .body("storeId", is(1))
-                .body("collectionPointId", is(1));
+                .given()
+                .when()
+                .get("/api/stores/3/parcels")
+                .then()
+                .statusCode(404);
+    }
 }
