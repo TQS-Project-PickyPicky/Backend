@@ -36,14 +36,14 @@ public class ParcelService {
         return parcelRepository.findAll();
     }
 
-    public Parcel createParcel(String clientName, String clientEmail, Integer clientPhone, Integer clientMobilePhone, LocalDate expectedArrival, Integer storeId, Integer collectionPointId) {
+    public Parcel createParcel(String clientName, String clientEmail, Integer clientPhone, Integer clientMobilePhone, Integer storeId, Integer collectionPointId) {
         Parcel parcel = new Parcel();
         parcel.setToken(TokenUtils.generateParcelToken());
         parcel.setClientName(clientName);
         parcel.setClientEmail(clientEmail);
         parcel.setClientPhone(clientPhone);
         parcel.setClientMobilePhone(clientMobilePhone);
-        parcel.setExpectedArrival(expectedArrival);
+        parcel.setExpectedArrival(LocalDate.now().plusDays(7));
         parcel.setStatus(ParcelStatus.PLACED);
         parcel.setStore(storeRepository.findById(storeId).orElse(null));
         parcel.setCollectionPoint(collectionPointRepository.findById(collectionPointId).orElse(null));

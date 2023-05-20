@@ -109,11 +109,10 @@ class ParcelServiceTest {
         String clientEmail = "charlie@mail.com";
         Integer clientPhone = 333000111;
         Integer clientMobilePhone = 333000222;
-        LocalDate expectedArrival = LocalDate.of(2023, 5, 19);
         Integer storeId = 1;
         Integer collectionPointId = 1;
 
-        Parcel created = service.createParcel(clientName, clientEmail, clientPhone, clientMobilePhone, expectedArrival, storeId, collectionPointId);
+        Parcel created = service.createParcel(clientName, clientEmail, clientPhone, clientMobilePhone, storeId, collectionPointId);
 
         assertThat(created).isNotNull();
         assertThat(created.getClientName()).isEqualTo("Charlie");

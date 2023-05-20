@@ -59,8 +59,8 @@ class ParcelRestControllerTest {
                 .thenThrow(new ParcelNotFoundException(3));
         when(parcelService.getAllParcels())
                 .thenReturn(allParcels);
-        when(parcelService.createParcel(any(String.class), any(String.class), any(Integer.class), any(Integer.class), any(LocalDate.class), eq(1), eq(1)))
-                .thenAnswer((Answer<Parcel>) invocation -> new Parcel(3, 333333, invocation.getArgument(0), invocation.getArgument(1), invocation.getArgument(2), invocation.getArgument(3), invocation.getArgument(4), ParcelStatus.PLACED, store, collectionPoint));
+        when(parcelService.createParcel(any(String.class), any(String.class), any(Integer.class), any(Integer.class), eq(1), eq(1)))
+                .thenAnswer((Answer<Parcel>) invocation -> new Parcel(3, 333333, invocation.getArgument(0), invocation.getArgument(1), invocation.getArgument(2), invocation.getArgument(3), LocalDate.now().plusDays(7), ParcelStatus.PLACED, store, collectionPoint));
         when(parcelService.updateParcel(eq(1), any(Parcel.class), eq(null)))
                 .thenAnswer((Answer<Parcel>) invocation -> new Parcel(1, 111111, invocation.<Parcel>getArgument(1).getClientName(), invocation.<Parcel>getArgument(1).getClientEmail(), invocation.<Parcel>getArgument(1).getClientPhone(), invocation.<Parcel>getArgument(1).getClientMobilePhone(), invocation.<Parcel>getArgument(1).getExpectedArrival(), invocation.<Parcel>getArgument(1).getStatus(), store, collectionPoint));
         when(parcelService.updateParcel(eq(1), any(Parcel.class), eq(111111)))
@@ -160,8 +160,8 @@ class ParcelRestControllerTest {
             .given()
                 .contentType("application/json")
                 .body("{\"clientName\": \"Charlie\", \"clientEmail\": \"charlie@mail.com\", " +
-                        "\"clientPhone\": 333000111, \"clientMobilePhone\": 333000222, " +
-                        "\"expectedArrival\": \"2023-05-19\", \"storeId\": 1, \"collectionPointId\": 1}")
+                        "\"clientPhone\": 333000111, \"clientMobilePhone\": 333000222, \"storeId\": 1, " +
+                        "\"collectionPointId\": 1}")
             .when()
                 .post("/api/parcels")
             .then()
@@ -172,7 +172,7 @@ class ParcelRestControllerTest {
                 .body("clientEmail", is("charlie@mail.com"))
                 .body("clientPhone", is(333000111))
                 .body("clientMobilePhone", is(333000222))
-                .body("expectedArrival", is("2023-05-19"))
+                .body("expectedArrival", instanceOf(String.class))
                 .body("status", is("PLACED"))
                 .body("storeId", is(1))
                 .body("collectionPointId", is(1));
