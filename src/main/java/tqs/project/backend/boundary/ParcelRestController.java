@@ -57,7 +57,6 @@ public class ParcelRestController {
             ParcelDto parcelDto = ConverterUtils.fromParcelToParcelDto(parcel);
             return new ResponseEntity<>(parcelDto, HttpStatus.CREATED);
         } catch (Exception e) {
-            System.out.println(e.getMessage() + " " + e.getCause());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
