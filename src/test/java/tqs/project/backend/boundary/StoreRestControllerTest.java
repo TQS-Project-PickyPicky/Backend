@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.parcel.Parcel;
 import tqs.project.backend.data.parcel.ParcelStatus;
 import tqs.project.backend.data.store.Store;
@@ -39,12 +40,16 @@ class StoreRestControllerTest {
 
         List<Store> allStores = List.of(store1, store2);
 
-        Parcel parcel1 = new Parcel(1, 111111, "Anna", "anna@mail.com", 111000111, 111000222, LocalDate.of(2023, 5, 19), ParcelStatus.PLACED, store1, null);
-        Parcel parcel2 = new Parcel(2, 222222, "Bob", "bob@mail.com", 222000111, 222000222, LocalDate.of(2023, 5, 19), ParcelStatus.DELIVERED, store1, null);
+        CollectionPoint collectionPoint = new CollectionPoint(1, "Mock Collection Point", "Mock Address", 40.6331731, -8.6594933, new ArrayList<>());
+
+        Parcel parcel1 = new Parcel(1, 111111, "Anna", "anna@mail.com", 111000111, 111000222, LocalDate.of(2023, 5, 19), ParcelStatus.PLACED, store1, collectionPoint);
+        Parcel parcel2 = new Parcel(2, 222222, "Bob", "bob@mail.com", 222000111, 222000222, LocalDate.of(2023, 5, 19), ParcelStatus.DELIVERED, store1, collectionPoint);
 
         List<Parcel> allParcels = List.of(parcel1, parcel2);
 
         store1.setParcels(allParcels);
+
+        collectionPoint.setParcels(allParcels);
 
         // Create expectations
         when(storeService.getStore(1))
@@ -150,7 +155,7 @@ class StoreRestControllerTest {
     }
 
     @Test
-    void givenExistingStore_whenDeleteStore_thenReturn200() {
+    void whenDeleteExistingStore_thenReturn200() {
         RestAssuredMockMvc
             .given()
             .when()
@@ -165,7 +170,7 @@ class StoreRestControllerTest {
     }
 
     @Test
-    void givenNonExistingStore_whenDeleteStore_thenReturn404() {
+    void whenDeleteNonExistingStore_thenReturn404() {
         RestAssuredMockMvc
             .given()
             .when()
@@ -173,4 +178,40 @@ class StoreRestControllerTest {
             .then()
                 .statusCode(404);
     }
+
+    @Test
+    void whenGetAllStoreParcels_thenReturn200() {
+        RestAssuredMockMvc
+            .given()
+            .when()
+                .get("/api/stores/1/parcels")
+            .then()
+                .statusCode(200)
+                .body("size()", is(2))
+                .body("[0].id", is(1))
+                .body("[1].id", is(2));
+    }
+
+    @Test
+    void givenNewParcel_whenPostStoreParcel_thenReturn201() {
+        RestAssuredMockMvc
+            .given()
+                .contentType("application/json")
+                .body("{\"clientName\": \"Charlie\", \"clientEmail\": \"charlie@mail.com\", " +
+                        "\"clientPhone\": 333000111, \"clientMobilePhone\": 333000222, " +
+                        "\"expectedArrival\": \"2023-05-19\", \"storeId\": 1, \"collectionPointId\": 1}")
+            .when()
+                .post("/api/stores/1/parcels")
+            .then()
+                .statusCode(201)
+                .body("id", is(Integer.class))
+                .body("token", is(Integer.class))
+                .body("clientName", is("Charlie"))
+                .body("clientEmail", is("charlie@mail.com"))
+                .body("clientPhone", is(333000111))
+                .body("clientMobilePhone", is(333000222))
+                .body("expectedArrival", is("2023-05-19"))
+                .body("status", is("PLACED"))
+                .body("storeId", is(1))
+                .body("collectionPointId", is(1));
 }
