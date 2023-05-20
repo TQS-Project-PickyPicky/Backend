@@ -1,10 +1,7 @@
 package tqs.project.backend.util;
 
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
-import tqs.project.backend.data.parcel.Parcel;
-import tqs.project.backend.data.parcel.ParcelDto;
-import tqs.project.backend.data.parcel.ParcelRepository;
-import tqs.project.backend.data.parcel.ParcelStatus;
+import tqs.project.backend.data.parcel.*;
 import tqs.project.backend.data.store.Store;
 import tqs.project.backend.data.store.StoreDto;
 import tqs.project.backend.data.store.StoreRepository;
@@ -58,6 +55,20 @@ public class ConverterUtils {
                 storeDto.getId(),
                 storeDto.getName(),
                 parcelRepository.findAllById(storeDto.getParcelsId()));
+    }
+
+    public static Parcel fromParcelUpdateDtoToParcel(ParcelUpdateDto parcelUpdateDto) {
+        return new Parcel(
+                null,
+                null,
+                parcelUpdateDto.getClientName(),
+                parcelUpdateDto.getClientEmail(),
+                parcelUpdateDto.getClientPhone(),
+                parcelUpdateDto.getClientMobilePhone(),
+                LocalDate.parse(parcelUpdateDto.getExpectedArrival()),
+                ParcelStatus.valueOf(parcelUpdateDto.getStatus()),
+                null,
+                null);
     }
 
     public static Store fromStoreUpdateDtoToStore(StoreUpdateDto storeUpdateDto) {
