@@ -18,7 +18,7 @@ public class StoreService {
         this.storeRepository = storeRepository;
     }
 
-    public Store getStore(Integer id) {
+    public Store getStore(Integer id) throws StoreNotFoundException {
         return storeRepository.findById(id).orElseThrow(() -> new StoreNotFoundException(id));
     }
 
@@ -33,15 +33,14 @@ public class StoreService {
         return storeRepository.save(store);
     }
 
-    public Store updateStore(Integer id, Store store) {
+    public Store updateStore(Integer id, Store store) throws StoreNotFoundException {
         Store oldStore = storeRepository.findById(id).orElseThrow(() -> new StoreNotFoundException(id));
         // Update the store
         oldStore.setName(store.getName());
-        oldStore.setParcels(store.getParcels());
         return storeRepository.save(oldStore);
     }
 
-    public Store deleteStore(Integer id) {
+    public Store deleteStore(Integer id) throws StoreNotFoundException {
         Store store = storeRepository.findById(id).orElseThrow(() -> new StoreNotFoundException(id));
         storeRepository.delete(store);
         return store;

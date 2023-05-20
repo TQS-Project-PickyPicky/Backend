@@ -28,7 +28,7 @@ public class ParcelService {
         this.collectionPointRepository = collectionPointRepository;
     }
 
-    public Parcel getParcel(Integer id) {
+    public Parcel getParcel(Integer id) throws ParcelNotFoundException {
         return parcelRepository.findById(id).orElseThrow(() -> new ParcelNotFoundException(id));
     }
 
@@ -50,7 +50,7 @@ public class ParcelService {
         return parcelRepository.save(parcel);
     }
 
-    public Parcel updateParcel(Integer id, Parcel parcel, Integer token) {
+    public Parcel updateParcel(Integer id, Parcel parcel, Integer token) throws ParcelNotFoundException, InvalidParcelStatusChangeException, IncorrectParcelTokenException {
         Parcel oldParcel = parcelRepository.findById(id).orElseThrow(() -> new ParcelNotFoundException(id));
         // Check if there was a valid status change
         if (!oldParcel.getStatus().equals(parcel.getStatus())
@@ -78,7 +78,7 @@ public class ParcelService {
         return parcelRepository.save(oldParcel);
     }
 
-    public Parcel deleteParcel(Integer id) {
+    public Parcel deleteParcel(Integer id) throws ParcelNotFoundException {
         Parcel parcel = parcelRepository.findById(id).orElseThrow(() -> new ParcelNotFoundException(id));
         parcelRepository.delete(parcel);
         return parcel;
