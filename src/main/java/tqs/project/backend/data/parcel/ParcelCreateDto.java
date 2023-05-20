@@ -11,7 +11,6 @@ public class ParcelCreateDto {
     private String clientEmail;
     private Integer clientPhone;
     private Integer clientMobilePhone;
-    private String expectedArrival;
     private Integer storeId;
     private Integer collectionPointId;
 }

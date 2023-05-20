@@ -13,7 +13,6 @@ import tqs.project.backend.exception.ParcelNotFoundException;
 import tqs.project.backend.service.ParcelService;
 import tqs.project.backend.util.ConverterUtils;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,10 +53,11 @@ public class ParcelRestController {
     @PostMapping("/parcels")
     public ResponseEntity<ParcelDto> createParcel(@RequestBody ParcelCreateDto parcelCreateDto) {
         try {
-            Parcel parcel = parcelService.createParcel(parcelCreateDto.getClientName(), parcelCreateDto.getClientEmail(), parcelCreateDto.getClientPhone(), parcelCreateDto.getClientMobilePhone(), LocalDate.parse(parcelCreateDto.getExpectedArrival()), parcelCreateDto.getStoreId(), parcelCreateDto.getCollectionPointId());
+            Parcel parcel = parcelService.createParcel(parcelCreateDto.getClientName(), parcelCreateDto.getClientEmail(), parcelCreateDto.getClientPhone(), parcelCreateDto.getClientMobilePhone(), parcelCreateDto.getStoreId(), parcelCreateDto.getCollectionPointId());
             ParcelDto parcelDto = ConverterUtils.fromParcelToParcelDto(parcel);
             return new ResponseEntity<>(parcelDto, HttpStatus.CREATED);
         } catch (Exception e) {
+            System.out.println(e.getMessage() + " " + e.getCause());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
