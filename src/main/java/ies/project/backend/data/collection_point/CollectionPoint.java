@@ -12,6 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class CollectionPoint {
 
     @Id
@@ -23,11 +24,11 @@ public class CollectionPoint {
     private String address;
     private Double latitude;
     private Double longitude;
-    private String owner_name;
-    private String owner_email;
-    private String owner_gender;
-    private Integer owner_phone;
-    private Integer owner_mobile_phone;
-    @OneToMany(mappedBy = "collectionPoint")
+    private String ownerName;
+    private String ownerEmail;
+    private String ownerGender;
+    private Integer ownerPhone;
+    private Integer ownerMobilePhone;
+    @OneToMany(mappedBy = "collectionPoint", cascade = CascadeType.REMOVE)
     private List<Parcel> parcels;
 }

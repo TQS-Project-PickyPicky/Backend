@@ -18,14 +18,14 @@ public class Parcel {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private Integer token;
-    private String client_name;
-    private String client_email;
-    private Integer client_phone;
-    private Integer client_mobile_phone;
+    private String clientName;
+    private String clientEmail;
+    private Integer clientPhone;
+    private Integer clientMobilePhone;
     private LocalDate expectedArrival;
     @ManyToOne
     private Store store;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     private CollectionPoint collectionPoint;
     private ParcelStatus status;
 }

@@ -66,10 +66,7 @@
       </p>
       <div th:switch="${parcel.status.toString()}">
         <div th:case="DELIVERED">
-          <form method="POST" th:action="@{/acp/parcel/return(id=${parcel.id})}">
-            <button class="btn btn-outline-secondary" type="button" style="width:15%;margin-left:35%;" data-bs-toggle="modal" data-bs-target="#exampleModalCenter" >Check-Out</button>
-            <button class="btn btn-outline-secondary" type="submit" style="width:15%;margin-right:32.5%;">Return</button>
-          </form>
+          <button class="btn btn-outline-secondary" type="button" style="width:15%;margin-left:42.5%;margin-right:42.5%;" data-bs-toggle="modal" data-bs-target="#exampleModalCenter" >Check-Out</button>
         </div>
         <!--<button th:case="IN_TRANSIT" th:onclick="${collectionPointService.checkIn(parcel.id)}" th:onClick="refreshPage()" class="btn btn-outline-secondary" type="button" style="width:10%;
       margin-left:45%;
@@ -79,6 +76,11 @@
               <input type="submit" style="width:10%;margin-left:45%;margin-right:45%;" value="Check-In" class="btn btn-outline-secondary" />
           </form>
         </div>
+        <div th:case="COLLECTED">
+          <form method="POST" th:action="@{/acp/parcel/return(id=${parcel.id})}">
+            <button class="btn btn-outline-secondary" type="submit" style="width:10%;margin-left:45%;margin-right:45%;">Return</button>
+          </form>
+        </div>
       </div>
     </div>
 
@@ -86,7 +88,7 @@
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+            <h5 class="modal-title" id="exampleModalLongTitle">Insert Token</h5>
             <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">X</span>
             </button>

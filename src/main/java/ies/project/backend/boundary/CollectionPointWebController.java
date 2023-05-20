@@ -7,6 +7,9 @@ import ies.project.backend.data.store.Store;
 import ies.project.backend.data.store.StoreRepository;
 import ies.project.backend.data.store.StoreStatus;
 import ies.project.backend.service.CollectionPointService;
+import ies.project.backend.util.CantAccessParcelException;
+import ies.project.backend.util.DifferentStateException;
+import ies.project.backend.util.IncorrectParcelTokenException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,51 +32,65 @@ public class CollectionPointWebController {
         this.collectionPointService = collectionPointService;
     }
 
-    @Autowired
-    private CollectionPointRepository collectionPointRepository;
-
-    @Autowired
-    private ParcelRepository parcelRepository;
-
-    @Autowired
-    private StoreRepository storeRepository;
+    //@Autowired
+    //private CollectionPointRepository collectionPointRepository;
+//
+    //@Autowired
+    //private ParcelRepository parcelRepository;
+//
+    //@Autowired
+    //private StoreRepository storeRepository;
 
     @GetMapping("/acp")
-    public String acp(Model model) {
-        List<ParcelAllDto> parcels = collectionPointService.getallParcels(1);
+    public String acp(@RequestParam(value="id") Integer id,Model model) {
+        // TODO - Change to ask for id of logged in user
+        List<ParcelAllDto> parcels = collectionPointService.getallParcels(id);
         model.addAttribute("parcels", parcels);
         return "acp";
     }
 
     @GetMapping("/acp/parcel")
-    public String parcel(@RequestParam(value="id") Integer id, Model model) {
-        System.out.println(id);
-        ParcelDto parcel = collectionPointService.getParcel(id);
-        model.addAttribute("parcel", parcel);
-        model.addAttribute("collectionPointService", collectionPointService);
-        return "parcelib";
+    public String parcel(@RequestParam(value="id") Integer id, Model model) throws CantAccessParcelException {
+        try{
+            ParcelDto parcel = collectionPointService.getParcel(id);
+            model.addAttribute("parcel", parcel);
+            model.addAttribute("collectionPointService", collectionPointService);
+            return "parcelib";
+        } catch (CantAccessParcelException e) {
+            return "redirect:/acp";
+        }
+
     }
 
     @PostMapping("/acp/parcel/checkin")
     public String parcelCheckIn(@RequestParam(value="id") Integer id, Model model) {
-        collectionPointService.checkIn(id);
-        return "redirect:/acp";
+        try{
+            collectionPointService.checkIn(id);
+            return "redirect:/acp";
+        } catch (CantAccessParcelException | DifferentStateException e) {
+            return "redirect:/acp/parcel?id=" + id;
+        }
     }
 
     @PostMapping("/acp/parcel/checkout")
     public String parcelCheckOut(@RequestParam(value="id") Integer id, @RequestParam(value="token") Integer token, Model model) {
-        boolean success = collectionPointService.checkOut(id, token);
-        if (success) {
+        try {
+            collectionPointService.checkOut(id, token);
             return "redirect:/acp";
-        } else {
+        } catch (IncorrectParcelTokenException | CantAccessParcelException | DifferentStateException e) {
             return "redirect:/acp/parcel?id=" + id;
         }
     }
 
     @PostMapping("/acp/parcel/return")
     public String parcelReturn(@RequestParam(value="id") Integer id, Model model) {
-        collectionPointService.returnParcel(id);
-        return "redirect:/acp";
+        try {
+            collectionPointService.returnParcel(id);
+            return "redirect:/acp";
+        } catch (CantAccessParcelException | DifferentStateException e) {
+            return "redirect:/acp/parcel?id=" + id;
+        }
+
     }
 
     @GetMapping("/acp/parcel/add")
@@ -85,11 +102,11 @@ public class CollectionPointWebController {
         collectionPoint.setAddress("Rua do ISEP");
         collectionPoint.setLatitude(41.178);
         collectionPoint.setLongitude(-8.608);
-        collectionPoint.setOwner_name("João");
-        collectionPoint.setOwner_email("joao@ua.pt");
-        collectionPoint.setOwner_gender("M");
-        collectionPoint.setOwner_phone(123456789);
-        collectionPoint.setOwner_mobile_phone(987654321);
+        collectionPoint.setOwnerName("João");
+        collectionPoint.setOwnerEmail("joao@ua.pt");
+        collectionPoint.setOwnerGender("M");
+        collectionPoint.setOwnerPhone(123456789);
+        collectionPoint.setOwnerMobilePhone(987654321);
 
         Store store = new Store();
         store.setName("Store 1");
@@ -97,10 +114,10 @@ public class CollectionPointWebController {
 
         Parcel parcel = new Parcel();
         parcel.setToken(123456);
-        parcel.setClient_name("João");
-        parcel.setClient_email("joao@ua.pt");
-        parcel.setClient_phone(123456789);
-        parcel.setClient_mobile_phone(987654321);
+        parcel.setClientName("João");
+        parcel.setClientEmail("joao@ua.pt");
+        parcel.setClientPhone(123456789);
+        parcel.setClientMobilePhone(987654321);
         parcel.setExpectedArrival(LocalDate.now().plusDays(5));
         parcel.setStore(store);
         parcel.setStatus(ParcelStatus.IN_TRANSIT);
@@ -108,10 +125,10 @@ public class CollectionPointWebController {
 
         Parcel parcel2 = new Parcel();
         parcel2.setToken(123456);
-        parcel2.setClient_name("Jorge");
-        parcel2.setClient_email("jorge@ua.pt");
-        parcel2.setClient_phone(123456789);
-        parcel2.setClient_mobile_phone(987654321);
+        parcel2.setClientName("Jorge");
+        parcel2.setClientEmail("jorge@ua.pt");
+        parcel2.setClientPhone(123456789);
+        parcel2.setClientMobilePhone(987654321);
         parcel2.setExpectedArrival(LocalDate.now().plusDays(7));
         parcel2.setStore(store);
         parcel2.setStatus(ParcelStatus.IN_TRANSIT);
@@ -119,10 +136,10 @@ public class CollectionPointWebController {
 
         Parcel parcel3 = new Parcel();
         parcel3.setToken(123456);
-        parcel3.setClient_name("Gabriel");
-        parcel3.setClient_email("gabriel@ua.pt");
-        parcel3.setClient_phone(123456789);
-        parcel3.setClient_mobile_phone(987654321);
+        parcel3.setClientName("Gabriel");
+        parcel3.setClientEmail("gabriel@ua.pt");
+        parcel3.setClientPhone(123456789);
+        parcel3.setClientMobilePhone(987654321);
         parcel3.setExpectedArrival(LocalDate.now());
         parcel3.setStore(store);
         parcel3.setStatus(ParcelStatus.COLLECTED);
@@ -130,10 +147,10 @@ public class CollectionPointWebController {
 
         Parcel parcel4 = new Parcel();
         parcel4.setToken(123456);
-        parcel4.setClient_name("Tiago");
-        parcel4.setClient_email("tiago@ua.pt");
-        parcel4.setClient_phone(123456789);
-        parcel4.setClient_mobile_phone(987654321);
+        parcel4.setClientName("Tiago");
+        parcel4.setClientEmail("tiago@ua.pt");
+        parcel4.setClientPhone(123456789);
+        parcel4.setClientMobilePhone(987654321);
         parcel4.setExpectedArrival(LocalDate.now().plusDays(3));
         parcel4.setStore(store);
         parcel4.setStatus(ParcelStatus.RETURNED);
@@ -146,19 +163,10 @@ public class CollectionPointWebController {
         parcels.add(parcel4);
 
         //Save
-        collectionPointRepository.save(collectionPoint);
-        storeRepository.save(store);
-        parcelRepository.saveAll(parcels);
+        //CollectionPoint acp = collectionPointRepository.save(collectionPoint);
+        //storeRepository.save(store);
+        //parcelRepository.saveAll(parcels);
 
         return "parcelir";
-    }
-
-    @GetMapping("/acp/parcel/checkout")
-    public String parcelCheckout(Model model) {
-        //collectionPointRepository.findAll().stream().map(collectionPoint -> collectionPoint.getId()).forEach(System.out::println);
-        //collectionPointRepository.findById(1).get().getParcels().stream().map(parcel -> parcel.getId()).forEach(System.out::println);
-        System.out.println(collectionPointService.getParcel(3).getEta());
-        System.out.println(collectionPointService.getParcel(5).getEta());
-        return "parcelib";
     }
 }
