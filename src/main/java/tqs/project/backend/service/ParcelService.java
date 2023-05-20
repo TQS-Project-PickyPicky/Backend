@@ -73,8 +73,6 @@ public class ParcelService {
         oldParcel.setClientMobilePhone(parcel.getClientMobilePhone());
         oldParcel.setExpectedArrival(parcel.getExpectedArrival());
         oldParcel.setStatus(parcel.getStatus());
-        oldParcel.setStore(parcel.getStore());
-        oldParcel.setCollectionPoint(parcel.getCollectionPoint());
         return parcelRepository.save(oldParcel);
     }
 

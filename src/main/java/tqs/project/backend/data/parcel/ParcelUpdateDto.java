@@ -12,6 +12,5 @@ public class ParcelUpdateDto {
     private Integer clientPhone;
     private Integer clientMobilePhone;
     private String expectedArrival;
-    private ParcelStatus status;
-    private Integer collectionPointId;
+    private String status;
 }
