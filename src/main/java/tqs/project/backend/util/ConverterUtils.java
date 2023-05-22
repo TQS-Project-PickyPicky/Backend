@@ -8,6 +8,7 @@ import tqs.project.backend.data.store.StoreRepository;
 import tqs.project.backend.data.store.StoreUpdateDto;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.stream.Collectors;
 
 public class ConverterUtils {
@@ -27,6 +28,19 @@ public class ConverterUtils {
                 parcel.getStatus().toString(),
                 parcel.getStore().getId(),
                 parcel.getCollectionPoint().getId());
+    }
+
+    public static ParcelMinimal fromParcelToParcelMinimal(Parcel parcel) {
+        return new ParcelMinimal(
+                parcel.getId(),
+                parcel.getStatus());
+    }
+
+    public static ParcelMinimalEta fromParcelToParcelMinimalEta(Parcel parcel) {
+        return new ParcelMinimalEta(
+                parcel.getId(),
+                parcel.getStatus(),
+                ChronoUnit.DAYS.between(LocalDate.now(), parcel.getExpectedArrival()));
     }
 
     public static Parcel fromParcelDtoToParcel(ParcelDto parcelDto, StoreRepository storeRepository, CollectionPointRepository collectionPointRepository) {

@@ -1,7 +1,6 @@
 package tqs.project.backend.service;
 
 import org.springframework.stereotype.Service;
-import tqs.project.backend.data.parcel.ParcelRepository;
 import tqs.project.backend.data.store.Store;
 import tqs.project.backend.data.store.StoreRepository;
 import tqs.project.backend.exception.StoreNotFoundException;
