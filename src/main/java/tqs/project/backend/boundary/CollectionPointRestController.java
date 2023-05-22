@@ -33,7 +33,6 @@ public class CollectionPointRestController {
             ParcelMinimalEta parcel = collectionPointService.getParcel(id);
             return ResponseEntity.ok(parcel);
         } catch (ParcelNotFoundException e) {
-            e.printStackTrace();
             return ResponseEntity.badRequest().body(null);
         }
     }
@@ -44,7 +43,6 @@ public class CollectionPointRestController {
             ParcelMinimal parcel = collectionPointService.checkIn(id);
             return ResponseEntity.ok(parcel);
         } catch (ParcelNotFoundException | InvalidParcelStatusChangeException e) {
-            e.printStackTrace();
             return ResponseEntity.badRequest().body(null);
         }
 
@@ -56,7 +54,6 @@ public class CollectionPointRestController {
             ParcelMinimal parcel = collectionPointService.checkOut(id, token);
             return ResponseEntity.ok(parcel);
         } catch (IncorrectParcelTokenException | ParcelNotFoundException | InvalidParcelStatusChangeException e) {
-            e.printStackTrace();
             return ResponseEntity.badRequest().body(null);
         }
     }
@@ -67,7 +64,6 @@ public class CollectionPointRestController {
             ParcelMinimal parcel = collectionPointService.returnParcel(id);
             return ResponseEntity.ok(parcel);
         } catch (ParcelNotFoundException | InvalidParcelStatusChangeException e) {
-            e.printStackTrace();
             return ResponseEntity.badRequest().body(null);
         }
     }
