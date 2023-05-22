@@ -1,9 +1,9 @@
-package ies.project.backend.data.parcel;
+package tqs.project.backend.data.parcel;
 
 import javax.persistence.*;
 
-import ies.project.backend.data.collection_point.CollectionPoint;
-import ies.project.backend.data.store.Store;
+import tqs.project.backend.data.collection_point.CollectionPoint;
+import tqs.project.backend.data.store.Store;
 import lombok.*;
 
 @Entity

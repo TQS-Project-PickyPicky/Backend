@@ -1,4 +1,4 @@
-package ies.project.backend.data.parcel;
+package tqs.project.backend.data.parcel;
 
 public enum ParcelStatus {
     PLACED, // Store created order to deliver the parcel
