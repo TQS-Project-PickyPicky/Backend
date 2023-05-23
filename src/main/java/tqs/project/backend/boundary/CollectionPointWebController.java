@@ -86,6 +86,8 @@ public class CollectionPointWebController {
         
         model.addAttribute("showModal", true);
         return "home-picky";
+    
+    }
         
 
 

@@ -9,7 +9,6 @@ import javax.validation.constraints.NotNull;
 import tqs.project.backend.data.parcel.Parcel;
 
 import lombok.*;
-import tqs.project.backend.data.parcel.Parcel;
 import tqs.project.backend.data.partner.Partner;
 
 import java.util.List;
@@ -56,12 +55,6 @@ public class CollectionPoint {
     @Valid
     @OneToOne(mappedBy = "collectionPoint")
     private Partner partner;
-
-    private String ownerName;
-    private String ownerEmail;
-    private String ownerGender;
-    private Integer ownerPhone;
-    private Integer ownerMobilePhone;
 
     @OneToMany(mappedBy = "collectionPoint", cascade = CascadeType.REMOVE)
     private List<Parcel> parcels;

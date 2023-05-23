@@ -6,8 +6,6 @@ import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.store.Store;
 
 import lombok.*;
-import tqs.project.backend.data.collection_point.CollectionPoint;
-import tqs.project.backend.data.store.Store;
 
 import java.time.LocalDate;
 
@@ -28,8 +26,10 @@ public class Parcel {
     private Integer clientMobilePhone;
     private LocalDate expectedArrival;
     private ParcelStatus status;
+
     @ManyToOne(cascade = CascadeType.REMOVE)
     private Store store;
+    
     @ManyToOne(cascade = CascadeType.REMOVE)
     private CollectionPoint collectionPoint;
 }

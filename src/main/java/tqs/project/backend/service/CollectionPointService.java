@@ -23,11 +23,18 @@ import tqs.project.backend.data.utils.ResolveLocation;
 @Slf4j
 public class CollectionPointService {
 
-    @Autowired
-    private CollectionPointRepository cpRepository;
+
+    private final PartnerRepository partnerRepository;
+    private final CollectionPointRepository collectionPointRepository;
+    private final ParcelRepository parcelRepository;
 
     @Autowired
-    private PartnerRepository partnerRepository;
+    public CollectionPointService(CollectionPointRepository collectionPointRepository, ParcelRepository parcelRepository, PartnerRepository partnerRepository) {
+        this.collectionPointRepository = collectionPointRepository;
+        this.parcelRepository = parcelRepository;
+        this.partnerRepository = partnerRepository;
+    }
+
 
     public boolean saveCPPoint(CollectionPoint point, String zipCode, String city){
         point.setStatus(false); //not accepted yet
@@ -41,21 +48,12 @@ public class CollectionPointService {
         point.setLongitude(latlon.get(1));
 
         partnerRepository.save(point.getPartner());
-        cpRepository.save(point);
+        collectionPointRepository.save(point);
 
         log.info("" + point);
 
         return true;
 
-    }
-
-    private final CollectionPointRepository collectionPointRepository;
-    private final ParcelRepository parcelRepository;
-
-    @Autowired
-    public CollectionPointService(CollectionPointRepository collectionPointRepository, ParcelRepository parcelRepository) {
-        this.collectionPointRepository = collectionPointRepository;
-        this.parcelRepository = parcelRepository;
     }
 
     public List<ParcelMinimal> getAllParcels(Integer id) {

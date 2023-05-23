@@ -1,6 +1,7 @@
 package tqs.project.backend.boundary;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -24,23 +25,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import tqs.project.backend.data.parcel.ParcelMinimal;
 import tqs.project.backend.data.parcel.ParcelMinimalEta;
 import tqs.project.backend.data.parcel.ParcelStatus;
-import tqs.project.backend.service.CollectionPointService;
 import tqs.project.backend.exception.ParcelNotFoundException;
 import tqs.project.backend.exception.InvalidParcelStatusChangeException;
 import tqs.project.backend.exception.IncorrectParcelTokenException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
 
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.mockito.Mockito.when;
-
 @RunWith(SpringRunner.class)
 @WebMvcTest(CollectionPointWebController.class)
-class CollectionPointWebControllerTest {
+public class CollectionPointWebControllerTest {
 
     @Autowired
     private MockMvc mvc;
@@ -48,9 +41,35 @@ class CollectionPointWebControllerTest {
     private CollectionPointService collectionPointService;
 
     @BeforeEach
-    public void setUp(){
-        
+    public void setUp() throws InvalidParcelStatusChangeException, IncorrectParcelTokenException, ParcelNotFoundException {
+
+        // All Parcels
+        when(collectionPointService.getAllParcels(1)).thenReturn(List.of(
+                new ParcelMinimal(1, ParcelStatus.IN_TRANSIT),
+                new ParcelMinimal(2, ParcelStatus.PLACED)
+        ));
+
+        // Parcel
+        when(collectionPointService.getParcel(1)).thenReturn(new ParcelMinimalEta(1, ParcelStatus.IN_TRANSIT, 5L));
+        when(collectionPointService.getParcel(2)).thenThrow(new ParcelNotFoundException(2));
+
+        // Checkin
+        when(collectionPointService.checkIn(1)).thenReturn(new ParcelMinimal(1, ParcelStatus.DELIVERED));
+        when(collectionPointService.checkIn(2)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.DELIVERED));
+        when(collectionPointService.checkIn(3)).thenThrow(new ParcelNotFoundException(3));
+
+        // Checkout
+        when(collectionPointService.checkOut(1, 5)).thenReturn(new ParcelMinimal(1, ParcelStatus.COLLECTED));
+        when(collectionPointService.checkOut(2, 5)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.COLLECTED));
+        when(collectionPointService.checkOut(3, 5)).thenThrow(new ParcelNotFoundException(3));
+        when(collectionPointService.checkOut(1, 6)).thenThrow(new IncorrectParcelTokenException(6, 1));
+
+        // Return
+        when(collectionPointService.returnParcel(1)).thenReturn(new ParcelMinimal(1, ParcelStatus.RETURNED));
+        when(collectionPointService.returnParcel(2)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.RETURNED));
+        when(collectionPointService.returnParcel(3)).thenThrow(new ParcelNotFoundException(3));
     }
+    
 
     @Test
     public void getAllForms() throws Exception{
@@ -131,36 +150,7 @@ class CollectionPointWebControllerTest {
 
         verifyNoInteractions(collectionPointService);
     }
-
-}
-    void setUp() throws InvalidParcelStatusChangeException, IncorrectParcelTokenException, ParcelNotFoundException {
-
-        // All Parcels
-        when(collectionPointService.getAllParcels(1)).thenReturn(List.of(
-                new ParcelMinimal(1, ParcelStatus.IN_TRANSIT),
-                new ParcelMinimal(2, ParcelStatus.PLACED)
-        ));
-
-        // Parcel
-        when(collectionPointService.getParcel(1)).thenReturn(new ParcelMinimalEta(1, ParcelStatus.IN_TRANSIT, 5L));
-        when(collectionPointService.getParcel(2)).thenThrow(new ParcelNotFoundException(2));
-
-        // Checkin
-        when(collectionPointService.checkIn(1)).thenReturn(new ParcelMinimal(1, ParcelStatus.DELIVERED));
-        when(collectionPointService.checkIn(2)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.DELIVERED));
-        when(collectionPointService.checkIn(3)).thenThrow(new ParcelNotFoundException(3));
-
-        // Checkout
-        when(collectionPointService.checkOut(1, 5)).thenReturn(new ParcelMinimal(1, ParcelStatus.COLLECTED));
-        when(collectionPointService.checkOut(2, 5)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.COLLECTED));
-        when(collectionPointService.checkOut(3, 5)).thenThrow(new ParcelNotFoundException(3));
-        when(collectionPointService.checkOut(1, 6)).thenThrow(new IncorrectParcelTokenException(6, 1));
-
-        // Return
-        when(collectionPointService.returnParcel(1)).thenReturn(new ParcelMinimal(1, ParcelStatus.RETURNED));
-        when(collectionPointService.returnParcel(2)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.RETURNED));
-        when(collectionPointService.returnParcel(3)).thenThrow(new ParcelNotFoundException(3));
-    }
+    
 
     @Test
     void getAllParcels() throws Exception {

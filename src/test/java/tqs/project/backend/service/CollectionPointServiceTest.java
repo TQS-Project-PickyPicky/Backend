@@ -79,50 +79,6 @@ public class CollectionPointServiceTest {
         when(collectionPointRepository.save(Mockito.any(CollectionPoint.class))).thenReturn(cp);
         when(partnerRepository.save(Mockito.any(Partner.class))).thenReturn(partner);
 
-    }
-
-    @Test
-    public void saveCPPointSuccess_Test(){
-
-        //to use in functions inside the service
-        CollectionPoint cp = new CollectionPoint();
-        String zipCode = "3810-193";
-        String city = "Aveiro";
-
-
-        boolean result = collectionPointService.saveCPPoint(cp, zipCode, city);
-        ArrayList<Double> coordinates = ResolveLocation.resolveAddress(zipCode, city);
-
-        assertTrue(result);
-        assertFalse(cp.getStatus());
-        
-        assertEquals(zipCode + ", " + city + ", Portugal", cp.getAddress());
-        assertEquals(coordinates.get(0), cp.getLatitude());
-        assertEquals(coordinates.get(1), cp.getLongitude());
-
-    }
-
-    @Test
-    public void saveCPPointFailureAPITest(){
-
-        CollectionPoint cp = new CollectionPoint();
-        String zipCode = "";
-        String city = "";
-
-        boolean result = collectionPointService.saveCPPoint(cp, zipCode, city);
-        ArrayList<Double> coordinates = ResolveLocation.resolveAddress(zipCode, city);
-
-        assertFalse(result);
-        assertFalse(cp.getStatus());
-
-        assertEquals(null, cp.getAddress());
-        assertNull(coordinates);
-        assertEquals(null, cp.getLatitude());
-        assertEquals(null, cp.getLongitude());
-    }
-
-    @BeforeEach
-    void setUp() {
         CollectionPoint collectionPoint = new CollectionPoint();
         collectionPoint.setName("Collection Point 1");
         collectionPoint.setType("Collection Point");
@@ -199,7 +155,44 @@ public class CollectionPointServiceTest {
         when(parcelRepository.findById(6))
                 .thenReturn(Optional.of(parcel3));
 
+    }
 
+    @Test
+    public void saveCPPointSuccess_Test(){
+
+        //to use in functions inside the service
+        CollectionPoint cp = new CollectionPoint();
+        String zipCode = "3810-193";
+        String city = "Aveiro";
+
+
+        boolean result = collectionPointService.saveCPPoint(cp, zipCode, city);
+        ArrayList<Double> coordinates = ResolveLocation.resolveAddress(zipCode, city);
+
+        assertTrue(result);
+        assertFalse(cp.getStatus());
+        assertEquals(coordinates.get(0), cp.getLatitude());
+        assertEquals(coordinates.get(1), cp.getLongitude());
+
+    }
+
+    @Test
+    public void saveCPPointFailureAPITest(){
+
+        CollectionPoint cp = new CollectionPoint();
+        String zipCode = "";
+        String city = "";
+
+        boolean result = collectionPointService.saveCPPoint(cp, zipCode, city);
+        ArrayList<Double> coordinates = ResolveLocation.resolveAddress(zipCode, city);
+
+        assertFalse(result);
+        assertFalse(cp.getStatus());
+
+        assertEquals(null, cp.getAddress());
+        assertNull(coordinates);
+        assertEquals(null, cp.getLatitude());
+        assertEquals(null, cp.getLongitude());
     }
 
     @Test

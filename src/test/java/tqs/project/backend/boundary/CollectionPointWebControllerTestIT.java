@@ -46,18 +46,13 @@ import java.util.List;
 import java.time.LocalDate;
 
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
-
-
-
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "application-integrationtest.properties")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureMockMvc
-class CollectionPointWebControllerTestIT {
+public class CollectionPointWebControllerTestIT {
 
     private CollectionPoint acp;
     private Parcel p, p1, p2, p3;

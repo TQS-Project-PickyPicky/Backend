@@ -8,7 +8,6 @@ import lombok.Setter;
 import javax.persistence.*;
 
 import lombok.*;
-import tqs.project.backend.data.parcel.Parcel;
 
 import java.util.List;
 

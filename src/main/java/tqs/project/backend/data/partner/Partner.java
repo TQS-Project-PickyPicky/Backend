@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -19,6 +20,7 @@ import javax.persistence.Table;
 public class Partner extends User {
 
     @OneToOne
+    @JoinColumn(name = "collectionPoint_id")
     private CollectionPoint collectionPoint;
 
     @Override
