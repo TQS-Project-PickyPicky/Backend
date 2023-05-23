@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Picky Platform</title>
+        <link rel="stylesheet" href="css/style.css"> 
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    </head>
+    <body>
+        <!-- Responsive navbar-->
+        <nav class="navbar navbar-dark bg-dark fixed-top">
+            <div class="container">
+                <a class="navbar-brand" href="home-picky.html">PickyPicky</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav">
+                        <li class="nav-item active">
+                          <a class="nav-link" href="home-picky.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" href="acp-application.html">Submit an application</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- Page header with logo and tagline-->
+        <header class="image-blog py-5 border-bottom mt-5 mb-5">
+            <div class="container">
+                <div class="text-center my-5">
+                    <h1 class="fw-bolder text-white">Start being a member</h1>
+                    <p class="lead mb-0 text-white">Register to be one of our delivery points!</p>
+                </div>
+            </div>
+        </header>
+        <!-- Page content-->
+        <div class="container">
+            <form th:action="@{/registerACP}" method="post" th:object="${cp}" name="cp">
+                <div class="text-center my-5">
+                    <h1 class="fw-bolder">Register into our platform</h1>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card mb-4">
+                            <div class="card-header">ACP Information</div>
+                            <div class="card-body">
+                                <div class="form-group container mb-4">
+                                    <label for="name-pickup">Pickup point name:</label>
+                                    <input type="text" th:field="*{name}" class="form-control" id="name-pickup">
+                                    <div class="mt-4 alert alert-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                                </div>
+                                <div class="row container">
+                                    <div class="col-md-6 form-group mb-4">
+                                        <label for="sel1">Pickup point type:</label>
+                                        <select th:field="*{type}" class="form-control" id="sel1">
+                                            <option value="" disabled selected>--</option>
+                                            <option value="store">Store</option>
+                                            <option value="home">Home</option>
+                                            <option value="locker">Locker</option>
+                                            <option value="airport">Airport</option>
+                                            <option value="library">Library</option>
+                                            <option value="cafe">Cafe</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div> 
+                                    <div class="col-md-6 form-group mb-4">
+                                        <label for="sel2">Capacity:</label>
+                                        <select th:field="*{capacity}" class="form-control" id="sel2">
+                                            <option value="" disabled selected>--</option>
+                                            <option value="1">2m² or less</option>
+                                            <option value="2">between 2m² and 20m²</option>
+                                            <option value="3">more than 20 m²</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mb-4">
+                            <div class="card-header">Register information</div>
+                            <div class="card-body">
+                                <div class="form-group container mb-4">
+                                    <label for="username">Username:</label>
+                                    <input th:field="*{partner.username}" type="text" class="form-control" id="username">
+                                    <div class="mt-4 alert alert-danger" th:if="${#fields.hasErrors('partner.username')}" th:errors="*{partner.username}"></div>
+                                </div>
+                                
+                                <div class="row container">
+                                    <div class="col-md-6 form-group container mb-4">
+                                        <label for="password">Password:</label>
+                                        <input th:field="*{partner.password}" type="password" class="form-control" id="password">
+                                        <div class="mt-4 alert alert-danger" th:if="${#fields.hasErrors('partner.password')}" th:errors="*{partner.password}"></div>
+                                    </div>
+                                    <div class="col-md-6 form-group container mb-4">
+                                        <label for="password-check">Repeat password:</label>
+                                        <input type="password" class="form-control" id="password-check" name="passwordCheck" th:value="${passwordCheck}">
+                                    </div>
+                                </div>                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card mb-4">
+                            <div class="card-header">Contact Information</div>
+                            <div class="card-body row container">
+                                <div class="form-group container mb-4">
+                                    <label for="name">Full Name:</label>
+                                    <input th:field="*{ownerName}" id="name" type="text" class="form-control">
+                                    <div class="mt-4 alert alert-danger" th:if="${#fields.hasErrors('ownerName')}" th:errors="*{ownerName}"></div>
+                                </div>
+                                <div class="form-group col-md-6 container mb-4">
+                                    <label for="email">Email:</label>
+                                    <input th:field="*{ownerEmail}" id="email" type="email" class="form-control">
+                                    <div class="mt-4 alert alert-danger" th:if="${#fields.hasErrors('ownerEmail')}" th:errors="*{ownerEmail}"></div>
+                                </div>
+                                <div class="col-md-6 form-group mb-4">
+                                    <label for="gender">Gender:</label>
+                                    <select th:field="*{ownerGender}" class="form-control" id="gender">
+                                        <option value="" disabled selected>--</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                        <option value="unknown">Prefer not to disclose</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-6 container mb-4">
+                                    <label for="phone">Phone:</label>
+                                    <input th:field="*{ownerPhone}" id="phone" type="tel" pattern="[0-9]{3}[0-9]{3}[0-9]{3}" class="form-control">
+                                    <div class="mt-4 alert alert-danger" th:if="${#fields.hasErrors('ownerPhone')}" th:errors="*{ownerPhone}"></div>
+                                </div>
+                                <div class="form-group col-md-6 container mb-4">
+                                    <label for="mobile-phone">Mobile phone:</label>
+                                    <input th:field="*{ownerMobilePhone}" id="mobile-phone" type="tel" pattern="[0-9]{3}[0-9]{3}[0-9]{3}" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mb-4">
+                            <div class="card-header">Location</div>
+                            <div class="card-body">
+                                <div class="form-group container mb-4">
+                                    <label>Country:</label>
+                                    <input disabled type="text" class="form-control" placeholder="Portugal">
+                                </div>
+                                <div class="row container">
+                                    <div class="col-md-6 form-group container mb-4">
+                                        <label for="zipcode">Zip Code:</label>
+                                        <input type="text" class="form-control" id="zipcode" name="zipcode" th:value="${zipcode}">
+                                    </div>
+                                    <div class="col-md-6 form-group container mb-4">
+                                        <label for="city">City:</label>
+                                        <input type="text" class="form-control" id="city" name="city" th:value="${city}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="address">Address:</label>
+                                        <textarea class="form-control mb-4" id="address" rows="2" name="address" th:value="${address}"></textarea>
+                                        <div class="mt-4 alert alert-danger" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <!--<hr class="my-0 mb-4"/>-->
+                </div>
+                <div th:if="${error}" th:utext="${error}" class="alert alert-danger"></div> <!--mensagem de erro caso passes sejam diferentes-->
+                <div th:if="${errorCoordinates}" th:utext="${errorCoordinates}" class="alert alert-danger"></div>
+                <div class="modal" id="myModal">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h4 class="modal-title">Application sent successfully</h4>
+                          <button id="close" type="button" class="close" data-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-footer">
+                          <button id="close2" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mb-4">Submit</button>
+            </form>
+            <!-- Side widgets-->
+        </div>
+        <!-- Footer-->
+        <footer class="py-3 bg-dark">
+            <div class="container"><p class="m-0 text-center text-white">Copyright &copy; PickyPicky 2023</p></div>
+        </footer>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <script src="js/scripts.js"></script>
+          
+    </body>
+</html>
