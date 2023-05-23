@@ -14,6 +14,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+
+@MappedSuperclass
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

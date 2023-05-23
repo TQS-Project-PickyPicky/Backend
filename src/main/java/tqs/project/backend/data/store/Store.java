@@ -6,13 +6,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+
+import lombok.*;
+import tqs.project.backend.data.parcel.Parcel;
+
 import java.util.List;
 
+
 @Entity
-@Table(name = "parcel")
+@Table(name = "store")
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Store {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

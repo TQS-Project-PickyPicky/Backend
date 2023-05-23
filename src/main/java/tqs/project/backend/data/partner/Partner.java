@@ -1,6 +1,7 @@
 package tqs.project.backend.data.partner;
 
 import tqs.project.backend.data.collection_point.CollectionPoint;
+
 import tqs.project.backend.data.user.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ import javax.persistence.Table;
 @Setter
 @NoArgsConstructor
 public class Partner extends User {
+
     @OneToOne
     private CollectionPoint collectionPoint;
 

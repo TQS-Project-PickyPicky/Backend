@@ -5,5 +5,5 @@ public enum ParcelStatus {
     IN_TRANSIT, // Courier collected the parcel from the store
     DELIVERED, // Courier delivered the parcel to the collection point
     COLLECTED, // Client collected the parcel from the collection point
-    RETURNED // Courier returned the parcel to the collection point
+    RETURNED // Client returned the parcel to the collection point
 }
