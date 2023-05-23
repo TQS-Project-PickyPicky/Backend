@@ -1,10 +1,5 @@
 package tqs.project.backend.data.store;
 
-import tqs.project.backend.data.parcel.Parcel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import javax.persistence.*;
 
 import lombok.*;
