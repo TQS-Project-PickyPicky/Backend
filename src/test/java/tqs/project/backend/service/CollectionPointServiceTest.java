@@ -1,12 +1,14 @@
 package tqs.project.backend.service;
 
 import tqs.project.backend.data.collection_point.CollectionPoint;
+import tqs.project.backend.data.collection_point.CollectionPointDto;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
 import tqs.project.backend.data.parcel.*;
 import tqs.project.backend.data.partner.Partner;
 import tqs.project.backend.data.partner.PartnerRepository;
 import tqs.project.backend.data.store.Store;
 import tqs.project.backend.exception.ParcelNotFoundException;
+import tqs.project.backend.util.ConverterUtils;
 import tqs.project.backend.util.ResolveLocation;
 import tqs.project.backend.exception.InvalidParcelStatusChangeException;
 import tqs.project.backend.exception.IncorrectParcelTokenException;
@@ -44,7 +46,7 @@ public class CollectionPointServiceTest {
 
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         //CP + zip code + city
         CollectionPoint cp = new CollectionPoint();
         cp.setName("cp1");
@@ -145,26 +147,27 @@ public class CollectionPointServiceTest {
     }
 
     @Test
-    public void saveCPPointSuccess_Test(){
+    void saveCPPointSuccess_Test(){
 
         //to use in functions inside the service
-        CollectionPoint cp = new CollectionPoint();
+        CollectionPointDto cp = new CollectionPointDto();
         String zipCode = "3810-193";
         String city = "Aveiro";
 
+        CollectionPoint collectionPoint = ConverterUtils.fromCollectionPointDTOToCollectionPoint(cp);
 
-        boolean result = collectionPointService.saveCPPoint(cp, zipCode, city);
+        boolean result = collectionPointService.saveCPPoint(collectionPoint, zipCode, city);
         ArrayList<Double> coordinates = ResolveLocation.resolveAddress(zipCode, city);
 
         assertTrue(result);
-        assertFalse(cp.getStatus());
-        assertEquals(coordinates.get(0), cp.getLatitude());
-        assertEquals(coordinates.get(1), cp.getLongitude());
+        assertFalse(collectionPoint.getStatus());
+        assertEquals(coordinates.get(0), collectionPoint.getLatitude());
+        assertEquals(coordinates.get(1), collectionPoint.getLongitude());
 
     }
 
     @Test
-    public void saveCPPointFailureAPITest(){
+    void saveCPPointFailureAPITest(){
 
         CollectionPoint cp = new CollectionPoint();
         String zipCode = "";
@@ -177,7 +180,7 @@ public class CollectionPointServiceTest {
         assertFalse(cp.getStatus());
 
         assertEquals(null, cp.getAddress());
-        assertNull(coordinates);
+        assertEquals(coordinates.size(), 0);
         assertEquals(null, cp.getLatitude());
         assertEquals(null, cp.getLongitude());
     }

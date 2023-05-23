@@ -1,6 +1,7 @@
 package tqs.project.backend.service;
 
 import tqs.project.backend.data.collection_point.CollectionPoint;
+import tqs.project.backend.data.collection_point.CollectionPointDto;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
 import tqs.project.backend.data.parcel.*;
 import tqs.project.backend.data.partner.PartnerRepository;
@@ -30,22 +31,26 @@ public class CollectionPointService {
     }
 
 
-    public boolean saveCPPoint(CollectionPoint point, String zipCode, String city){
-        point.setStatus(false); //not accepted yet
-
+    public boolean saveCPPoint(CollectionPoint point, String zipCode, String city) {
+    
+        point.setStatus(false); // not accepted yet
+    
         ArrayList<Double> latlon = ResolveLocation.resolveAddress(zipCode, city);
-        if (latlon == null){
+        if (latlon.isEmpty()) {
             return false;
         }
-
+    
         point.setLatitude(latlon.get(0));
         point.setLongitude(latlon.get(1));
-
+    
+        // Set other properties of the CollectionPoint from the DTO
+        point.setName(point.getName());
+        // Set other properties accordingly
+    
         partnerRepository.save(point.getPartner());
         collectionPointRepository.save(point);
-
+    
         return true;
-
     }
 
     public List<ParcelMinimal> getAllParcels(Integer id) {

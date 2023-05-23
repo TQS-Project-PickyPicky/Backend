@@ -1,5 +1,6 @@
 package tqs.project.backend.util;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -13,6 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ResolveLocation {
+
+    private ResolveLocation() {
+    }
 
     public static ArrayList<Double> resolveAddress(String zipCode, String city){
 
@@ -28,24 +32,24 @@ public class ResolveLocation {
             int responsecode = conn.getResponseCode();
 
             if (responsecode != 200){
-                return null;
+                return new ArrayList<Double>();
             }
 
             String inline = "";
-            Scanner scanner = new Scanner(url.openStream());
-
-            while (scanner.hasNext()){
-                inline += scanner.nextLine();
+            try (Scanner scanner = new Scanner(url.openStream())) {
+                while (scanner.hasNext()) {
+                    inline += scanner.nextLine();
+                }
+            } catch (IOException e) {
+                return new ArrayList<Double>();
             }
 
-            scanner.close();
-
             JSONParser parse = new JSONParser();
-            JSONObject data_obj = (JSONObject) parse.parse(inline);
+            JSONObject dataObj = (JSONObject) parse.parse(inline);
 
-            log.info("" + data_obj);
+            log.info("" + dataObj);
 
-            JSONArray jsonArray = (JSONArray) data_obj.get("data");
+            JSONArray jsonArray = (JSONArray) dataObj.get("data");
             JSONObject obj = (JSONObject) jsonArray.get(0); //get 1st element
             Double latitude = (Double) obj.get("latitude");
             Double longitude = (Double) obj.get("longitude");
@@ -56,7 +60,7 @@ public class ResolveLocation {
             log.info(latitude + ", " + longitude);
 
         } catch (Exception e) {
-            return null;
+            return new ArrayList<Double>();
         }
 
         return array;

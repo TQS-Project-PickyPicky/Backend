@@ -41,7 +41,7 @@ public class CollectionPointWebControllerTest {
     private CollectionPointService collectionPointService;
 
     @BeforeEach
-    public void setUp() throws InvalidParcelStatusChangeException, IncorrectParcelTokenException, ParcelNotFoundException {
+    void setUp() throws InvalidParcelStatusChangeException, IncorrectParcelTokenException, ParcelNotFoundException {
 
         // All Parcels
         when(collectionPointService.getAllParcels(1)).thenReturn(List.of(
@@ -72,7 +72,7 @@ public class CollectionPointWebControllerTest {
     
 
     @Test
-    public void getAllForms() throws Exception{
+    void getAllForms() throws Exception{
         mvc.perform(get("/registerACP").contentType(MediaType.TEXT_HTML))
             .andExpect(status().isOk())
             .andExpect(view().name("acp-application"))
@@ -80,7 +80,7 @@ public class CollectionPointWebControllerTest {
     }
 
     @Test
-    public void registerACP_ValidForm_Success() throws Exception {
+    void registerACP_ValidForm_Success() throws Exception {
 
         when(collectionPointService.saveCPPoint(any(), anyString(), anyString())).thenReturn(true);
 
@@ -107,7 +107,7 @@ public class CollectionPointWebControllerTest {
     }
 
     @Test
-    public void registerACP_InvalidForm_ValidationError() throws Exception {
+    void registerACP_InvalidForm_ValidationError() throws Exception {
         mvc.perform(post("/registerACP")
                 .param("name", "")
                 .param("type", "")
@@ -128,7 +128,7 @@ public class CollectionPointWebControllerTest {
     }
 
     @Test
-    public void registerACP_PasswordMismatch_Error() throws Exception {
+    void registerACP_PasswordMismatch_Error() throws Exception {
         mvc.perform(post("/registerACP")
                 .param("name", "cp1")
                 .param("type", "Library")

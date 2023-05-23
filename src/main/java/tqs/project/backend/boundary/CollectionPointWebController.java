@@ -1,12 +1,15 @@
 package tqs.project.backend.boundary;
 
 import tqs.project.backend.data.collection_point.CollectionPoint;
+import tqs.project.backend.data.collection_point.CollectionPointDto;
 import tqs.project.backend.data.parcel.*;
 import tqs.project.backend.data.partner.Partner;
 import tqs.project.backend.exception.IncorrectParcelTokenException;
 import tqs.project.backend.exception.InvalidParcelStatusChangeException;
 import tqs.project.backend.exception.ParcelNotFoundException;
 import tqs.project.backend.service.CollectionPointService;
+import tqs.project.backend.util.ConverterUtils;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -44,7 +47,7 @@ public class CollectionPointWebController {
 
     //put information on the database -> ACP application
     @PostMapping("/registerACP")
-    public String registerACP(@Valid @ModelAttribute("cp") CollectionPoint cp,
+    public String registerACP(@Valid @ModelAttribute("cp") CollectionPointDto cpDto,
                             BindingResult result,
                             @RequestParam("passwordCheck") String passwordCheck, 
                             @RequestParam("zipcode") String zipcode, 
@@ -52,18 +55,18 @@ public class CollectionPointWebController {
                             Model model){
 
         if (result.hasErrors()) {
-            model.addAttribute("cp", cp);
+            model.addAttribute("cp", cpDto);
             return "acp-application"; 
         }
 
-        model.addAttribute("cp", cp);
+        model.addAttribute("cp", cpDto);
 
-        if (!cp.getPartner().getPassword().equals(passwordCheck)) {
-            System.out.println("Password: " + cp.getPartner().getPassword());
-            System.out.println("Password Check: " + passwordCheck);
+        if (!cpDto.getPartner().getPassword().equals(passwordCheck)) {
             model.addAttribute("error", "Passwords do not match");
             return "acp-application";
         }
+
+        CollectionPoint cp = ConverterUtils.fromCollectionPointDTOToCollectionPoint(cpDto);
 
         if (!collectionPointService.saveCPPoint(cp, zipcode, city)){ //was able to retreive data
             model.addAttribute("errorCoordinates", "Couldn't get that address... Try again.");
