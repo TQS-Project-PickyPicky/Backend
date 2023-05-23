@@ -1,33 +1,20 @@
 package tqs.project.backend.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.Mockito.when;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import tqs.project.backend.data.partner.Partner;
-import tqs.project.backend.data.partner.PartnerRepository;
-import tqs.project.backend.data.utils.ResolveLocation;
 import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
 import tqs.project.backend.data.parcel.*;
+import tqs.project.backend.data.partner.Partner;
+import tqs.project.backend.data.partner.PartnerRepository;
 import tqs.project.backend.data.store.Store;
 import tqs.project.backend.exception.ParcelNotFoundException;
+import tqs.project.backend.util.ResolveLocation;
 import tqs.project.backend.exception.InvalidParcelStatusChangeException;
 import tqs.project.backend.exception.IncorrectParcelTokenException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.Test;
 
@@ -42,15 +29,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CollectionPointServiceTest {
-    
-    @Mock(lenient = true)
-    private PartnerRepository partnerRepository;
-  
+
     @Mock(lenient = true)
     private CollectionPointRepository collectionPointRepository;
 
     @Mock(lenient = true)
     private ParcelRepository parcelRepository;
+
+    @Mock(lenient = true)
+    private PartnerRepository partnerRepository;
 
     @InjectMocks
     private CollectionPointService collectionPointService;

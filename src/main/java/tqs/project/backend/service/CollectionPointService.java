@@ -3,26 +3,20 @@ package tqs.project.backend.service;
 import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
 import tqs.project.backend.data.parcel.*;
+import tqs.project.backend.data.partner.PartnerRepository;
 import tqs.project.backend.exception.ParcelNotFoundException;
 import tqs.project.backend.exception.InvalidParcelStatusChangeException;
 import tqs.project.backend.exception.IncorrectParcelTokenException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tqs.project.backend.util.ConverterUtils;
+import tqs.project.backend.util.ResolveLocation;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-import tqs.project.backend.data.collection_point.CollectionPoint;
-import tqs.project.backend.data.collection_point.CollectionPointRepository;
-import tqs.project.backend.data.partner.PartnerRepository;
-import tqs.project.backend.data.utils.ResolveLocation;
-
 @Service
-@Slf4j
 public class CollectionPointService {
-
 
     private final PartnerRepository partnerRepository;
     private final CollectionPointRepository collectionPointRepository;
@@ -49,8 +43,6 @@ public class CollectionPointService {
 
         partnerRepository.save(point.getPartner());
         collectionPointRepository.save(point);
-
-        log.info("" + point);
 
         return true;
 
@@ -178,5 +170,4 @@ public class CollectionPointService {
         }
 
     }
-
 }

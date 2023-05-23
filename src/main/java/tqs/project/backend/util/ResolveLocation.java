@@ -1,4 +1,4 @@
-package tqs.project.backend.data.utils;
+package tqs.project.backend.util;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -13,20 +13,20 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ResolveLocation {
-    
+
     public static ArrayList<Double> resolveAddress(String zipCode, String city){
-        
+
         ArrayList<Double> array = new ArrayList<Double>();
 
         URL url;
-        
+
         try {
             url = new URL("http://api.positionstack.com/v1/forward?access_key=ef172f272fb26510e06d61ab72338570&query=" + zipCode + " " + city + " " + "&country=PT&limit=1");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.connect();
             int responsecode = conn.getResponseCode();
-            
+
             if (responsecode != 200){
                 return null;
             }
@@ -58,7 +58,7 @@ public class ResolveLocation {
         } catch (Exception e) {
             return null;
         }
-        
+
         return array;
 
     }

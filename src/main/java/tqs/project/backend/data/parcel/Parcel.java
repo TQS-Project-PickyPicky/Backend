@@ -2,10 +2,9 @@ package tqs.project.backend.data.parcel;
 
 import javax.persistence.*;
 
+import lombok.*;
 import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.store.Store;
-
-import lombok.*;
 
 import java.time.LocalDate;
 

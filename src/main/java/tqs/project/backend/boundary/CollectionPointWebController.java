@@ -1,8 +1,12 @@
 package tqs.project.backend.boundary;
 
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import tqs.project.backend.data.collection_point.CollectionPoint;
+import tqs.project.backend.data.parcel.*;
+import tqs.project.backend.data.partner.Partner;
+import tqs.project.backend.exception.IncorrectParcelTokenException;
+import tqs.project.backend.exception.InvalidParcelStatusChangeException;
+import tqs.project.backend.exception.ParcelNotFoundException;
+import tqs.project.backend.service.CollectionPointService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -11,31 +15,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import tqs.project.backend.data.collection_point.CollectionPoint;
-import tqs.project.backend.data.partner.Partner;
-import tqs.project.backend.service.CollectionPointService;
-
-import tqs.project.backend.data.collection_point.CollectionPoint;
-import tqs.project.backend.data.parcel.*;
-import tqs.project.backend.data.store.Store;
-import tqs.project.backend.exception.IncorrectParcelTokenException;
-import tqs.project.backend.exception.InvalidParcelStatusChangeException;
-import tqs.project.backend.exception.ParcelNotFoundException;
-import tqs.project.backend.service.CollectionPointService;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+
+import javax.validation.Valid;
 
 @Controller
 public class CollectionPointWebController {
 
-    @Autowired
     private final CollectionPointService collectionPointService;
 
     public CollectionPointWebController(CollectionPointService collectionPointService) {
@@ -45,6 +31,7 @@ public class CollectionPointWebController {
     //get ACP application page -> fucntional
     @GetMapping("/registerACP")
     public String registerACPPage(Model model){
+
         model.addAttribute("showModal", false);
         
         CollectionPoint cp = new CollectionPoint();

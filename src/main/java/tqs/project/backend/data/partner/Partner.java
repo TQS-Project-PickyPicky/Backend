@@ -1,7 +1,6 @@
 package tqs.project.backend.data.partner;
 
 import tqs.project.backend.data.collection_point.CollectionPoint;
-
 import tqs.project.backend.data.user.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
