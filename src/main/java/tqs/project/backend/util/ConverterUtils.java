@@ -1,5 +1,7 @@
 package tqs.project.backend.util;
 
+import tqs.project.backend.data.collection_point.CollectionPoint;
+import tqs.project.backend.data.collection_point.CollectionPointDto;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
 import tqs.project.backend.data.parcel.*;
 import tqs.project.backend.data.store.Store;
@@ -90,5 +92,25 @@ public class ConverterUtils {
                 null,
                 storeUpdateDto.getName(),
                 null);
+    }
+
+    public static CollectionPoint fromCollectionPointDTOToCollectionPoint(CollectionPointDto collectionPointDto){
+        return new CollectionPoint(
+            null, 
+            collectionPointDto.getName(), 
+            collectionPointDto.getType(),
+            collectionPointDto.getCapacity(), 
+            collectionPointDto.getAddress(), 
+            null, 
+            null, 
+            collectionPointDto.getOwnerName(), 
+            collectionPointDto.getOwnerEmail(), 
+            collectionPointDto.getOwnerGender(), 
+            collectionPointDto.getOwnerPhone(), 
+            collectionPointDto.getOwnerMobilePhone(), 
+            null, 
+            collectionPointDto.getPartner(), 
+            null);
+        
     }
 }

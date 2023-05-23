@@ -1,14 +1,17 @@
 package tqs.project.backend.service;
 
 import tqs.project.backend.data.collection_point.CollectionPoint;
+import tqs.project.backend.data.collection_point.CollectionPointDto;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
 import tqs.project.backend.data.parcel.*;
+import tqs.project.backend.data.partner.PartnerRepository;
 import tqs.project.backend.exception.ParcelNotFoundException;
 import tqs.project.backend.exception.InvalidParcelStatusChangeException;
 import tqs.project.backend.exception.IncorrectParcelTokenException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tqs.project.backend.util.ConverterUtils;
+import tqs.project.backend.util.ResolveLocation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,13 +19,38 @@ import java.util.List;
 @Service
 public class CollectionPointService {
 
+    private final PartnerRepository partnerRepository;
     private final CollectionPointRepository collectionPointRepository;
     private final ParcelRepository parcelRepository;
 
     @Autowired
-    public CollectionPointService(CollectionPointRepository collectionPointRepository, ParcelRepository parcelRepository) {
+    public CollectionPointService(CollectionPointRepository collectionPointRepository, ParcelRepository parcelRepository, PartnerRepository partnerRepository) {
         this.collectionPointRepository = collectionPointRepository;
         this.parcelRepository = parcelRepository;
+        this.partnerRepository = partnerRepository;
+    }
+
+
+    public boolean saveCPPoint(CollectionPoint point, String zipCode, String city) {
+    
+        point.setStatus(false); // not accepted yet
+    
+        ArrayList<Double> latlon = ResolveLocation.resolveAddress(zipCode, city);
+        if (latlon.isEmpty()) {
+            return false;
+        }
+    
+        point.setLatitude(latlon.get(0));
+        point.setLongitude(latlon.get(1));
+    
+        // Set other properties of the CollectionPoint from the DTO
+        point.setName(point.getName());
+        // Set other properties accordingly
+    
+        partnerRepository.save(point.getPartner());
+        collectionPointRepository.save(point);
+    
+        return true;
     }
 
     public List<ParcelMinimal> getAllParcels(Integer id) {

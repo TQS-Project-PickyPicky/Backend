@@ -1,16 +1,22 @@
 package tqs.project.backend.service;
 
 import tqs.project.backend.data.collection_point.CollectionPoint;
+import tqs.project.backend.data.collection_point.CollectionPointDto;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
 import tqs.project.backend.data.parcel.*;
+import tqs.project.backend.data.partner.Partner;
+import tqs.project.backend.data.partner.PartnerRepository;
 import tqs.project.backend.data.store.Store;
 import tqs.project.backend.exception.ParcelNotFoundException;
+import tqs.project.backend.util.ConverterUtils;
+import tqs.project.backend.util.ResolveLocation;
 import tqs.project.backend.exception.InvalidParcelStatusChangeException;
 import tqs.project.backend.exception.IncorrectParcelTokenException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.Test;
 
@@ -32,11 +38,36 @@ public class CollectionPointServiceTest {
     @Mock(lenient = true)
     private ParcelRepository parcelRepository;
 
+    @Mock(lenient = true)
+    private PartnerRepository partnerRepository;
+
     @InjectMocks
     private CollectionPointService collectionPointService;
 
+
     @BeforeEach
     void setUp() {
+        //CP + zip code + city
+        CollectionPoint cp = new CollectionPoint();
+        cp.setName("cp1");
+        cp.setType("Library");
+        cp.setCapacity(100);
+        cp.setAddress("Rua do ISEP");
+        cp.setOwnerName("João");
+        cp.setOwnerEmail("joao@ua.pt");
+        cp.setOwnerPhone(910000000);
+
+        Partner partner = new Partner();
+        partner.setId(1);
+        partner.setPassword("pass");
+        partner.setUsername("partner1");
+
+        cp.setPartner(partner);
+
+        //mock repository methods
+        when(collectionPointRepository.save(Mockito.any(CollectionPoint.class))).thenReturn(cp);
+        when(partnerRepository.save(Mockito.any(Partner.class))).thenReturn(partner);
+
         CollectionPoint collectionPoint = new CollectionPoint();
         collectionPoint.setName("Collection Point 1");
         collectionPoint.setType("Collection Point");
@@ -113,7 +144,45 @@ public class CollectionPointServiceTest {
         when(parcelRepository.findById(6))
                 .thenReturn(Optional.of(parcel3));
 
+    }
 
+    @Test
+    void saveCPPointSuccess_Test(){
+
+        //to use in functions inside the service
+        CollectionPointDto cp = new CollectionPointDto();
+        String zipCode = "3810-193";
+        String city = "Aveiro";
+
+        CollectionPoint collectionPoint = ConverterUtils.fromCollectionPointDTOToCollectionPoint(cp);
+
+        boolean result = collectionPointService.saveCPPoint(collectionPoint, zipCode, city);
+        ArrayList<Double> coordinates = ResolveLocation.resolveAddress(zipCode, city);
+
+        assertTrue(result);
+        assertFalse(collectionPoint.getStatus());
+        assertEquals(coordinates.get(0), collectionPoint.getLatitude());
+        assertEquals(coordinates.get(1), collectionPoint.getLongitude());
+
+    }
+
+    @Test
+    void saveCPPointFailureAPITest(){
+
+        CollectionPoint cp = new CollectionPoint();
+        String zipCode = "";
+        String city = "";
+
+        boolean result = collectionPointService.saveCPPoint(cp, zipCode, city);
+        ArrayList<Double> coordinates = ResolveLocation.resolveAddress(zipCode, city);
+
+        assertFalse(result);
+        assertFalse(cp.getStatus());
+
+        assertEquals(null, cp.getAddress());
+        assertEquals(coordinates.size(), 0);
+        assertEquals(null, cp.getLatitude());
+        assertEquals(null, cp.getLongitude());
     }
 
     @Test

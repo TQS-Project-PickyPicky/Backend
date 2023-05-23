@@ -50,7 +50,7 @@ class ParcelServiceTest {
         // Create entities for mock database
         Store store = new Store(1, "Mock Store", new ArrayList<>());
 
-        CollectionPoint collectionPoint = new CollectionPoint(1, "Mock Collection Point", "Mock Type", 100, "Mock Address", 40.6331731, -8.6594933, "Mock Owner Name", "Mock Owner Email", "Mock Owner Gender", 111000111, 111000222, new ArrayList<>());
+        CollectionPoint collectionPoint = new CollectionPoint(1, "Mock Collection Point", "Mock Type", 100, "Mock Address", 40.6331731, -8.6594933, "Mock Owner Name", "Mock Owner Email", "Mock Owner Gender", 111000111, 111000222, true, null, new ArrayList<>());
 
         Parcel parcel1 = new Parcel(1, 111111, "Anna", "anna@mail.com", 111000111, 111000222, LocalDate.of(2023, 5, 19), ParcelStatus.PLACED, store, collectionPoint);
         Parcel parcel2 = new Parcel(2, 222222, "Bob", "bob@mail.com", 222000111, 222000222, LocalDate.of(2023, 5, 19), ParcelStatus.DELIVERED, store, collectionPoint);
