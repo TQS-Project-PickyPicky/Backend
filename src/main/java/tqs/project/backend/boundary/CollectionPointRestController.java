@@ -1,11 +1,15 @@
 package tqs.project.backend.boundary;
 
+import tqs.project.backend.data.collection_point.CollectionPoint;
+import tqs.project.backend.data.collection_point.CollectionPointDto;
 import tqs.project.backend.data.parcel.ParcelMinimal;
 import tqs.project.backend.data.parcel.ParcelMinimalEta;
 import tqs.project.backend.exception.IncorrectParcelTokenException;
 import tqs.project.backend.exception.InvalidParcelStatusChangeException;
 import tqs.project.backend.exception.ParcelNotFoundException;
 import tqs.project.backend.service.CollectionPointService;
+import tqs.project.backend.util.ConverterUtils;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +23,27 @@ public class CollectionPointRestController {
 
     public CollectionPointRestController(CollectionPointService collectionPointService) {
         this.collectionPointService = collectionPointService;
+    }
+
+    @PostMapping("/acp")
+    public ResponseEntity<String> addCollectionPoint(@RequestBody CollectionPointDto collectionPointDto, 
+                                                                @RequestParam(value = "password-check") String passwordCheck,
+                                                                @RequestParam(value = "zip-code") String zipCode,
+                                                                @RequestParam(value = "city") String city){
+        
+        //TODO -> testing
+        if (!collectionPointDto.getPartner().getPassword().equals(passwordCheck)) {
+            return ResponseEntity.ok().body("Passwords do not match!");
+        }     
+
+        CollectionPoint cp = ConverterUtils.fromCollectionPointDTOToCollectionPoint(collectionPointDto);
+        if (!collectionPointService.saveCPPoint(cp, zipCode, city)){ 
+            return ResponseEntity.ok().body("Couldn't get coordinates for that address...");
+        }
+                                                 
+        
+        return ResponseEntity.ok().body("Collection point created with success!");
+        
     }
 
     @GetMapping("/acp")
