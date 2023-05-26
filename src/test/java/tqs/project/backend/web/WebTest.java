@@ -118,7 +118,7 @@ public class WebTest {
         storeRepository.save(store);
         parcelRepository.saveAll(parcels);
 
-        String url = "http://localhost:" + localPort + "/acp?id=" + acp.getId();
+        String url = "http://localhost:" + localPort + "/acp-page/acp?id=" + acp.getId();
 
         driver.get(url);
     }

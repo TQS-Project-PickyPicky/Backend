@@ -129,7 +129,7 @@ public class CollectionPointWebControllerTestIT {
 
     @Test
     void getAllParcels() throws Exception {
-        String url = "/acp?id=" + acp.getId();
+        String url = "/acp-page/acp?id=" + acp.getId();
         mvc.perform(get(url).contentType(MediaType.TEXT_HTML))
                 .andExpect(status().isOk())
                 .andExpect(view().name("acp"))
@@ -138,7 +138,7 @@ public class CollectionPointWebControllerTestIT {
 
     @Test
     void getParcel_ifExistsInCollectionPoint() throws Exception {
-        String url = "/acp/parcel?id=" + p.getId();
+        String url = "/acp-page/acp/parcel?id=" + p.getId();
         mvc.perform(get(url).contentType(MediaType.TEXT_HTML))
                 .andExpect(status().isOk())
                 .andExpect(view().name("parcelib"))
@@ -155,10 +155,10 @@ public class CollectionPointWebControllerTestIT {
 
     @Test
     void checkIn_ifExistsInCollectionPoint() throws Exception {
-        String url = "/acp/parcel/checkin?id=" + p.getId();
+        String url = "/acp-page/acp/parcel/checkin?id=" + p.getId();
         mvc.perform(post(url).contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp"));
+                .andExpect(redirectedUrl("/acp-page/acp"));
     }
 
     //@Test
@@ -170,8 +170,8 @@ public class CollectionPointWebControllerTestIT {
 
     @Test
     void checkIn_ifNotInTransit() throws Exception {
-        String url = "/acp/parcel/checkin?id=" + p1.getId();
-        String url2 = "/acp/parcel?id=" + p1.getId();
+        String url = "/acp-page/acp/parcel/checkin?id=" + p1.getId();
+        String url2 = "/acp-page/acp/parcel?id=" + p1.getId();
         mvc.perform(post(url).contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl(url2));
@@ -179,10 +179,10 @@ public class CollectionPointWebControllerTestIT {
 
     @Test
     void checkOut_ifExistsInCollectionPoint() throws Exception {
-        String url = "/acp/parcel/checkout?id=" + p1.getId() + "&token=" + p.getToken();
+        String url = "/acp-page/acp/parcel/checkout?id=" + p1.getId() + "&token=" + p.getToken();
         mvc.perform(post(url).contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp"));
+                .andExpect(redirectedUrl("/acp-page/acp"));
     }
 
     //@Test
@@ -194,8 +194,8 @@ public class CollectionPointWebControllerTestIT {
 
     @Test
     void checkOut_ifNotDelivered() throws Exception {
-        String url = "/acp/parcel/checkout?id=" + p2.getId() + "&token=" + p2.getToken();
-        String url2 = "/acp/parcel?id=" + p2.getId();
+        String url = "/acp-page/acp/parcel/checkout?id=" + p2.getId() + "&token=" + p2.getToken();
+        String url2 = "/acp-page/acp/parcel?id=" + p2.getId();
         mvc.perform(post(url).contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl(url2));
@@ -203,8 +203,8 @@ public class CollectionPointWebControllerTestIT {
 
     @Test
     void checkOut_ifTokenIsIncorrect() throws Exception {
-        String url = "/acp/parcel/checkout?id=" + p1.getId() + "&token=6";
-        String url2 = "/acp/parcel?id=" + p1.getId();
+        String url = "/acp-page/acp/parcel/checkout?id=" + p1.getId() + "&token=6";
+        String url2 = "/acp-page/acp/parcel?id=" + p1.getId();
         mvc.perform(post(url).contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl(url2));
@@ -212,10 +212,10 @@ public class CollectionPointWebControllerTestIT {
 
     @Test
     void returnParcel_ifExistsInCollectionPoint() throws Exception {
-        String url = "/acp/parcel/return?id=" + p2.getId();
+        String url = "/acp-page/acp/parcel/return?id=" + p2.getId();
         mvc.perform(post(url).contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp"));
+                .andExpect(redirectedUrl("/acp-page/acp"));
     }
 
     //@Test
@@ -227,8 +227,8 @@ public class CollectionPointWebControllerTestIT {
 
     @Test
     void returnParcel_ifNotCollected() throws Exception {
-        String url = "/acp/parcel/return?id=" + p.getId();
-        String url2 = "/acp/parcel?id=" + p.getId();
+        String url = "/acp-page/acp/parcel/return?id=" + p.getId();
+        String url2 = "/acp-page/acp/parcel?id=" + p.getId();
         mvc.perform(post(url).contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl(url2));

@@ -157,7 +157,7 @@ public class CollectionPointServiceTest {
         CollectionPoint collectionPoint = ConverterUtils.fromCollectionPointDTOToCollectionPoint(cp);
 
         boolean result = collectionPointService.saveCPPoint(collectionPoint, zipCode, city);
-        ArrayList<Double> coordinates = ResolveLocation.resolveAddress(zipCode, city);
+        ArrayList<Double> coordinates = ResolveLocation.resolveAddress(zipCode);
 
         assertTrue(result);
         assertFalse(collectionPoint.getStatus());
@@ -174,7 +174,7 @@ public class CollectionPointServiceTest {
         String city = "";
 
         boolean result = collectionPointService.saveCPPoint(cp, zipCode, city);
-        ArrayList<Double> coordinates = ResolveLocation.resolveAddress(zipCode, city);
+        ArrayList<Double> coordinates = ResolveLocation.resolveAddress(zipCode);
 
         assertFalse(result);
         assertFalse(cp.getStatus());

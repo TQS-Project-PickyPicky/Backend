@@ -18,14 +18,14 @@ public class ResolveLocation {
     private ResolveLocation() {
     }
 
-    public static ArrayList<Double> resolveAddress(String zipCode, String city){
+    public static ArrayList<Double> resolveAddress(String zipCode){
 
         ArrayList<Double> array = new ArrayList<Double>();
 
         URL url;
 
         try {
-            url = new URL("http://api.positionstack.com/v1/forward?access_key=ef172f272fb26510e06d61ab72338570&query=" + zipCode + " " + city + " " + "&country=PT&limit=1");
+            url = new URL("https://json.geoapi.pt/cp/" + zipCode);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.connect();
@@ -49,10 +49,12 @@ public class ResolveLocation {
 
             log.info("" + dataObj);
 
-            JSONArray jsonArray = (JSONArray) dataObj.get("data");
+            JSONArray jsonArray = (JSONArray) dataObj.get("pontos");
             JSONObject obj = (JSONObject) jsonArray.get(0); //get 1st element
-            Double latitude = (Double) obj.get("latitude");
-            Double longitude = (Double) obj.get("longitude");
+            JSONArray coordenadas = (JSONArray) obj.get("coordenadas");
+
+            Double latitude = (Double) coordenadas.get(0);
+            Double longitude = (Double) coordenadas.get(1);
 
             array.add(latitude);
             array.add(longitude);
