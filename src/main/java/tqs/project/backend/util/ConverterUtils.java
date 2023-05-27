@@ -1,8 +1,6 @@
 package tqs.project.backend.util;
 
-import tqs.project.backend.data.collection_point.CollectionPoint;
-import tqs.project.backend.data.collection_point.CollectionPointDto;
-import tqs.project.backend.data.collection_point.CollectionPointRepository;
+import tqs.project.backend.data.collection_point.*;
 import tqs.project.backend.data.parcel.*;
 import tqs.project.backend.data.store.Store;
 import tqs.project.backend.data.store.StoreDto;
@@ -111,6 +109,53 @@ public class ConverterUtils {
             null, 
             collectionPointDto.getPartner(), 
             null);
-        
+    }
+
+    public static CollectionPoint fromCollectionPointCreateDtoToCollectionPoint(CollectionPointCreateDto collectionPointCreateDto){
+        return new CollectionPoint(
+                null,
+            collectionPointCreateDto.getName(),
+            collectionPointCreateDto.getType(),
+            collectionPointCreateDto.getCapacity(),
+            collectionPointCreateDto.getAddress(),
+            null,
+            null,
+            collectionPointCreateDto.getOwnerName(),
+            collectionPointCreateDto.getOwnerEmail(),
+            collectionPointCreateDto.getOwnerGender(),
+            collectionPointCreateDto.getOwnerPhone(),
+            collectionPointCreateDto.getOwnerMobilePhone(),
+            null,
+            collectionPointCreateDto.getPartner(),
+            null);
+    }
+
+    public static CollectionPointRDto fromCollectionPointToCollectionPointRDto(CollectionPoint collectionPoint){
+        return new CollectionPointRDto(
+            collectionPoint.getId(),
+            collectionPoint.getName(),
+            collectionPoint.getType(),
+            collectionPoint.getCapacity(),
+            collectionPoint.getAddress(),
+            collectionPoint.getStatus());
+    }
+
+    public static CollectionPoint fromCollectionPointUpdateDtoToCollectionPoint(CollectionPointUpdateDto collectionPointUpdateDto){
+        return new CollectionPoint(
+            null,
+            collectionPointUpdateDto.getName(),
+            collectionPointUpdateDto.getType(),
+            collectionPointUpdateDto.getCapacity(),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            collectionPointUpdateDto.getOwnerPhone(),
+            collectionPointUpdateDto.getOwnerMobilePhone(),
+            collectionPointUpdateDto.getStatus(),
+            null,
+            null);
     }
 }

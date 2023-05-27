@@ -68,7 +68,7 @@ public class CollectionPointWebController {
 
         CollectionPoint cp = ConverterUtils.fromCollectionPointDTOToCollectionPoint(cpDto);
 
-        if (!collectionPointService.saveCPPoint(cp, zipcode, city)){ //was able to retreive data
+        if (!collectionPointService.saveCPPoint(cp, zipcode)){ //was able to retreive data
             model.addAttribute("errorCoordinates", "Couldn't get that address... Try again.");
             return "acp-application";
         }

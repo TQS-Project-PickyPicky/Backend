@@ -31,7 +31,6 @@ import tqs.project.backend.exception.IncorrectParcelTokenException;
 
 import java.util.List;
 
-@RunWith(SpringRunner.class)
 @WebMvcTest(CollectionPointWebController.class)
 public class CollectionPointWebControllerTest {
 
@@ -82,7 +81,7 @@ public class CollectionPointWebControllerTest {
     @Test
     void registerACP_ValidForm_Success() throws Exception {
 
-        when(collectionPointService.saveCPPoint(any(), anyString(), anyString())).thenReturn(true);
+        when(collectionPointService.saveCPPoint(any(), anyString())).thenReturn(true);
 
         mvc.perform(post("/registerACP")
                 .param("name", "cp1")
@@ -103,7 +102,7 @@ public class CollectionPointWebControllerTest {
                 .andExpect(model().attributeDoesNotExist("error"))
                 .andExpect(model().attributeDoesNotExist("errorCoordinates"));
 
-        verify(collectionPointService).saveCPPoint(any(), eq("12345"), eq("Aveiro"));
+        verify(collectionPointService).saveCPPoint(any(), eq("12345"));
     }
 
     @Test
