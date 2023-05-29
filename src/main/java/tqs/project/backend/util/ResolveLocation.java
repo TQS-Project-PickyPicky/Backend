@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import org.json.simple.JSONArray;
@@ -24,14 +25,19 @@ public class ResolveLocation {
 
         URL url;
 
-        String possible = "https://json.geoapi.pt/cp/[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9]";
+        System.out.println(zipCode);
+
+        //String p = "https://json.geoapi.pt/cp/[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9]";
+
+        List<String> allowed = new ArrayList<String>();
+        allowed.add("https://json.geoapi.pt/cp/");
 
         String u = "https://json.geoapi.pt/cp/" + zipCode;
 
         try {
             url = new URL(u);
 
-            if(url.toString().matches(possible)){
+            if(u.startsWith(allowed.get(0))){
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 conn.connect();
