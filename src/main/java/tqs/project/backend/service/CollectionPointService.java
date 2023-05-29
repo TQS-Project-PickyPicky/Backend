@@ -60,10 +60,6 @@ public class CollectionPointService {
         point.setLatitude(latlon.get(0));
         point.setLongitude(latlon.get(1));
     
-        // Set other properties of the CollectionPoint from the DTO
-        point.setName(point.getName());
-        // Set other properties accordingly
-    
         partnerRepository.save(point.getPartner());
         collectionPointRepository.save(point);
     

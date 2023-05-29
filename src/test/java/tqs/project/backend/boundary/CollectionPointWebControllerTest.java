@@ -32,7 +32,7 @@ import tqs.project.backend.exception.IncorrectParcelTokenException;
 import java.util.List;
 
 @WebMvcTest(CollectionPointWebController.class)
-public class CollectionPointWebControllerTest {
+class CollectionPointWebControllerTest {
 
     @Autowired
     private MockMvc mvc;
@@ -68,92 +68,10 @@ public class CollectionPointWebControllerTest {
         when(collectionPointService.returnParcel(2)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.RETURNED));
         when(collectionPointService.returnParcel(3)).thenThrow(new ParcelNotFoundException(3));
     }
-    
-
-    @Test
-    void getAllForms() throws Exception{
-        mvc.perform(get("/registerACP").contentType(MediaType.TEXT_HTML))
-            .andExpect(status().isOk())
-            .andExpect(view().name("acp-application"))
-            .andExpect(model().attributeExists("cp"));
-    }
-
-    @Test
-    void registerACP_ValidForm_Success() throws Exception {
-
-        when(collectionPointService.saveCPPoint(any(), anyString())).thenReturn(true);
-
-        mvc.perform(post("/registerACP")
-                .param("name", "cp1")
-                .param("type", "Library")
-                .param("capacity", "100")              
-                .param("ownerName", "João")
-                .param("ownerEmail", "joao@ua.pt")
-                .param("ownerPhone", "910000000")
-                .param("passwordCheck", "pass1")
-                .param("zipcode", "12345")
-                .param("city", "Aveiro")
-                .param("address", "Rua do ISEP")
-                .param("partner.username", "username1")
-                .param("partner.password", "pass1"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("home-picky"))
-                .andExpect(model().attributeExists("cp"))
-                .andExpect(model().attributeDoesNotExist("error"))
-                .andExpect(model().attributeDoesNotExist("errorCoordinates"));
-
-        verify(collectionPointService).saveCPPoint(any(), eq("12345"));
-    }
-
-    @Test
-    void registerACP_InvalidForm_ValidationError() throws Exception {
-        mvc.perform(post("/registerACP")
-                .param("name", "")
-                .param("type", "")
-                .param("capacity", "0")
-                .param("address", "")
-                .param("ownerName", "")
-                .param("ownerEmail", "invalid_email")
-                .param("ownerPhone", "invalid_phone")
-                .param("passwordCheck", "password")
-                .param("zipcode", "12345")
-                .param("city", "Aveiro"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("acp-application"))
-                .andExpect(model().attributeExists("cp"))
-                .andExpect(model().hasErrors());
-
-        verifyNoInteractions(collectionPointService);
-    }
-
-    @Test
-    void registerACP_PasswordMismatch_Error() throws Exception {
-        mvc.perform(post("/registerACP")
-                .param("name", "cp1")
-                .param("type", "Library")
-                .param("capacity", "100")
-                .param("address", "Rua do ISEP")
-                .param("ownerName", "João")
-                .param("ownerEmail", "joao@ua.pt")
-                .param("ownerPhone", "910000000")
-                .param("passwordCheck", "mismatched_password")
-                .param("partner.username", "username1")
-                .param("partner.password", "pass1")
-                .param("zipcode", "12345")
-                .param("city", "Aveiro"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("acp-application"))
-                .andExpect(model().attributeExists("cp"))
-                .andExpect(model().attributeExists("error"))
-                .andExpect(model().attributeDoesNotExist("errorCoordinates"));
-
-        verifyNoInteractions(collectionPointService);
-    }
-    
 
     @Test
     void getAllParcels() throws Exception {
-        mvc.perform(get("/acp?id=1").contentType(MediaType.TEXT_HTML))
+        mvc.perform(get("/acp-page/acp?id=1").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().isOk())
                 .andExpect(view().name("acp"))
                 .andExpect(model().attributeExists("parcels"));
@@ -161,7 +79,7 @@ public class CollectionPointWebControllerTest {
 
     @Test
     void getParcel_ifExistsInCollectionPoint() throws Exception {
-        mvc.perform(get("/acp/parcel?id=1").contentType(MediaType.TEXT_HTML))
+        mvc.perform(get("/acp-page/acp/parcel?id=1").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().isOk())
                 .andExpect(view().name("parcelib"))
                 .andExpect(model().attributeExists("parcel"))
@@ -170,78 +88,78 @@ public class CollectionPointWebControllerTest {
 
     @Test
     void getParcel_ifNotExistsInCollectionPoint() throws Exception {
-        mvc.perform(get("/acp/parcel?id=2").contentType(MediaType.TEXT_HTML))
+        mvc.perform(get("/acp-page/acp/parcel?id=2").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp"));
+                .andExpect(redirectedUrl("/acp-page/acp"));
     }
 
     @Test
     void checkIn_ifExistsInCollectionPoint() throws Exception {
-        mvc.perform(post("/acp/parcel/checkin?id=1").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/checkin?id=1").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp"));
+                .andExpect(redirectedUrl("/acp-page/acp"));
     }
 
     @Test
     void checkIn_ifNotExistsInCollectionPoint() throws Exception {
-        mvc.perform(post("/acp/parcel/checkin?id=2").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/checkin?id=2").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp/parcel?id=2"));
+                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=2"));
     }
 
     @Test
     void checkIn_ifNotInTransit() throws Exception {
-        mvc.perform(post("/acp/parcel/checkin?id=3").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/checkin?id=3").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp/parcel?id=3"));
+                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=3"));
     }
 
     @Test
     void checkOut_ifExistsInCollectionPoint() throws Exception {
-        mvc.perform(post("/acp/parcel/checkout?id=1&token=5").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/checkout?id=1&token=5").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp"));
+                .andExpect(redirectedUrl("/acp-page/acp"));
     }
 
     @Test
     void checkOut_ifNotExistsInCollectionPoint() throws Exception {
-        mvc.perform(post("/acp/parcel/checkout?id=2&token=5").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/checkout?id=2&token=5").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp/parcel?id=2"));
+                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=2"));
     }
 
     @Test
     void checkOut_ifNotDelivered() throws Exception {
-        mvc.perform(post("/acp/parcel/checkout?id=3&token=5").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/checkout?id=3&token=5").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp/parcel?id=3"));
+                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=3"));
     }
 
     @Test
     void checkOut_ifTokenIsIncorrect() throws Exception {
-        mvc.perform(post("/acp/parcel/checkout?id=1&token=6").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/checkout?id=1&token=6").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp/parcel?id=1"));
+                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=1"));
     }
 
     @Test
     void returnParcel_ifExistsInCollectionPoint() throws Exception {
-        mvc.perform(post("/acp/parcel/return?id=1").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/return?id=1").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp"));
+                .andExpect(redirectedUrl("/acp-page/acp"));
     }
 
     @Test
     void returnParcel_ifNotExistsInCollectionPoint() throws Exception {
-        mvc.perform(post("/acp/parcel/return?id=2").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/return?id=2").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp/parcel?id=2"));
+                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=2"));
     }
 
     @Test
     void returnParcel_ifNotCollected() throws Exception {
-        mvc.perform(post("/acp/parcel/return?id=3").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/return?id=3").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp/parcel?id=3"));
+                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=3"));
     }
 }

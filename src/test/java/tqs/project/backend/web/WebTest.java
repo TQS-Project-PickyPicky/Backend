@@ -1,5 +1,6 @@
 package tqs.project.backend.web;
 
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
@@ -118,7 +119,7 @@ public class WebTest {
         storeRepository.save(store);
         parcelRepository.saveAll(parcels);
 
-        String url = "http://localhost:" + localPort + "/acp?id=" + acp.getId();
+        String url = "http://localhost:" + localPort + "/acp-page/acp?id=" + acp.getId();
 
         driver.get(url);
     }

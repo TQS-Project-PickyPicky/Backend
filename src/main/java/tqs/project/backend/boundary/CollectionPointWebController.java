@@ -1,5 +1,7 @@
 package tqs.project.backend.boundary;
 
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.collection_point.CollectionPointDto;
 import tqs.project.backend.data.parcel.*;
@@ -8,21 +10,21 @@ import tqs.project.backend.exception.IncorrectParcelTokenException;
 import tqs.project.backend.exception.InvalidParcelStatusChangeException;
 import tqs.project.backend.exception.ParcelNotFoundException;
 import tqs.project.backend.service.CollectionPointService;
-import tqs.project.backend.util.ConverterUtils;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.List;
+import tqs.project.backend.util.ConverterUtils;
 
 import javax.validation.Valid;
+import java.util.List;
+
 
 @Controller
+@RequestMapping("/acp-page")
 public class CollectionPointWebController {
 
     private final CollectionPointService collectionPointService;
@@ -30,56 +32,6 @@ public class CollectionPointWebController {
     public CollectionPointWebController(CollectionPointService collectionPointService) {
         this.collectionPointService = collectionPointService;
     }
-
-    //get ACP application page -> fucntional
-    @GetMapping("/registerACP")
-    public String registerACPPage(Model model){
-
-        model.addAttribute("showModal", false);
-        
-        CollectionPoint cp = new CollectionPoint();
-        cp.setPartner(new Partner());
-
-        model.addAttribute("cp", cp);
-
-        return "acp-application";
-    }
-
-    //put information on the database -> ACP application
-    @PostMapping("/registerACP")
-    public String registerACP(@Valid @ModelAttribute("cp") CollectionPointDto cpDto,
-                            BindingResult result,
-                            @RequestParam("passwordCheck") String passwordCheck, 
-                            @RequestParam("zipcode") String zipcode, 
-                            @RequestParam("city") String city, 
-                            Model model){
-
-        if (result.hasErrors()) {
-            model.addAttribute("cp", cpDto);
-            return "acp-application"; 
-        }
-
-        model.addAttribute("cp", cpDto);
-
-        if (!cpDto.getPartner().getPassword().equals(passwordCheck)) {
-            model.addAttribute("error", "Passwords do not match");
-            return "acp-application";
-        }
-
-        CollectionPoint cp = ConverterUtils.fromCollectionPointDTOToCollectionPoint(cpDto);
-
-        if (!collectionPointService.saveCPPoint(cp, zipcode)){ //was able to retreive data
-            model.addAttribute("errorCoordinates", "Couldn't get that address... Try again.");
-            return "acp-application";
-        }
-
-        
-        model.addAttribute("showModal", true);
-        return "home-picky";
-    
-    }
-        
-
 
     @GetMapping("/acp")
     public String acp(@RequestParam(value="id") Integer id,Model model) {
@@ -97,7 +49,7 @@ public class CollectionPointWebController {
             model.addAttribute("collectionPointService", collectionPointService);
             return "parcelib";
         } catch (ParcelNotFoundException e) {
-            return "redirect:/acp";
+            return "redirect:/acp-page/acp";
         }
 
     }
@@ -106,9 +58,9 @@ public class CollectionPointWebController {
     public String parcelCheckIn(@RequestParam(value="id") Integer id, Model model) {
         try{
             collectionPointService.checkIn(id);
-            return "redirect:/acp";
+            return "redirect:/acp-page/acp";
         } catch (ParcelNotFoundException | InvalidParcelStatusChangeException e) {
-            return "redirect:/acp/parcel?id=" + id;
+            return "redirect:/acp-page/acp/parcel?id=" + id;
         }
     }
 
@@ -116,9 +68,9 @@ public class CollectionPointWebController {
     public String parcelCheckOut(@RequestParam(value="id") Integer id, @RequestParam(value="token") Integer token, Model model) {
         try {
             collectionPointService.checkOut(id, token);
-            return "redirect:/acp";
+            return "redirect:/acp-page/acp";
         } catch (IncorrectParcelTokenException | ParcelNotFoundException | InvalidParcelStatusChangeException e) {
-            return "redirect:/acp/parcel?id=" + id;
+            return "redirect:/acp-page/acp/parcel?id=" + id;
         }
     }
 
@@ -126,9 +78,9 @@ public class CollectionPointWebController {
     public String parcelReturn(@RequestParam(value="id") Integer id, Model model) {
         try {
             collectionPointService.returnParcel(id);
-            return "redirect:/acp";
+            return "redirect:/acp-page/acp";
         } catch (ParcelNotFoundException | InvalidParcelStatusChangeException e) {
-            return "redirect:/acp/parcel?id=" + id;
+            return "redirect:/acp-page/acp/parcel?id=" + id;
         }
     }
 }
