@@ -12,6 +12,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import tqs.project.backend.service.CollectionPointService;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -26,7 +31,6 @@ import tqs.project.backend.exception.IncorrectParcelTokenException;
 
 import java.util.List;
 
-@RunWith(SpringRunner.class)
 @WebMvcTest(CollectionPointWebController.class)
 class CollectionPointWebControllerTest {
 
@@ -63,7 +67,7 @@ class CollectionPointWebControllerTest {
         when(collectionPointService.returnParcel(1)).thenReturn(new ParcelMinimal(1, ParcelStatus.RETURNED));
         when(collectionPointService.returnParcel(2)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.RETURNED));
         when(collectionPointService.returnParcel(3)).thenThrow(new ParcelNotFoundException(3));
-    }    
+    }
 
     @Test
     void getAllParcels() throws Exception {

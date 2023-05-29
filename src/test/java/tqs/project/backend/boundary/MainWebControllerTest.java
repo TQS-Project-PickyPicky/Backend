@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@RunWith(SpringRunner.class)
 @WebMvcTest(MainWebController.class)
 public class MainWebControllerTest {
 
@@ -43,7 +42,7 @@ public class MainWebControllerTest {
     @Test
     void registerACP_ValidForm_Success() throws Exception {
 
-        when(collectionPointService.saveCPPoint(any(), anyString(), anyString())).thenReturn(true);
+        when(collectionPointService.saveCPPoint(any(), anyString())).thenReturn(true);
 
         mvc.perform(post("/main/registerACP")
                 .param("name", "cp1")
@@ -63,7 +62,7 @@ public class MainWebControllerTest {
                 .andExpect(model().attributeDoesNotExist("error"))
                 .andExpect(model().attributeDoesNotExist("errorCoordinates"));
 
-        verify(collectionPointService).saveCPPoint(any(), eq("12345"), eq("Aveiro"));
+        verify(collectionPointService).saveCPPoint(any(), eq("12345"));
     }
 
     @Test

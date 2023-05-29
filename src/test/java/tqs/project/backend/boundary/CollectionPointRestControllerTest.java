@@ -1,8 +1,13 @@
 package tqs.project.backend.boundary;
 
+import org.apache.tomcat.util.net.TLSClientHelloExtractor;
+import tqs.project.backend.data.collection_point.CollectionPoint;
+import tqs.project.backend.data.collection_point.CollectionPointRDto;
 import tqs.project.backend.data.parcel.ParcelMinimal;
 import tqs.project.backend.data.parcel.ParcelMinimalEta;
 import tqs.project.backend.data.parcel.ParcelStatus;
+import tqs.project.backend.data.partner.Partner;
+import tqs.project.backend.exception.CollectionPointNotFoundException;
 import tqs.project.backend.exception.IncorrectParcelTokenException;
 import tqs.project.backend.exception.InvalidParcelStatusChangeException;
 import tqs.project.backend.exception.ParcelNotFoundException;
@@ -17,6 +22,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.hamcrest.CoreMatchers.is;
 
@@ -31,6 +38,32 @@ class CollectionPointRestControllerTest {
     @BeforeEach
     void setUp() throws ParcelNotFoundException, InvalidParcelStatusChangeException, IncorrectParcelTokenException {
         RestAssuredMockMvc.mockMvc(mvc);
+
+        // All CollectionPoints
+        when(collectionPointService.getAll()).thenReturn(List.of(
+                new CollectionPointRDto(1, "CP1", "Rua 1", 100, "Porto", true),
+                new CollectionPointRDto(2, "CP2", "Rua 2", 100, "Lisboa", true)
+                ));
+
+        when(collectionPointService.getAll("1111-111")).thenReturn(List.of(
+                new CollectionPointRDto(2, "CP2", "Rua 2", 100, "Lisboa", true),
+                new CollectionPointRDto(1, "CP1", "Rua 1", 100, "Porto", true)
+                ));
+
+        // Add CollectionPoint
+
+        when(collectionPointService.saveCPPoint(any(CollectionPoint.class), any(String.class)))
+                .thenReturn(true);
+
+        // Update CollectionPoint
+
+        when(collectionPointService.updateCPPoint(eq(2),any(CollectionPoint.class))).thenThrow(new CollectionPointNotFoundException(2));
+        when(collectionPointService.updateCPPoint(eq(1),any(CollectionPoint.class))).thenReturn(new CollectionPointRDto(1, "CP1", "Rua 1", 100, "Porto", true));
+
+        // Delete CollectionPoint
+        CollectionPointRDto cp1 = new CollectionPointRDto(1, "CP1", "Rua 1", 100, "Porto", true);
+        when(collectionPointService.deleteCPPoint(1)).thenReturn(cp1);
+        when(collectionPointService.deleteCPPoint(2)).thenThrow(new CollectionPointNotFoundException(2));
 
         // All Parcels
         when(collectionPointService.getAllParcels(1)).thenReturn(List.of(
@@ -60,10 +93,94 @@ class CollectionPointRestControllerTest {
     }
 
     @Test
+    void getAllCollectionPoints() {
+        RestAssuredMockMvc.given()
+                .when()
+                .get("/api/acp/all")
+                .then()
+                .statusCode(200)
+                .body("size()", is(2))
+                .body("[0].id", is(1))
+                .body("[0].name", is("CP1"))
+                .body("[1].id", is(2))
+                .body("[1].name", is("CP2"));
+    }
+
+    @Test
+    void getAllCollectionPointsByLocation() {
+        RestAssuredMockMvc.given()
+                .when()
+                .get("/api/acp/all?zip=1111-111")
+                .then()
+                .statusCode(200)
+                .body("size()", is(2))
+                .body("[0].id", is(2))
+                .body("[0].name", is("CP2"))
+                .body("[1].id", is(1))
+                .body("[1].name", is("CP1"));
+    }
+
+    @Test
+    void createCollectionPoint() {
+        RestAssuredMockMvc.given()
+                    .contentType("application/json")
+                    .body("{\"name\":\"CP3\",\"type\":\"Jogo\",\"capacity\":100,\"address\":\"Rua 3\",\"ownerName\":\"Diogo\",\"ownerEmail\":\"d@ua.pt\",\"ownerGender\":\"Male\",\"ownerPhone\":965833174,\"ownerMobilePhone\":965833174,\"zipcode\":\"1111-111\",\"partner\":{\"username\":\"DiogoPaiva\",\"password\":\"diogo\"}}")
+                .when()
+                    .post("/api/acp/add")
+                .then()
+                    .statusCode(200)
+                    .body("name", is("CP3"));
+    }
+
+    @Test
+    void updateCollectionPoint() {
+        RestAssuredMockMvc.given()
+                .contentType("application/json")
+                .body("{\"name\":\"CP3\",\"type\":\"Jogo\",\"capacity\":100,\"address\":\"Rua 3\",\"ownerName\":\"Diogo\"}")
+                .when()
+                .put("/api/acp/1")
+                .then()
+                .statusCode(200)
+                .body("id", is(1))
+                .body("name", is("CP1"));
+    }
+
+    @Test
+    void updateCollectionPointNotFound() {
+        RestAssuredMockMvc.given()
+                .contentType("application/json")
+                .body("{\"name\":\"CP3\",\"type\":\"Jogo\",\"capacity\":100,\"address\":\"Rua 3\",\"ownerName\":\"Diogo\"}")
+                .when()
+                .put("/api/acp/2")
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    void deleteCollectionPoint() {
+        RestAssuredMockMvc.given()
+                .when()
+                .delete("/api/acp/1")
+                .then()
+                .statusCode(200)
+                .body("id", is(1))
+                .body("name", is("CP1"));
+    }
+
+    @Test
+    void deleteCollectionPointNotFound() {
+        RestAssuredMockMvc.given()
+                .when()
+                .delete("/api/acp/2")
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
     void getAllParcels() {
         RestAssuredMockMvc.given()
                 .when()
-                .get("/api/acp?id=1")
+                .get("/api/acp/1")
                 .then()
                 .statusCode(200)
                 .body("size()", is(2))
@@ -77,7 +194,7 @@ class CollectionPointRestControllerTest {
     void getParcel_ifExistsInCollectionPoint() {
         RestAssuredMockMvc.given()
                 .when()
-                .get("/api/acp/parcel?id=1")
+                .get("/api/acp/parcel/1")
                 .then()
                 .statusCode(200)
                 .body("id", is(1))
@@ -89,7 +206,7 @@ class CollectionPointRestControllerTest {
     void getParcel_ifNotExistsInCollectionPoint() {
         RestAssuredMockMvc.given()
                 .when()
-                .get("/api/acp/parcel?id=2")
+                .get("/api/acp/parcel/2")
                 .then()
                 .statusCode(400);
     }
@@ -98,7 +215,7 @@ class CollectionPointRestControllerTest {
     void checkin_ifExistsInCollectionPoint() {
         RestAssuredMockMvc.given()
                 .when()
-                .post("/api/acp/parcel/checkin?id=1")
+                .post("/api/acp/parcel/checkin/1")
                 .then()
                 .statusCode(200)
                 .body("id", is(1))
@@ -109,7 +226,7 @@ class CollectionPointRestControllerTest {
     void checkin_ifNotExistsInCollectionPoint() {
         RestAssuredMockMvc.given()
                 .when()
-                .post("/api/acp/parcel/checkin?id=2")
+                .post("/api/acp/parcel/checkin/2")
                 .then()
                 .statusCode(400);
     }
@@ -118,7 +235,7 @@ class CollectionPointRestControllerTest {
     void checkin_ifNotInTransit() {
         RestAssuredMockMvc.given()
                 .when()
-                .post("/api/acp/parcel/checkin?id=3")
+                .post("/api/acp/parcel/checkin/3")
                 .then()
                 .statusCode(400);
     }
@@ -127,7 +244,7 @@ class CollectionPointRestControllerTest {
     void checkout_ifExistsInCollectionPoint() {
         RestAssuredMockMvc.given()
                 .when()
-                .post("/api/acp/parcel/checkout?id=1&token=5")
+                .post("/api/acp/parcel/checkout/1?token=5")
                 .then()
                 .statusCode(200)
                 .body("id", is(1))
@@ -138,7 +255,7 @@ class CollectionPointRestControllerTest {
     void checkout_ifNotExistsInCollectionPoint() {
         RestAssuredMockMvc.given()
                 .when()
-                .post("/api/acp/parcel/checkout?id=2&token=5")
+                .post("/api/acp/parcel/checkout/2?token=5")
                 .then()
                 .statusCode(400);
     }
@@ -147,7 +264,7 @@ class CollectionPointRestControllerTest {
     void checkout_ifNotDelivered() {
         RestAssuredMockMvc.given()
                 .when()
-                .post("/api/acp/parcel/checkout?id=3&token=5")
+                .post("/api/acp/parcel/checkout/3?token=5")
                 .then()
                 .statusCode(400);
     }
@@ -156,7 +273,7 @@ class CollectionPointRestControllerTest {
     void checkout_ifTokenIsIncorrect() {
         RestAssuredMockMvc.given()
                 .when()
-                .post("/api/acp/parcel/checkout?id=1&token=6")
+                .post("/api/acp/parcel/checkout/1?token=6")
                 .then()
                 .statusCode(400);
     }
@@ -165,7 +282,7 @@ class CollectionPointRestControllerTest {
     void returnParcel_ifExistsInCollectionPoint() {
         RestAssuredMockMvc.given()
                 .when()
-                .post("/api/acp/parcel/return?id=1")
+                .post("/api/acp/parcel/return/1")
                 .then()
                 .statusCode(200)
                 .body("id", is(1))
@@ -176,7 +293,7 @@ class CollectionPointRestControllerTest {
     void returnParcel_ifNotExistsInCollectionPoint() {
         RestAssuredMockMvc.given()
                 .when()
-                .post("/api/acp/parcel/return?id=2")
+                .post("/api/acp/parcel/return/2")
                 .then()
                 .statusCode(400);
     }
@@ -185,7 +302,7 @@ class CollectionPointRestControllerTest {
     void returnParcel_ifNotCollected() {
         RestAssuredMockMvc.given()
                 .when()
-                .post("/api/acp/parcel/return?id=3")
+                .post("/api/acp/parcel/return/3")
                 .then()
                 .statusCode(400);
     }

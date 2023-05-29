@@ -1,10 +1,14 @@
 package tqs.project.backend.boundary;
 
+import io.restassured.http.ContentType;
 import tqs.project.backend.data.collection_point.CollectionPoint;
+import tqs.project.backend.data.collection_point.CollectionPointCreateDto;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
+import tqs.project.backend.data.collection_point.CollectionPointUpdateDto;
 import tqs.project.backend.data.parcel.Parcel;
 import tqs.project.backend.data.parcel.ParcelRepository;
 import tqs.project.backend.data.parcel.ParcelStatus;
+import tqs.project.backend.data.partner.Partner;
 import tqs.project.backend.data.store.Store;
 import tqs.project.backend.data.store.StoreRepository;
 import io.restassured.RestAssured;
@@ -23,10 +27,9 @@ import static org.hamcrest.CoreMatchers.is;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "application-integrationtest.properties")
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CollectionPointRestControllerTestIT {
 
-    private CollectionPoint acp;
+    private CollectionPoint acp, acp2;
     private Parcel p, p1, p2, p3;
 
     @LocalServerPort
@@ -56,6 +59,20 @@ class CollectionPointRestControllerTestIT {
         collectionPoint.setLatitude(41.178);
         collectionPoint.setLongitude(-8.608);
         collectionPoint.setOwnerName("João");
+        collectionPoint.setOwnerEmail("joao@ua.pt");
+        collectionPoint.setOwnerGender("M");
+        collectionPoint.setOwnerPhone(123456789);
+        collectionPoint.setOwnerMobilePhone(987654321);
+
+        CollectionPoint collectionPoint2 = new CollectionPoint();
+        collectionPoint2.setId(2);
+        collectionPoint2.setName("Collection Point 2");
+        collectionPoint2.setType("Collection Point");
+        collectionPoint2.setCapacity(100);
+        collectionPoint2.setAddress("Rua do Prof António");
+        collectionPoint2.setLatitude(41.174660);
+        collectionPoint2.setLongitude(-8.588069);
+        collectionPoint2.setOwnerName("João");
         collectionPoint.setOwnerEmail("joao@ua.pt");
         collectionPoint.setOwnerGender("M");
         collectionPoint.setOwnerPhone(123456789);
@@ -108,6 +125,7 @@ class CollectionPointRestControllerTestIT {
 
         // Save to database
         acp = collectionPointRepository.save(collectionPoint);
+        acp2 = collectionPointRepository.save(collectionPoint2);
         storeRepository.save(store);
         p = parcelRepository.save(parcel);
         p1 = parcelRepository.save(parcel2);
@@ -116,15 +134,183 @@ class CollectionPointRestControllerTestIT {
     }
 
     @Test
-    @Order(1)
+    void getAllCollectionPoints() {
+        String endpoint = UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host("localhost")
+                .port(localPort)
+                .pathSegment("api","acp","all")
+                .build()
+                .toUriString();
+
+        RestAssured.given()
+                .when()
+                    .get(endpoint)
+                .then()
+                    .statusCode(200)
+                    .body("size()", is(2))
+                    .body("[0].id", is(acp.getId()))
+                    .body("[0].name", is("Collection Point 1"))
+                    .body("[1].id", is(acp2.getId()))
+                    .body("[1].name", is("Collection Point 2"));
+    }
+
+    @Test
+    void getCollectionPointsByLocation() {
+        String endpoint = UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host("localhost")
+                .port(localPort)
+                .pathSegment("api","acp","all")
+                .queryParam("zip", "4435-677")
+                .build()
+                .toUriString();
+
+        RestAssured.given()
+                .when()
+                    .get(endpoint)
+                .then()
+                    .statusCode(200)
+                    .body("size()", is(2))
+                    .body("[0].id", is(acp2.getId()))
+                    .body("[0].name", is("Collection Point 2"))
+                    .body("[1].id", is(acp.getId()))
+                    .body("[1].name", is("Collection Point 1"));
+    }
+
+    @Test
+    void createCollectionPoint() {
+        String endpoint = UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host("localhost")
+                .port(localPort)
+                .pathSegment("api","acp","add")
+                .build()
+                .toUriString();
+
+        CollectionPointCreateDto cp = new CollectionPointCreateDto();
+        cp.setName("Collection Point 3");
+        cp.setType("Collection Point");
+        cp.setCapacity(100);
+        cp.setAddress("Rua do Prof António");
+        cp.setOwnerName("João");
+        cp.setOwnerEmail("j@ua.pt");
+        cp.setOwnerGender("M");
+        cp.setOwnerPhone(123456789);
+        cp.setOwnerMobilePhone(987654321);
+        cp.setZipcode("4435-677");
+        Partner p = new Partner();
+        p.setUsername("partner");
+        p.setPassword("password");
+        cp.setPartner(p);
+
+        RestAssured.given()
+                .when()
+                    .contentType(ContentType.JSON)
+                    .body(cp)
+                    .post(endpoint)
+                .then()
+                    .statusCode(200)
+                    .body("name", is("Collection Point 3"));
+    }
+
+    @Test
+    void updateCollectionPoint() {
+        String endpoint = UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host("localhost")
+                .port(localPort)
+                .pathSegment("api", "acp", acp.getId().toString())
+                .build()
+                .toUriString();
+
+        CollectionPointUpdateDto cp = new CollectionPointUpdateDto();
+        cp.setName("Collection Point 3");
+        cp.setType("Collection Point");
+        cp.setCapacity(100);
+        cp.setOwnerPhone(965833174);
+        cp.setOwnerMobilePhone(965833174);
+        cp.setStatus(true);
+
+        RestAssured.given()
+                .when()
+                    .contentType(ContentType.JSON)
+                    .body(cp)
+                    .put(endpoint)
+                .then()
+                    .statusCode(200)
+                    .body("name", is("Collection Point 3"));
+    }
+
+    @Test
+    void updateCollectionPointNotFound() {
+        String endpoint = UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host("localhost")
+                .port(localPort)
+                .pathSegment("api", "acp", "327846")
+                .build()
+                .toUriString();
+
+        CollectionPointUpdateDto cp = new CollectionPointUpdateDto();
+        cp.setName("Collection Point 3");
+        cp.setType("Collection Point");
+        cp.setCapacity(100);
+        cp.setOwnerPhone(965833174);
+        cp.setOwnerMobilePhone(965833174);
+        cp.setStatus(true);
+
+        RestAssured.given()
+                .when()
+                    .contentType(ContentType.JSON)
+                    .body(cp)
+                    .put(endpoint)
+                .then()
+                    .statusCode(404);
+    }
+
+    @Test
+    void deleteCollectionPoint() {
+        String endpoint = UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host("localhost")
+                .port(localPort)
+                .pathSegment("api", "acp", acp.getId().toString())
+                .build()
+                .toUriString();
+
+        RestAssured.given()
+                .when()
+                    .delete(endpoint)
+                .then()
+                    .statusCode(200);
+    }
+
+    @Test
+    void deleteCollectionPointNotFound() {
+        String endpoint = UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host("localhost")
+                .port(localPort)
+                .pathSegment("api", "acp", "327846")
+                .build()
+                .toUriString();
+
+        RestAssured.given()
+                .when()
+                    .delete(endpoint)
+                .then()
+                    .statusCode(404);
+    }
+
+    @Test
     void getAllParcels(){
 
         String endpoint = UriComponentsBuilder.newInstance()
                 .scheme("http")
                 .host("localhost")
                 .port(localPort)
-                .pathSegment("api","acp")
-                .queryParam("id",acp.getId())
+                .pathSegment("api","acp",acp.getId().toString())
                 .build()
                 .toUriString();
 
@@ -143,7 +329,6 @@ class CollectionPointRestControllerTestIT {
     }
 
     @Test
-    @Order(2)
     void getParcel_ifExistsInCollectionPoint() {
         System.out.println(p.getId());
 
@@ -153,8 +338,7 @@ class CollectionPointRestControllerTestIT {
                 .scheme("http")
                 .host("localhost")
                 .port(localPort)
-                .pathSegment("api","acp","parcel")
-                .queryParam("id",p.getId())
+                .pathSegment("api","acp","parcel",p.getId().toString())
                 .build()
                 .toUriString();
 
@@ -169,7 +353,6 @@ class CollectionPointRestControllerTestIT {
     }
 
     //@Test
-    //@Order()
     //void getParcel_ifNotExistsInCollectionPoint() {
     //    String endpoint = UriComponentsBuilder.newInstance()
     //            .scheme("http")
@@ -188,14 +371,12 @@ class CollectionPointRestControllerTestIT {
     //}
 
     @Test
-    @Order(3)
     void checkin_ifParcelExistsInCollectionPoint() {
         String endpoint = UriComponentsBuilder.newInstance()
                 .scheme("http")
                 .host("localhost")
                 .port(localPort)
-                .pathSegment("api","acp", "parcel","checkin")
-                .queryParam("id",p.getId())
+                .pathSegment("api","acp", "parcel","checkin",p.getId().toString())
                 .build()
                 .toUriString();
 
@@ -209,7 +390,6 @@ class CollectionPointRestControllerTestIT {
     }
 
     //@Test
-    //@Order(5)
     //void checkin_ifParcelNotExistsInCollectionPoint() {
     //    String endpoint = UriComponentsBuilder.newInstance()
     //            .scheme("http")
@@ -228,14 +408,12 @@ class CollectionPointRestControllerTestIT {
     //}
 
     @Test
-    @Order(4)
     void checkin_ifNotInTransit(){
         String endpoint = UriComponentsBuilder.newInstance()
                 .scheme("http")
                 .host("localhost")
                 .port(localPort)
-                .pathSegment("api","acp", "parcel","checkin")
-                .queryParam("id",p1.getId())
+                .pathSegment("api","acp", "parcel","checkin",p1.getId().toString())
                 .build()
                 .toUriString();
 
@@ -247,14 +425,12 @@ class CollectionPointRestControllerTestIT {
     }
 
     @Test
-    @Order(5)
     void checkout_ifTokenIsIncorrect() {
         String endpoint = UriComponentsBuilder.newInstance()
                 .scheme("http")
                 .host("localhost")
                 .port(localPort)
-                .pathSegment("api","acp", "parcel","checkout")
-                .queryParam("id",p1.getId())
+                .pathSegment("api","acp", "parcel","checkout",p1.getId().toString())
                 .queryParam("token",1234567)
                 .build()
                 .toUriString();
@@ -267,14 +443,12 @@ class CollectionPointRestControllerTestIT {
     }
 
     @Test
-    @Order(6)
     void checkout_ifParcelExistsInCollectionPoint() {
         String endpoint = UriComponentsBuilder.newInstance()
                 .scheme("http")
                 .host("localhost")
                 .port(localPort)
-                .pathSegment("api","acp", "parcel","checkout")
-                .queryParam("id",p1.getId())
+                .pathSegment("api","acp", "parcel","checkout",p1.getId().toString())
                 .queryParam("token",123456)
                 .build()
                 .toUriString();
@@ -289,7 +463,6 @@ class CollectionPointRestControllerTestIT {
     }
 
     //@Test
-    //@Order(9)
     //void checkout_ifParcelNotExistsInCollectionPoint() {
     //    String endpoint = UriComponentsBuilder.newInstance()
     //            .scheme("http")
@@ -309,14 +482,12 @@ class CollectionPointRestControllerTestIT {
     //}
 
     @Test
-    @Order(7)
     void checkout_ifNotDelivered() {
         String endpoint = UriComponentsBuilder.newInstance()
                 .scheme("http")
                 .host("localhost")
                 .port(localPort)
-                .pathSegment("api", "acp", "parcel","checkout")
-                .queryParam("id", p.getId())
+                .pathSegment("api", "acp", "parcel","checkout",p.getId().toString())
                 .queryParam("token",123456)
                 .build()
                 .toUriString();
@@ -329,14 +500,12 @@ class CollectionPointRestControllerTestIT {
     }
 
     @Test
-    @Order(8)
     void returnParcel_ifExistsInCollectionPoint() {
         String endpoint = UriComponentsBuilder.newInstance()
                 .scheme("http")
                 .host("localhost")
                 .port(localPort)
-                .pathSegment("api", "acp", "parcel", "return")
-                .queryParam("id", p2.getId())
+                .pathSegment("api", "acp", "parcel", "return", p2.getId().toString())
                 .build()
                 .toUriString();
 
@@ -350,7 +519,6 @@ class CollectionPointRestControllerTestIT {
     }
 
     //@Test
-    //@Order(12)
     //void returnParcel_ifNotExistsInCollectionPoint() {
     //    String endpoint = UriComponentsBuilder.newInstance()
     //            .scheme("http")
@@ -369,14 +537,12 @@ class CollectionPointRestControllerTestIT {
     //}
 
     @Test
-    @Order(9)
     void returnParcel_ifNotCollected() {
         String endpoint = UriComponentsBuilder.newInstance()
                 .scheme("http")
                 .host("localhost")
                 .port(localPort)
-                .pathSegment("api", "acp", "parcel", "return")
-                .queryParam("id", p.getId())
+                .pathSegment("api", "acp", "parcel", "return", p.getId().toString())
                 .build()
                 .toUriString();
 
