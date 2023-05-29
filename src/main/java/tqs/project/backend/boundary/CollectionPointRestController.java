@@ -1,5 +1,6 @@
 package tqs.project.backend.boundary;
 
+import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import tqs.project.backend.data.collection_point.*;
 import tqs.project.backend.data.parcel.ParcelMinimal;
@@ -40,6 +41,7 @@ public class CollectionPointRestController {
     @PostMapping("/acp/add")
     public ResponseEntity<CollectionPointRDto> addAcp(@RequestBody CollectionPointCreateDto collectionPointCreateDto) {
         String zipcode = collectionPointCreateDto.getZipcode();
+        System.out.println(zipcode);
         CollectionPoint cp = ConverterUtils.fromCollectionPointCreateDtoToCollectionPoint(collectionPointCreateDto);
         Boolean b = collectionPointService.saveCPPoint(cp, zipcode);
         if(b){

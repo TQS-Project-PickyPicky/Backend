@@ -24,43 +24,43 @@ public class ResolveLocation {
 
         URL url;
 
+        String possible = "https://json.geoapi.pt/cp/[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9]";
+
+        String u = "https://json.geoapi.pt/cp/" + zipCode;
+
         try {
-            url = new URL("https://json.geoapi.pt/cp/" + zipCode);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.connect();
-            int responsecode = conn.getResponseCode();
+            url = new URL(u);
 
-            if (responsecode != 200){
-                return new ArrayList<Double>();
-            }
-
-            String inline = "";
-            try (Scanner scanner = new Scanner(url.openStream())) {
-                while (scanner.hasNext()) {
-                    inline += scanner.nextLine();
+            if(url.toString().matches(possible)){
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.connect();
+                int responsecode = conn.getResponseCode();
+                if (responsecode != 200){
+                    return new ArrayList<Double>();
                 }
-            } catch (IOException e) {
+                String inline = "";
+                try (Scanner scanner = new Scanner(url.openStream())) {
+                    while (scanner.hasNext()) {
+                        inline += scanner.nextLine();
+                    }
+                } catch (IOException e) {
+                    return new ArrayList<Double>();
+                }
+                JSONParser parse = new JSONParser();
+                JSONObject dataObj = (JSONObject) parse.parse(inline);
+                log.info("" + dataObj);
+                JSONArray jsonArray = (JSONArray) dataObj.get("pontos");
+                JSONObject obj = (JSONObject) jsonArray.get(0); //get 1st element
+                JSONArray coordenadas = (JSONArray) obj.get("coordenadas");
+                Double latitude = (Double) coordenadas.get(0);
+                Double longitude = (Double) coordenadas.get(1);
+                array.add(latitude);
+                array.add(longitude);
+                log.info(latitude + ", " + longitude);
+            }else {
                 return new ArrayList<Double>();
             }
-
-            JSONParser parse = new JSONParser();
-            JSONObject dataObj = (JSONObject) parse.parse(inline);
-
-            log.info("" + dataObj);
-
-            JSONArray jsonArray = (JSONArray) dataObj.get("pontos");
-            JSONObject obj = (JSONObject) jsonArray.get(0); //get 1st element
-            JSONArray coordenadas = (JSONArray) obj.get("coordenadas");
-
-            Double latitude = (Double) coordenadas.get(0);
-            Double longitude = (Double) coordenadas.get(1);
-
-            array.add(latitude);
-            array.add(longitude);
-
-            log.info(latitude + ", " + longitude);
-
         } catch (Exception e) {
             return new ArrayList<Double>();
         }

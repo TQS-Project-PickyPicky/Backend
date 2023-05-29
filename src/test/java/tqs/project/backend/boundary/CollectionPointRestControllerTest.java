@@ -120,17 +120,17 @@ class CollectionPointRestControllerTest {
                 .body("[1].name", is("CP1"));
     }
 
-    //@Test
-    //void createCollectionPoint() {
-    //    RestAssuredMockMvc.given()
-    //                .contentType("application/json")
-    //                .body("{\"name\":\"CP3\",\"type\":\"Jogo\",\"capacity\":100,\"address\":\"Rua 3\",\"ownerName\":\"Diogo\",\"ownerEmail\":\"d@ua.pt\",\"ownerGender\":\"Male\",\"ownerPhone\":965833174,\"ownerMobilePhone\":965833174,\"zip\":\"1111-111\",\"partner\":{\"username\":DiogoPaiva,\"password\":\"diogo\"}}")
-    //            .when()
-    //                .post("/api/acp/add")
-    //            .then()
-    //                .body("id", is(1))
-    //                .body("name", is("CP3"));
-    //}
+    @Test
+    void createCollectionPoint() {
+        RestAssuredMockMvc.given()
+                    .contentType("application/json")
+                    .body("{\"name\":\"CP3\",\"type\":\"Jogo\",\"capacity\":100,\"address\":\"Rua 3\",\"ownerName\":\"Diogo\",\"ownerEmail\":\"d@ua.pt\",\"ownerGender\":\"Male\",\"ownerPhone\":965833174,\"ownerMobilePhone\":965833174,\"zipcode\":\"1111-111\",\"partner\":{\"username\":\"DiogoPaiva\",\"password\":\"diogo\"}}")
+                .when()
+                    .post("/api/acp/add")
+                .then()
+                    .statusCode(200)
+                    .body("name", is("CP3"));
+    }
 
     @Test
     void updateCollectionPoint() {
