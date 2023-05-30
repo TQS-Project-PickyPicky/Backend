@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
 import tqs.project.backend.data.parcel.Parcel;
+import tqs.project.backend.data.parcel.ParcelMinimal;
 import tqs.project.backend.data.parcel.ParcelRepository;
 import tqs.project.backend.data.parcel.ParcelStatus;
 import tqs.project.backend.data.store.Store;
@@ -25,6 +26,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,6 +59,58 @@ class ParcelServiceTest {
         Parcel parcel2 = new Parcel(2, 222222, "Bob", "bob@mail.com", 222000111, 222000222, LocalDate.of(2023, 5, 19), ParcelStatus.DELIVERED, store, collectionPoint);
 
         List<Parcel> allParcels = List.of(parcel1, parcel2);
+
+        // CheckIn, CheckOut and Return
+
+        Parcel parcel = new Parcel();
+        parcel.setId(7);
+        parcel.setToken(123456);
+        parcel.setClientName("João");
+        parcel.setClientEmail("joao@ua.pt");
+        parcel.setClientPhone(123456789);
+        parcel.setClientMobilePhone(987654321);
+        parcel.setExpectedArrival(LocalDate.now().plusDays(5));
+        parcel.setStore(store);
+        parcel.setStatus(ParcelStatus.IN_TRANSIT);
+        parcel.setCollectionPoint(collectionPoint);
+
+        Parcel parcel3 = new Parcel();
+        parcel3.setId(4);
+        parcel3.setToken(123456);
+        parcel3.setClientName("Jorge");
+        parcel3.setClientEmail("jorge@ua.pt");
+        parcel3.setClientPhone(123456789);
+        parcel3.setClientMobilePhone(987654321);
+        parcel3.setExpectedArrival(LocalDate.now().plusDays(7));
+        parcel3.setStore(store);
+        parcel3.setStatus(ParcelStatus.DELIVERED);
+        parcel3.setCollectionPoint(collectionPoint);
+
+        Parcel parcel5 = new Parcel();
+
+        Parcel parcel4 = new Parcel();
+        parcel4.setId(6);
+        parcel4.setToken(123456);
+        parcel4.setClientName("Gabriel");
+        parcel4.setClientEmail("gabriel@ua.pt");
+        parcel4.setClientPhone(123456789);
+        parcel4.setClientMobilePhone(987654321);
+        parcel4.setExpectedArrival(LocalDate.now());
+        parcel4.setStore(store);
+        parcel4.setStatus(ParcelStatus.COLLECTED);
+        parcel4.setCollectionPoint(collectionPoint);
+
+        when(parcelRepository.findById(7))
+                .thenReturn(Optional.of(parcel));
+
+        when(parcelRepository.findById(4))
+                .thenReturn(Optional.of(parcel3));
+
+        when(parcelRepository.findById(5))
+                .thenReturn(Optional.of(parcel5));
+
+        when(parcelRepository.findById(6))
+                .thenReturn(Optional.of(parcel4));
 
         // Create expectations
         when(storeRepository.findById(1))
@@ -218,5 +273,84 @@ class ParcelServiceTest {
 
     public Parcel cloneParcel(Integer id) {
         return ConverterUtils.fromParcelDtoToParcel(ConverterUtils.fromParcelToParcelDto(service.getParcel(id)), storeRepository, collectionPointRepository);
+    }
+
+    @Test
+    void checkinParcel_ifParcelExistsCollectionPoint() throws ParcelNotFoundException, InvalidParcelStatusChangeException {
+        ParcelMinimal parcel = service.checkIn(7);
+
+        ParcelMinimal parcelCheck = new ParcelMinimal(7, ParcelStatus.DELIVERED);
+
+        assertEquals(parcelCheck.getId(), parcel.getId());
+        assertEquals(parcelCheck.getStatus(), parcel.getStatus());
+    }
+
+    //@Test
+    //void checkinParcel_ifParcelDoesNotExistCollectionPoint() {
+    //    assertThrows(ParcelNotFoundException.class, () -> {
+    //        service.checkIn(5);
+    //    });
+    //}
+
+    @Test
+    void checkinParcel_ifParcelDoesNotHaveStateInTransit() {
+        assertThrows(InvalidParcelStatusChangeException.class, () -> {
+            service.checkIn(4);
+        });
+    }
+
+    @Test
+    void checkoutParcel_ifParcelExistsCollectionPoint() throws ParcelNotFoundException, InvalidParcelStatusChangeException, IncorrectParcelTokenException {
+        ParcelMinimal parcel = service.checkOut(4, 123456);
+
+        ParcelMinimal parcelCheck = new ParcelMinimal(4, ParcelStatus.COLLECTED);
+
+        assertEquals(parcelCheck.getId(), parcel.getId());
+        assertEquals(parcelCheck.getStatus(), parcel.getStatus());
+    }
+
+    //@Test
+    //void checkoutParcel_ifParcelDoesNotExistCollectionPoint() {
+    //    assertThrows(ParcelNotFoundException.class, () -> {
+    //        service.checkOut(5,123456);
+    //    });
+    //}
+
+    @Test
+    void checkoutParcel_ifParcelDoesNotHaveStateDelivered() {
+        assertThrows(InvalidParcelStatusChangeException.class, () -> {
+            service.checkOut(7, 123456);
+        });
+    }
+
+    @Test
+    void checkoutParcel_ifParcelDoesNotHaveCorrectToken() {
+        assertThrows(IncorrectParcelTokenException.class, () -> {
+            service.checkOut(4, 1234567);
+        });
+    }
+
+    @Test
+    void returnParcel__ifParcelExistsCollectionPoint() throws InvalidParcelStatusChangeException, ParcelNotFoundException {
+        ParcelMinimal parcel = service.returnParcel(6);
+
+        ParcelMinimal parcelCheck = new ParcelMinimal(6, ParcelStatus.RETURNED);
+
+        assertEquals(parcelCheck.getId(), parcel.getId());
+        assertEquals(parcelCheck.getStatus(), parcel.getStatus());
+    }
+
+    //@Test
+    //void returnParcel_ifParcelDoesNotExistCollectionPoint() {
+    //    assertThrows(ParcelNotFoundException.class, () -> {
+    //        service.returnParcel(5);
+    //    });
+    //}
+
+    @Test
+    void returnParcel_ifParcelDoesNotHaveStateCollected() {
+        assertThrows(InvalidParcelStatusChangeException.class, () -> {
+            service.returnParcel(7);
+        });
     }
 }

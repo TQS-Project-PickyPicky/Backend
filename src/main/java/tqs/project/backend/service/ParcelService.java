@@ -4,12 +4,14 @@ import org.springframework.stereotype.Service;
 
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
 import tqs.project.backend.data.parcel.Parcel;
+import tqs.project.backend.data.parcel.ParcelMinimal;
 import tqs.project.backend.data.parcel.ParcelRepository;
 import tqs.project.backend.data.parcel.ParcelStatus;
 import tqs.project.backend.data.store.StoreRepository;
 import tqs.project.backend.exception.IncorrectParcelTokenException;
 import tqs.project.backend.exception.InvalidParcelStatusChangeException;
 import tqs.project.backend.exception.ParcelNotFoundException;
+import tqs.project.backend.util.ConverterUtils;
 import tqs.project.backend.util.TokenUtils;
 
 import java.time.LocalDate;
@@ -80,5 +82,99 @@ public class ParcelService {
         Parcel parcel = parcelRepository.findById(id).orElseThrow(() -> new ParcelNotFoundException(id));
         parcelRepository.delete(parcel);
         return parcel;
+    }
+
+    public ParcelMinimal checkIn(Integer parcelId) throws ParcelNotFoundException, InvalidParcelStatusChangeException {
+        Parcel parcel = parcelRepository.findById(parcelId).orElseThrow();
+
+        // TODO - Change to ask for id of logged in user
+        //CollectionPoint collectionPoint = collectionPointRepository.findById(1).orElseThrow();
+        //List<Parcel> parcels = collectionPoint.getParcels();
+
+        //if(parcels.contains(parcel)){
+        //    if(parcel.getStatus().equals(ParcelStatus.IN_TRANSIT)){
+        //        parcel.setStatus(ParcelStatus.DELIVERED);
+        //        parcelRepository.save(parcel);
+        //        return new ParcelAllDto(parcel.getId(), parcel.getStatus());
+        //    } else {
+        //        throw new InvalidParcelStatusChangeException("Parcel is not in transit");
+        //    }
+        //} else {
+        //    throw new ParcelNotFoundException("Can't access this parcel");
+        //}
+
+        if(parcel.getStatus().equals(ParcelStatus.IN_TRANSIT)){
+            parcel.setStatus(ParcelStatus.DELIVERED);
+            parcelRepository.save(parcel);
+            return ConverterUtils.fromParcelToParcelMinimal(parcel);
+        } else {
+            throw new InvalidParcelStatusChangeException(parcel.getStatus(), ParcelStatus.DELIVERED);
+        }
+    }
+
+    public ParcelMinimal checkOut(Integer parcelId, Integer token) throws IncorrectParcelTokenException, ParcelNotFoundException, InvalidParcelStatusChangeException {
+        Parcel parcel = parcelRepository.findById(parcelId).orElseThrow();
+
+        // TODO - Change to ask for id of logged in user
+        //CollectionPoint collectionPoint = collectionPointRepository.findById(1).orElseThrow();
+        //List<Parcel> parcels = collectionPoint.getParcels();
+//
+        //if(parcels.contains(parcel)){
+        //    if (parcel.getStatus().equals(ParcelStatus.DELIVERED)) {
+        //        if (!token.equals(parcel.getToken())) {
+        //            System.out.println("Token is not correct");
+        //            throw new IncorrectParcelTokenException("Token is not correct");
+        //        } else {
+        //            parcel.setStatus(ParcelStatus.COLLECTED);
+        //            parcelRepository.save(parcel);
+        //            return new ParcelAllDto(parcel.getId(), parcel.getStatus());
+        //        }
+        //    } else {
+        //        throw new InvalidParcelStatusChangeException("Parcel is not in transit");
+        //    }
+        //} else {
+        //    throw new ParcelNotFoundException("Can't access this parcel");
+        //}
+
+        if (parcel.getStatus().equals(ParcelStatus.DELIVERED)) {
+            if (!token.equals(parcel.getToken())) {
+                throw new IncorrectParcelTokenException(token, parcelId);
+            } else {
+                parcel.setStatus(ParcelStatus.COLLECTED);
+                parcelRepository.save(parcel);
+                return ConverterUtils.fromParcelToParcelMinimal(parcel);
+            }
+        } else {
+            throw new InvalidParcelStatusChangeException(parcel.getStatus(), ParcelStatus.COLLECTED);
+        }
+    }
+
+    public ParcelMinimal returnParcel(Integer parcelId) throws ParcelNotFoundException, InvalidParcelStatusChangeException {
+        Parcel parcel = parcelRepository.findById(parcelId).orElseThrow();
+
+        // TODO - Change to ask for id of logged in user
+        //CollectionPoint collectionPoint = collectionPointRepository.findById(1).orElseThrow();
+        //List<Parcel> parcels = collectionPoint.getParcels();
+
+        //if(parcels.contains(parcel)){
+        //    if(parcel.getStatus().equals(ParcelStatus.COLLECTED)){
+        //        parcel.setStatus(ParcelStatus.RETURNED);
+        //        parcelRepository.save(parcel);
+        //        return new ParcelAllDto(parcel.getId(), parcel.getStatus());
+        //    } else {
+        //        throw new InvalidParcelStatusChangeException("Parcel is not in transit");
+        //    }
+        //} else {
+        //    throw new ParcelNotFoundException("Can't access this parcel");
+        //}
+
+        if(parcel.getStatus().equals(ParcelStatus.COLLECTED)){
+            parcel.setStatus(ParcelStatus.RETURNED);
+            parcelRepository.save(parcel);
+            return ConverterUtils.fromParcelToParcelMinimal(parcel);
+        } else {
+            throw new InvalidParcelStatusChangeException(parcel.getStatus(), ParcelStatus.RETURNED);
+        }
+
     }
 }

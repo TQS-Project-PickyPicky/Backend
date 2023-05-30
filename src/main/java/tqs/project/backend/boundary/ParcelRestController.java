@@ -3,10 +3,7 @@ package tqs.project.backend.boundary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tqs.project.backend.data.parcel.Parcel;
-import tqs.project.backend.data.parcel.ParcelCreateDto;
-import tqs.project.backend.data.parcel.ParcelDto;
-import tqs.project.backend.data.parcel.ParcelUpdateDto;
+import tqs.project.backend.data.parcel.*;
 import tqs.project.backend.exception.IncorrectParcelTokenException;
 import tqs.project.backend.exception.InvalidParcelStatusChangeException;
 import tqs.project.backend.exception.ParcelNotFoundException;
@@ -88,6 +85,36 @@ public class ParcelRestController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/parcel/{id}/checkin")
+    public ResponseEntity<ParcelMinimal> parcelCheckIn(@PathVariable(value = "id") Integer id) {
+        try {
+            ParcelMinimal parcel = parcelService.checkIn(id);
+            return ResponseEntity.ok(parcel);
+        } catch (ParcelNotFoundException | InvalidParcelStatusChangeException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @PostMapping("/parcel/{id}/checkout")
+    public ResponseEntity<ParcelMinimal> parcelCheckOut(@PathVariable(value = "id") Integer id, @RequestParam(value = "token") Integer token) {
+        try {
+            ParcelMinimal parcel = parcelService.checkOut(id, token);
+            return ResponseEntity.ok(parcel);
+        } catch (IncorrectParcelTokenException | ParcelNotFoundException | InvalidParcelStatusChangeException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @PostMapping("/parcel/{id}/return")
+    public ResponseEntity<ParcelMinimal> parcelReturn(@PathVariable(value = "id") Integer id) {
+        try {
+            ParcelMinimal parcel = parcelService.returnParcel(id);
+            return ResponseEntity.ok(parcel);
+        } catch (ParcelNotFoundException | InvalidParcelStatusChangeException e) {
+            return ResponseEntity.badRequest().body(null);
         }
     }
 }
