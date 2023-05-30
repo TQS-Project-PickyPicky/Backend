@@ -165,6 +165,18 @@ public class CollectionPointServiceTest {
     }
 
     @Test
+    void getCollectionPointById() {
+        CollectionPointRDto collectionPoint = collectionPointService.getCP(1);
+        assertEquals(1, collectionPoint.getId());
+        assertEquals("Collection Point 1", collectionPoint.getName());
+    }
+
+    @Test
+    void getCollectionPointByIdNotFound() {
+        assertThrows(CollectionPointNotFoundException.class, () -> collectionPointService.getCP(3));
+    }
+
+    @Test
     void getAllCollectionPoints() {
         List<CollectionPointRDto> collectionPoints = collectionPointService.getAll();
         assertEquals(2, collectionPoints.size());

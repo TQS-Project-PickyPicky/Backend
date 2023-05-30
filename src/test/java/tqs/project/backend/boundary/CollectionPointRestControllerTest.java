@@ -39,6 +39,10 @@ class CollectionPointRestControllerTest {
     void setUp() throws ParcelNotFoundException, InvalidParcelStatusChangeException, IncorrectParcelTokenException {
         RestAssuredMockMvc.mockMvc(mvc);
 
+        // Get CollectionPoint by ID
+        when(collectionPointService.getCP(1)).thenReturn(new CollectionPointRDto(1, "CP1", "Rua 1", 100, "Porto", true));
+        when(collectionPointService.getCP(2)).thenThrow(new CollectionPointNotFoundException(2));
+
         // All CollectionPoints
         when(collectionPointService.getAll()).thenReturn(List.of(
                 new CollectionPointRDto(1, "CP1", "Rua 1", 100, "Porto", true),
@@ -70,6 +74,26 @@ class CollectionPointRestControllerTest {
                 new ParcelMinimal(1, ParcelStatus.IN_TRANSIT),
                 new ParcelMinimal(2, ParcelStatus.PLACED)
                 ));
+    }
+
+    @Test
+    void getCollectionPoint() {
+        RestAssuredMockMvc.given()
+                .when()
+                .get("/api/acp/1")
+                .then()
+                .statusCode(200)
+                .body("id", is(1))
+                .body("name", is("CP1"));
+    }
+
+    @Test
+    void getCollectionPointNotFound() {
+        RestAssuredMockMvc.given()
+                .when()
+                .get("/api/acp/2")
+                .then()
+                .statusCode(404);
     }
 
     @Test

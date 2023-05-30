@@ -116,6 +116,11 @@ public class CollectionPointService {
         return list;
     }
 
+    public CollectionPointRDto getCP(Integer id) {
+        CollectionPoint cp = collectionPointRepository.findById(id).orElseThrow(() -> new CollectionPointNotFoundException(id));
+        return ConverterUtils.fromCollectionPointToCollectionPointRDto(cp);
+    }
+
     public List<ParcelMinimal> getAllParcels(Integer id) {
         CollectionPoint collectionPoint = collectionPointRepository.findById(id).orElseThrow();
         List<Parcel> parcels = collectionPoint.getParcels();

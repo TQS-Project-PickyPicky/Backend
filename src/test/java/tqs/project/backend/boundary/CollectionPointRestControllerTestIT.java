@@ -136,6 +136,42 @@ class CollectionPointRestControllerTestIT {
     }
 
     @Test
+    void getCollectionPoint() {
+        String endpoint = UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host("localhost")
+                .port(localPort)
+                .pathSegment("api","acp", String.valueOf(acp.getId()))
+                .build()
+                .toUriString();
+
+        RestAssured.given()
+                .when()
+                    .get(endpoint)
+                .then()
+                    .statusCode(200)
+                    .body("id", is(acp.getId()))
+                    .body("name", is("Collection Point 1"));
+    }
+
+    @Test
+    void getCollectionPointNotFound() {
+        String endpoint = UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host("localhost")
+                .port(localPort)
+                .pathSegment("api","acp", String.valueOf(-1))
+                .build()
+                .toUriString();
+
+        RestAssured.given()
+                .when()
+                    .get(endpoint)
+                .then()
+                    .statusCode(404);
+    }
+
+    @Test
     void getAllCollectionPoints() {
         String endpoint = UriComponentsBuilder.newInstance()
                 .scheme("http")
