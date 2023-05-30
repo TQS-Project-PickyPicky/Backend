@@ -91,8 +91,10 @@ public class CollectionPointService {
     public List<CollectionPointRDto> getAll() {
         List<CollectionPointRDto> list = new ArrayList<>();
         for (CollectionPoint collectionPoint : collectionPointRepository.findAll()) {
-            CollectionPointRDto collectionPointRDto = ConverterUtils.fromCollectionPointToCollectionPointRDto(collectionPoint);
-            list.add(collectionPointRDto);
+            if(collectionPoint.getStatus()) {
+                CollectionPointRDto collectionPointRDto = ConverterUtils.fromCollectionPointToCollectionPointRDto(collectionPoint);
+                list.add(collectionPointRDto);
+            }
         }
         return list;
     }
@@ -106,8 +108,10 @@ public class CollectionPointService {
 
         List<CollectionPointRDto> list = new ArrayList<>();
         for (CollectionPoint collectionPoint : nearestCollectionPoints) {
-            CollectionPointRDto collectionPointRDto = ConverterUtils.fromCollectionPointToCollectionPointRDto(collectionPoint);
-            list.add(collectionPointRDto);
+            if(collectionPoint.getStatus()) {
+                CollectionPointRDto collectionPointRDto = ConverterUtils.fromCollectionPointToCollectionPointRDto(collectionPoint);
+                list.add(collectionPointRDto);
+            }
         }
         return list;
     }
@@ -139,99 +143,5 @@ public class CollectionPointService {
         //    throw new ParcelNotFoundException("Can't access this parcel");
         //}
         return ConverterUtils.fromParcelToParcelMinimalEta(parcel);
-    }
-
-    public ParcelMinimal checkIn(Integer parcelId) throws ParcelNotFoundException, InvalidParcelStatusChangeException {
-        Parcel parcel = parcelRepository.findById(parcelId).orElseThrow();
-
-        // TODO - Change to ask for id of logged in user
-        //CollectionPoint collectionPoint = collectionPointRepository.findById(1).orElseThrow();
-        //List<Parcel> parcels = collectionPoint.getParcels();
-
-        //if(parcels.contains(parcel)){
-        //    if(parcel.getStatus().equals(ParcelStatus.IN_TRANSIT)){
-        //        parcel.setStatus(ParcelStatus.DELIVERED);
-        //        parcelRepository.save(parcel);
-        //        return new ParcelAllDto(parcel.getId(), parcel.getStatus());
-        //    } else {
-        //        throw new InvalidParcelStatusChangeException("Parcel is not in transit");
-        //    }
-        //} else {
-        //    throw new ParcelNotFoundException("Can't access this parcel");
-        //}
-
-        if(parcel.getStatus().equals(ParcelStatus.IN_TRANSIT)){
-            parcel.setStatus(ParcelStatus.DELIVERED);
-            parcelRepository.save(parcel);
-            return ConverterUtils.fromParcelToParcelMinimal(parcel);
-        } else {
-            throw new InvalidParcelStatusChangeException(parcel.getStatus(), ParcelStatus.DELIVERED);
-        }
-    }
-
-    public ParcelMinimal checkOut(Integer parcelId, Integer token) throws IncorrectParcelTokenException, ParcelNotFoundException, InvalidParcelStatusChangeException {
-        Parcel parcel = parcelRepository.findById(parcelId).orElseThrow();
-
-        // TODO - Change to ask for id of logged in user
-        //CollectionPoint collectionPoint = collectionPointRepository.findById(1).orElseThrow();
-        //List<Parcel> parcels = collectionPoint.getParcels();
-//
-        //if(parcels.contains(parcel)){
-        //    if (parcel.getStatus().equals(ParcelStatus.DELIVERED)) {
-        //        if (!token.equals(parcel.getToken())) {
-        //            System.out.println("Token is not correct");
-        //            throw new IncorrectParcelTokenException("Token is not correct");
-        //        } else {
-        //            parcel.setStatus(ParcelStatus.COLLECTED);
-        //            parcelRepository.save(parcel);
-        //            return new ParcelAllDto(parcel.getId(), parcel.getStatus());
-        //        }
-        //    } else {
-        //        throw new InvalidParcelStatusChangeException("Parcel is not in transit");
-        //    }
-        //} else {
-        //    throw new ParcelNotFoundException("Can't access this parcel");
-        //}
-
-        if (parcel.getStatus().equals(ParcelStatus.DELIVERED)) {
-            if (!token.equals(parcel.getToken())) {
-                throw new IncorrectParcelTokenException(token, parcelId);
-            } else {
-                parcel.setStatus(ParcelStatus.COLLECTED);
-                parcelRepository.save(parcel);
-                return ConverterUtils.fromParcelToParcelMinimal(parcel);
-            }
-        } else {
-            throw new InvalidParcelStatusChangeException(parcel.getStatus(), ParcelStatus.COLLECTED);
-        }
-    }
-
-    public ParcelMinimal returnParcel(Integer parcelId) throws ParcelNotFoundException, InvalidParcelStatusChangeException {
-        Parcel parcel = parcelRepository.findById(parcelId).orElseThrow();
-
-        // TODO - Change to ask for id of logged in user
-        //CollectionPoint collectionPoint = collectionPointRepository.findById(1).orElseThrow();
-        //List<Parcel> parcels = collectionPoint.getParcels();
-
-        //if(parcels.contains(parcel)){
-        //    if(parcel.getStatus().equals(ParcelStatus.COLLECTED)){
-        //        parcel.setStatus(ParcelStatus.RETURNED);
-        //        parcelRepository.save(parcel);
-        //        return new ParcelAllDto(parcel.getId(), parcel.getStatus());
-        //    } else {
-        //        throw new InvalidParcelStatusChangeException("Parcel is not in transit");
-        //    }
-        //} else {
-        //    throw new ParcelNotFoundException("Can't access this parcel");
-        //}
-
-        if(parcel.getStatus().equals(ParcelStatus.COLLECTED)){
-            parcel.setStatus(ParcelStatus.RETURNED);
-            parcelRepository.save(parcel);
-            return ConverterUtils.fromParcelToParcelMinimal(parcel);
-        } else {
-            throw new InvalidParcelStatusChangeException(parcel.getStatus(), ParcelStatus.RETURNED);
-        }
-
     }
 }
