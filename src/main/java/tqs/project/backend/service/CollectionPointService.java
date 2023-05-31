@@ -7,8 +7,6 @@ import tqs.project.backend.data.parcel.*;
 import tqs.project.backend.data.partner.PartnerRepository;
 import tqs.project.backend.exception.CollectionPointNotFoundException;
 import tqs.project.backend.exception.ParcelNotFoundException;
-import tqs.project.backend.exception.InvalidParcelStatusChangeException;
-import tqs.project.backend.exception.IncorrectParcelTokenException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

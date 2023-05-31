@@ -1,5 +1,7 @@
 package tqs.project.backend.service;
 
+import tqs.project.backend.data.admin.Admin;
+import tqs.project.backend.data.admin.AdminRepository;
 import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.collection_point.CollectionPointDDto;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
@@ -12,12 +14,11 @@ import tqs.project.backend.util.ConverterUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ch.qos.logback.core.pattern.ConverterUtil;
-
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,13 +28,25 @@ public class AdminService {
     private final PartnerRepository partnerRepository;
     private final CollectionPointRepository collectionPointRepository;
     private final ParcelRepository parcelRepository;
+    private final AdminRepository adminRepository;
 
     @Autowired
-    public AdminService(CollectionPointRepository collectionPointRepository, ParcelRepository parcelRepository, PartnerRepository partnerRepository) {
+    public AdminService(CollectionPointRepository collectionPointRepository, ParcelRepository parcelRepository, PartnerRepository partnerRepository, AdminRepository adminRepository) {
         this.collectionPointRepository = collectionPointRepository;
         this.parcelRepository = parcelRepository;
         this.partnerRepository = partnerRepository;
+        this.adminRepository = adminRepository;
 
+    }
+
+    @PostConstruct
+    public void initData() {
+        if (adminRepository.count() == 0) {
+            Admin admin = new Admin();
+            admin.setUsername("admin");
+            admin.setPassword("admin");
+            adminRepository.save(admin);
+        }
     }
 
     public CollectionPoint getCollectionPointById(Integer id) throws Exception{

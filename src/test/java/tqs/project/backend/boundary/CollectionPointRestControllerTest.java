@@ -3,7 +3,6 @@ package tqs.project.backend.boundary;
 import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.collection_point.CollectionPointRDto;
 import tqs.project.backend.data.parcel.ParcelMinimal;
-import tqs.project.backend.data.parcel.ParcelMinimalEta;
 import tqs.project.backend.data.parcel.ParcelStatus;
 import tqs.project.backend.exception.CollectionPointNotFoundException;
 import tqs.project.backend.exception.IncorrectParcelTokenException;

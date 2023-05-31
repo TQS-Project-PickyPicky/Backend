@@ -2,6 +2,7 @@ package tqs.project.backend.boundary;
 
 import javax.validation.Valid;
 
+import org.hamcrest.core.IsInstanceOf;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -11,20 +12,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import lombok.extern.slf4j.Slf4j;
+import tqs.project.backend.data.admin.Admin;
 import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.collection_point.CollectionPointDto;
 import tqs.project.backend.data.partner.Partner;
-import tqs.project.backend.service.CollectionPointService;
+import tqs.project.backend.data.user.User;
+import tqs.project.backend.service.MainService;
 import tqs.project.backend.util.ConverterUtils;
 
 @Controller
 @RequestMapping("/main")
+@Slf4j
 public class MainWebController {
 
-    private final CollectionPointService collectionPointService;
+    private final MainService mainService;
 
-    public MainWebController(CollectionPointService collectionPointService) {
-        this.collectionPointService = collectionPointService;
+    public MainWebController(MainService mainService) {
+        this.mainService = mainService;
     }
 
     //get ACP application page -> fucntional
@@ -63,26 +68,36 @@ public class MainWebController {
 
         CollectionPoint cp = ConverterUtils.fromCollectionPointDTOToCollectionPoint(cpDto);
 
-        if (!collectionPointService.saveCPPoint(cp, zipcode)){ //was able to retreive data
+        if (!mainService.saveCPPoint(cp, zipcode)){ //was able to retreive data
             model.addAttribute("errorCoordinates", "Couldn't get that address... Try again.");
             return "acp-application";
         }
 
-        
         model.addAttribute("showModal", true);
         return "redirect:/main/login";
     
     }
-    // Login form
+
     @GetMapping("/login")
     public String login() {
-        return "home-picky.html";
+        return "home-picky";
     }
 
-    // Login form with error
-    @GetMapping("/login-error")
-    public String loginError(Model model) {
-        model.addAttribute("loginError", true);
-        return "login.html";
+    @PostMapping("/login")
+    public String loginPost(@RequestParam String username, @RequestParam String password, Model model){
+        User user = mainService.findByUsernameAndPassword(username, password);
+        if (user instanceof Admin) {
+            return "redirect:/admin/acp-pages";
+        } else {
+            if (user instanceof Partner) {
+                log.info(user.getId() + "");
+                return "redirect:/acp/home";
+            } else {
+                model.addAttribute("error", "Username or password incorrect");
+                return "home-picky";
+            }
+        }
+       
     }
+
 }

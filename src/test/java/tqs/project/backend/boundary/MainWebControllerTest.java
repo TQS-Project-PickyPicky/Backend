@@ -14,7 +14,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import tqs.project.backend.service.CollectionPointService;
+import tqs.project.backend.data.admin.Admin;
+import tqs.project.backend.data.partner.Partner;
+import tqs.project.backend.service.MainService;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -27,10 +29,13 @@ public class MainWebControllerTest {
     private MockMvc mvc;
     
     @MockBean
-    private CollectionPointService collectionPointService;
+    private MainService mainService;
 
     @Test
     void getAllForms() throws Exception{
+        Partner partner = new Partner();
+        partner.setUsername("partner");
+        partner.setPassword("password");
         mvc.perform(get("/main/registerACP").contentType(MediaType.TEXT_HTML))
             .andExpect(status().isOk())
             .andExpect(view().name("acp-application"))
@@ -40,7 +45,7 @@ public class MainWebControllerTest {
     @Test
     void registerACP_ValidForm_Success() throws Exception {
 
-        when(collectionPointService.saveCPPoint(any(), anyString())).thenReturn(true);
+        when(mainService.saveCPPoint(any(), anyString())).thenReturn(true);
 
         mvc.perform(post("/main/registerACP")
                 .param("name", "cp1")
@@ -60,7 +65,7 @@ public class MainWebControllerTest {
                 .andExpect(model().attributeDoesNotExist("error"))
                 .andExpect(model().attributeDoesNotExist("errorCoordinates"));
 
-        verify(collectionPointService).saveCPPoint(any(), eq("12345"));
+        verify(mainService).saveCPPoint(any(), eq("12345"));
     }
 
     @Test
@@ -81,7 +86,7 @@ public class MainWebControllerTest {
                 .andExpect(model().attributeExists("cp"))
                 .andExpect(model().hasErrors());
 
-        verifyNoInteractions(collectionPointService);
+        verifyNoInteractions(mainService);
     }
 
     @Test
@@ -105,7 +110,39 @@ public class MainWebControllerTest {
                 .andExpect(model().attributeExists("error"))
                 .andExpect(model().attributeDoesNotExist("errorCoordinates"));
 
-        verifyNoInteractions(collectionPointService);
+        verifyNoInteractions(mainService);
+    }
+
+    @Test
+    void badAuthentication() throws Exception {
+        when(mainService.findByUsernameAndPassword(any(), any())).thenReturn(null);
+
+        mvc.perform(post("/main/login")
+                .param("username", "invalid")
+                .param("password", "invalid"))
+                .andExpect(model().attributeExists("error"))
+                .andExpect(view().name("home-picky"));
+    }
+
+    @Test
+    void adminAuthentication() throws Exception {
+        when(mainService.findByUsernameAndPassword(any(), any())).thenReturn(new Admin());
+        mvc.perform(post("/main/login")
+                .param("username", "admin")
+                .param("password", "admin"))
+                .andExpect(redirectedUrl("/admin/acp-pages"));
+    }
+
+    @Test
+    void partnerAuthentication() throws Exception {
+        Partner partner = new Partner();
+        partner.setUsername("partner");
+        partner.setPassword("password");
+        when(mainService.findByUsernameAndPassword("partner", "password")).thenReturn(partner);
+        mvc.perform(post("/main/login")
+                .param("username", "partner")
+                .param("password", "password"))
+                .andExpect(redirectedUrl("/acp/home"));
     }
 
 }
