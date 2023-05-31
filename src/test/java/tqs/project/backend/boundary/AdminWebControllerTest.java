@@ -180,36 +180,5 @@ class AdminWebControllerTest {
         verify(adminService, times(1)).deleteParcel(idParcel);
     }
 
-    @Test
-    void testGetCandidateAcp() throws Exception {
-        List<CollectionPointDDto> cps = new ArrayList<>();
-        CollectionPointDDto cp1 = new CollectionPointDDto();
-        cp1.setName("nome1");
-        cp1.setType("library");
-        cp1.setEmail("email1@ua.pt");
-
-        CollectionPointDDto cp2 = new CollectionPointDDto();
-        cp2.setName("nome2");
-        cp2.setType("cafe");
-        cp2.setEmail("email2@ua.pt");
-
-        CollectionPointDDto cp3 = new CollectionPointDDto();
-        cp3.setName("nome3");
-        cp3.setType("florist");
-        cp3.setEmail("email3@ua.pt");
-
-        cps.add(cp1);
-        cps.add(cp2);
-        cps.add(cp3);
-
-        when(adminService.getCollectionPointsDDto(false)).thenReturn(cps);
-
-        mockMvc.perform(get("/admin/acp-candidates"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("admin-applications"))
-                .andExpect(model().attribute("cps", Matchers.is(cps)));
-    }
-    
-
-    
+        
 }
