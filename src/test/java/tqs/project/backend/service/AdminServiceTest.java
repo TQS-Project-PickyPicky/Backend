@@ -79,8 +79,8 @@ public class AdminServiceTest {
     @Test
     public void testDeleteCollectionPointAndParcels_ExistingId_DeletesAssociatedPartnerAndParcels() throws Exception {
 
-        Integer idACP = 1;
         CollectionPoint collectionPoint = new CollectionPoint();
+        Integer idACP = collectionPoint.getId();
         Partner partner = new Partner();
         List<Parcel> parcels = new ArrayList<>();
         collectionPoint.setPartner(partner);
@@ -92,7 +92,7 @@ public class AdminServiceTest {
 
         verify(partnerRepository, times(1)).delete(partner);
         verify(parcelRepository, times(1)).deleteAll(parcels);
-        verify(collectionPointRepository, times(1)).deleteById(idACP);
+        verify(collectionPointRepository, times(1)).delete(collectionPoint);
     }
 
     @Test
