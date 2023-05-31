@@ -1,11 +1,6 @@
 package tqs.project.backend.boundary;
 
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import tqs.project.backend.data.collection_point.CollectionPoint;
-import tqs.project.backend.data.collection_point.CollectionPointDto;
 import tqs.project.backend.data.parcel.*;
-import tqs.project.backend.data.partner.Partner;
 import tqs.project.backend.exception.IncorrectParcelTokenException;
 import tqs.project.backend.exception.InvalidParcelStatusChangeException;
 import tqs.project.backend.exception.ParcelNotFoundException;
@@ -19,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import tqs.project.backend.service.ParcelService;
 import tqs.project.backend.util.ConverterUtils;
-
-import javax.validation.Valid;
 import java.util.List;
 
 

@@ -9,6 +9,7 @@ import tqs.project.backend.data.store.StoreUpdateDto;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ConverterUtils {
@@ -62,6 +63,22 @@ public class ConverterUtils {
                 store.getId(),
                 store.getName(),
                 store.getParcels().stream().map(Parcel::getId).collect(Collectors.toList()));
+    }
+
+    public static List<CollectionPointDDto> fromCollectionPointsToCollectionPointDDto(List<CollectionPoint> collectionPoints){
+        
+        List<CollectionPointDDto> dtoList = collectionPoints.stream()
+            .map(collectionPoint -> {
+                CollectionPointDDto dto = new CollectionPointDDto();
+                dto.setId(collectionPoint.getId());
+                dto.setName(collectionPoint.getName());
+                dto.setType(collectionPoint.getType());
+                dto.setEmail(collectionPoint.getOwnerEmail());
+                return dto;
+            })
+            .collect(Collectors.toList());
+    
+        return dtoList;
     }
 
     public static Store fromStoreDtoToStore(StoreDto storeDto, ParcelRepository parcelRepository) {

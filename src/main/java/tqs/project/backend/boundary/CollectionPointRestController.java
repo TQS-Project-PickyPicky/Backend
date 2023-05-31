@@ -2,22 +2,15 @@ package tqs.project.backend.boundary;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import tqs.project.backend.data.collection_point.*;
 import tqs.project.backend.data.parcel.ParcelMinimal;
-import tqs.project.backend.data.parcel.ParcelMinimalEta;
-import tqs.project.backend.data.partner.Partner;
 import tqs.project.backend.exception.CollectionPointNotFoundException;
-import tqs.project.backend.exception.IncorrectParcelTokenException;
-import tqs.project.backend.exception.InvalidParcelStatusChangeException;
-import tqs.project.backend.exception.ParcelNotFoundException;
 import tqs.project.backend.service.CollectionPointService;
 import tqs.project.backend.util.ConverterUtils;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tqs.project.backend.util.ConverterUtils;
 
 import java.util.List;
 

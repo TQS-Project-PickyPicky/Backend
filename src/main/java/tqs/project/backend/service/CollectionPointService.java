@@ -1,7 +1,6 @@
 package tqs.project.backend.service;
 
 import tqs.project.backend.data.collection_point.CollectionPoint;
-import tqs.project.backend.data.collection_point.CollectionPointDto;
 import tqs.project.backend.data.collection_point.CollectionPointRDto;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
 import tqs.project.backend.data.parcel.*;
@@ -12,6 +11,7 @@ import tqs.project.backend.exception.InvalidParcelStatusChangeException;
 import tqs.project.backend.exception.IncorrectParcelTokenException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import tqs.project.backend.util.ConverterUtils;
 import tqs.project.backend.util.ResolveLocation;
 
