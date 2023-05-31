@@ -47,17 +47,10 @@ public class MainService {
     }
 
     public User findByUsernameAndPassword(String username, String password){
-        Admin admin = adminRepository.findByUsernameAndPassword(username, password);
-        Partner partner = partnerRepository.findByUsernameAndPassword(username, password);
-        if (admin!=null){
-            return admin;
-        }
-        else if (partner!=null){
-            return partner;
-        }
-        else{
-            return null;
-        }
+        return adminRepository.findByUsernameAndPassword(username, password) != null
+            ? adminRepository.findByUsernameAndPassword(username, password)
+            : partnerRepository.findByUsernameAndPassword(username, password);
+
     }
 
 }
