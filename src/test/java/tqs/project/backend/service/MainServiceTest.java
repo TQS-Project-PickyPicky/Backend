@@ -15,16 +15,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import tqs.project.backend.data.admin.Admin;
+import tqs.project.backend.data.admin.AdminRepository;
 import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
 import tqs.project.backend.data.partner.Partner;
 import tqs.project.backend.data.partner.PartnerRepository;
+import tqs.project.backend.data.user.User;
 
 @ExtendWith(MockitoExtension.class)
 public class MainServiceTest {
     
     @Mock
     private PartnerRepository partnerRepository;
+
+    @Mock
+    private AdminRepository adminRepository;
     
     @Mock
     private CollectionPointRepository collectionPointRepository;
@@ -60,16 +66,32 @@ public class MainServiceTest {
     }
 
     @Test
-    void testFindByUsernameAndPassword() {
+    void testFindByUsernameAndPasswordAdmin() {
         String username = "admin";
         String password = "admin";
+        Admin admin = new Admin();
+
+        when(adminRepository.findByUsernameAndPassword(username, password)).thenReturn(admin);
+
+        User result = mainService.findByUsernameAndPassword(username, password);
+
+        Assertions.assertEquals(admin, result);
+        assert(result instanceof Admin);
+        verify(partnerRepository, times(1)).findByUsernameAndPassword(username, password);
+    }
+
+    @Test
+    void testFindByUsernameAndPasswordPartner() {
+        String username = "someuser";
+        String password = "somepass";
         Partner expectedPartner = new Partner();
 
         when(partnerRepository.findByUsernameAndPassword(username, password)).thenReturn(expectedPartner);
 
-        Partner result = mainService.findByUsernameAndPassword(username, password);
+        User result = mainService.findByUsernameAndPassword(username, password);
 
         Assertions.assertEquals(expectedPartner, result);
+        assert(result instanceof Partner);
         verify(partnerRepository, times(1)).findByUsernameAndPassword(username, password);
     }
 }

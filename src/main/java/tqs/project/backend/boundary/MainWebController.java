@@ -2,6 +2,7 @@ package tqs.project.backend.boundary;
 
 import javax.validation.Valid;
 
+import org.hamcrest.core.IsInstanceOf;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,6 +17,7 @@ import tqs.project.backend.data.admin.Admin;
 import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.collection_point.CollectionPointDto;
 import tqs.project.backend.data.partner.Partner;
+import tqs.project.backend.data.user.User;
 import tqs.project.backend.service.MainService;
 import tqs.project.backend.util.ConverterUtils;
 
@@ -83,13 +85,12 @@ public class MainWebController {
 
     @PostMapping("/login")
     public String loginPost(@RequestParam String username, @RequestParam String password, Model model){
-        Admin admin = mainService.findAdmin(username, password);
-        if (admin!=null) {
+        User user = mainService.findByUsernameAndPassword(username, password);
+        if (user instanceof Admin) {
             return "redirect:/admin/acp-pages";
         } else {
-            Partner partner = mainService.findByUsernameAndPassword(username, password);
-            if (partner != null) {
-                log.info(partner.getId() + "");
+            if (user instanceof Partner) {
+                log.info(user.getId() + "");
                 return "redirect:/acp/home";
             } else {
                 model.addAttribute("error", "Username or password incorrect");

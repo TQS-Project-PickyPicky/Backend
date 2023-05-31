@@ -126,7 +126,7 @@ public class MainWebControllerTest {
 
     @Test
     void adminAuthentication() throws Exception {
-        when(mainService.findAdmin(any(), any())).thenReturn(new Admin());
+        when(mainService.findByUsernameAndPassword(any(), any())).thenReturn(new Admin());
         mvc.perform(post("/main/login")
                 .param("username", "admin")
                 .param("password", "admin"))

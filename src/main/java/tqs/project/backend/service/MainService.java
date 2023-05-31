@@ -11,6 +11,7 @@ import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
 import tqs.project.backend.data.partner.Partner;
 import tqs.project.backend.data.partner.PartnerRepository;
+import tqs.project.backend.data.user.User;
 import tqs.project.backend.util.ResolveLocation;
 
 @Service
@@ -45,12 +46,18 @@ public class MainService {
         return true;
     }
 
-    public Admin findAdmin(String username, String password){
-        return adminRepository.findByUsernameAndPassword(username, password);
-    }
-
-    public Partner findByUsernameAndPassword(String username, String password){
-        return partnerRepository.findByUsernameAndPassword(username, password);    
+    public User findByUsernameAndPassword(String username, String password){
+        Admin admin = adminRepository.findByUsernameAndPassword(username, password);
+        Partner partner = partnerRepository.findByUsernameAndPassword(username, password);
+        if (admin!=null){
+            return admin;
+        }
+        else if (partner!=null){
+            return partner;
+        }
+        else{
+            return null;
+        }
     }
 
 }
