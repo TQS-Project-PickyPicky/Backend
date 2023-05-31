@@ -77,7 +77,7 @@ public class MainServiceTest {
 
         Assertions.assertEquals(admin, result);
         assert(result instanceof Admin);
-        verify(partnerRepository, times(1)).findByUsernameAndPassword(username, password);
+        verify(adminRepository, times(2)).findByUsernameAndPassword(username, password);
     }
 
     @Test
