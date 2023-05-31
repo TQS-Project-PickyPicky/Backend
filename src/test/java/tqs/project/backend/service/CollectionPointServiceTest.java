@@ -81,6 +81,7 @@ public class CollectionPointServiceTest {
         collectionPoint.setOwnerGender("M");
         collectionPoint.setOwnerPhone(123456789);
         collectionPoint.setOwnerMobilePhone(987654321);
+        collectionPoint.setStatus(true);
 
         CollectionPoint collectionPoint2 = new CollectionPoint();
         collectionPoint2.setId(2);
@@ -91,10 +92,11 @@ public class CollectionPointServiceTest {
         collectionPoint2.setLatitude(41.174660);
         collectionPoint2.setLongitude(-8.588069);
         collectionPoint2.setOwnerName("João");
-        collectionPoint.setOwnerEmail("joao@ua.pt");
-        collectionPoint.setOwnerGender("M");
-        collectionPoint.setOwnerPhone(123456789);
-        collectionPoint.setOwnerMobilePhone(987654321);
+        collectionPoint2.setStatus(true);
+        collectionPoint2.setOwnerEmail("joao@ua.pt");
+        collectionPoint2.setOwnerGender("M");
+        collectionPoint2.setOwnerPhone(123456789);
+        collectionPoint2.setOwnerMobilePhone(987654321);
 
         Store store = new Store();
         store.setName("Store 1");
@@ -160,6 +162,18 @@ public class CollectionPointServiceTest {
                 .thenReturn(Optional.of(parcel3));
         when(collectionPointRepository.findAll())
                 .thenReturn(List.of(collectionPoint, collectionPoint2));
+    }
+
+    @Test
+    void getCollectionPointById() {
+        CollectionPointRDto collectionPoint = collectionPointService.getCP(1);
+        assertEquals(1, collectionPoint.getId());
+        assertEquals("Collection Point 1", collectionPoint.getName());
+    }
+
+    @Test
+    void getCollectionPointByIdNotFound() {
+        assertThrows(CollectionPointNotFoundException.class, () -> collectionPointService.getCP(3));
     }
 
     @Test
@@ -289,83 +303,4 @@ public class CollectionPointServiceTest {
     //        collectionPointService.getParcel(5);
     //    });
     //}
-
-    @Test
-    void checkinParcel_ifParcelExistsCollectionPoint() throws ParcelNotFoundException, InvalidParcelStatusChangeException {
-        ParcelMinimal parcel = collectionPointService.checkIn(3);
-
-        ParcelMinimal parcelCheck = new ParcelMinimal(3, ParcelStatus.DELIVERED);
-
-        assertEquals(parcelCheck.getId(), parcel.getId());
-        assertEquals(parcelCheck.getStatus(), parcel.getStatus());
-    }
-
-    //@Test
-    //void checkinParcel_ifParcelDoesNotExistCollectionPoint() {
-    //    assertThrows(ParcelNotFoundException.class, () -> {
-    //        collectionPointService.checkIn(5);
-    //    });
-    //}
-
-    @Test
-    void checkinParcel_ifParcelDoesNotHaveStateInTransit() {
-        assertThrows(InvalidParcelStatusChangeException.class, () -> {
-            collectionPointService.checkIn(4);
-        });
-    }
-
-    @Test
-    void checkoutParcel_ifParcelExistsCollectionPoint() throws ParcelNotFoundException, InvalidParcelStatusChangeException, IncorrectParcelTokenException {
-        ParcelMinimal parcel = collectionPointService.checkOut(4, 123456);
-
-        ParcelMinimal parcelCheck = new ParcelMinimal(4, ParcelStatus.COLLECTED);
-
-        assertEquals(parcelCheck.getId(), parcel.getId());
-        assertEquals(parcelCheck.getStatus(), parcel.getStatus());
-    }
-
-    //@Test
-    //void checkoutParcel_ifParcelDoesNotExistCollectionPoint() {
-    //    assertThrows(ParcelNotFoundException.class, () -> {
-    //        collectionPointService.checkOut(5,123456);
-    //    });
-    //}
-
-    @Test
-    void checkoutParcel_ifParcelDoesNotHaveStateDelivered() {
-        assertThrows(InvalidParcelStatusChangeException.class, () -> {
-            collectionPointService.checkOut(3, 123456);
-        });
-    }
-
-    @Test
-    void checkoutParcel_ifParcelDoesNotHaveCorrectToken() {
-        assertThrows(IncorrectParcelTokenException.class, () -> {
-            collectionPointService.checkOut(4, 1234567);
-        });
-    }
-
-    @Test
-    void returnParcel__ifParcelExistsCollectionPoint() throws InvalidParcelStatusChangeException, ParcelNotFoundException {
-        ParcelMinimal parcel = collectionPointService.returnParcel(6);
-
-        ParcelMinimal parcelCheck = new ParcelMinimal(6, ParcelStatus.RETURNED);
-
-        assertEquals(parcelCheck.getId(), parcel.getId());
-        assertEquals(parcelCheck.getStatus(), parcel.getStatus());
-    }
-
-    //@Test
-    //void returnParcel_ifParcelDoesNotExistCollectionPoint() {
-    //    assertThrows(ParcelNotFoundException.class, () -> {
-    //        collectionPointService.returnParcel(5);
-    //    });
-    //}
-
-    @Test
-    void returnParcel_ifParcelDoesNotHaveStateCollected() {
-        assertThrows(InvalidParcelStatusChangeException.class, () -> {
-            collectionPointService.returnParcel(3);
-        });
-    }
 }

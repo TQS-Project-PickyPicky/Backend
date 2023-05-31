@@ -63,6 +63,7 @@ class CollectionPointRestControllerTestIT {
         collectionPoint.setOwnerGender("M");
         collectionPoint.setOwnerPhone(123456789);
         collectionPoint.setOwnerMobilePhone(987654321);
+        collectionPoint.setStatus(true);
 
         CollectionPoint collectionPoint2 = new CollectionPoint();
         collectionPoint2.setId(2);
@@ -73,10 +74,11 @@ class CollectionPointRestControllerTestIT {
         collectionPoint2.setLatitude(41.174660);
         collectionPoint2.setLongitude(-8.588069);
         collectionPoint2.setOwnerName("João");
-        collectionPoint.setOwnerEmail("joao@ua.pt");
-        collectionPoint.setOwnerGender("M");
-        collectionPoint.setOwnerPhone(123456789);
-        collectionPoint.setOwnerMobilePhone(987654321);
+        collectionPoint2.setOwnerEmail("joao@ua.pt");
+        collectionPoint2.setOwnerGender("M");
+        collectionPoint2.setOwnerPhone(123456789);
+        collectionPoint2.setOwnerMobilePhone(987654321);
+        collectionPoint2.setStatus(true);
 
         Store store = new Store();
         store.setName("Store 1");
@@ -134,12 +136,48 @@ class CollectionPointRestControllerTestIT {
     }
 
     @Test
+    void getCollectionPoint() {
+        String endpoint = UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host("localhost")
+                .port(localPort)
+                .pathSegment("api","acp", String.valueOf(acp.getId()))
+                .build()
+                .toUriString();
+
+        RestAssured.given()
+                .when()
+                    .get(endpoint)
+                .then()
+                    .statusCode(200)
+                    .body("id", is(acp.getId()))
+                    .body("name", is("Collection Point 1"));
+    }
+
+    @Test
+    void getCollectionPointNotFound() {
+        String endpoint = UriComponentsBuilder.newInstance()
+                .scheme("http")
+                .host("localhost")
+                .port(localPort)
+                .pathSegment("api","acp", String.valueOf(-1))
+                .build()
+                .toUriString();
+
+        RestAssured.given()
+                .when()
+                    .get(endpoint)
+                .then()
+                    .statusCode(404);
+    }
+
+    @Test
     void getAllCollectionPoints() {
         String endpoint = UriComponentsBuilder.newInstance()
                 .scheme("http")
                 .host("localhost")
                 .port(localPort)
-                .pathSegment("api","acp","all")
+                .pathSegment("api","acp")
                 .build()
                 .toUriString();
 
@@ -161,7 +199,7 @@ class CollectionPointRestControllerTestIT {
                 .scheme("http")
                 .host("localhost")
                 .port(localPort)
-                .pathSegment("api","acp","all")
+                .pathSegment("api","acp")
                 .queryParam("zip", "4435-677")
                 .build()
                 .toUriString();
@@ -184,7 +222,7 @@ class CollectionPointRestControllerTestIT {
                 .scheme("http")
                 .host("localhost")
                 .port(localPort)
-                .pathSegment("api","acp","add")
+                .pathSegment("api","acp")
                 .build()
                 .toUriString();
 
@@ -210,7 +248,7 @@ class CollectionPointRestControllerTestIT {
                     .body(cp)
                     .post(endpoint)
                 .then()
-                    .statusCode(200)
+                    .statusCode(201)
                     .body("name", is("Collection Point 3"));
     }
 
@@ -310,7 +348,7 @@ class CollectionPointRestControllerTestIT {
                 .scheme("http")
                 .host("localhost")
                 .port(localPort)
-                .pathSegment("api","acp",acp.getId().toString())
+                .pathSegment("api","acp",acp.getId().toString(),"parcels")
                 .build()
                 .toUriString();
 
@@ -326,30 +364,6 @@ class CollectionPointRestControllerTestIT {
                     .body("[1].status", is("DELIVERED"))
                     .body("[2].id", is(p2.getId()))
                     .body("[2].status", is("COLLECTED"));
-    }
-
-    @Test
-    void getParcel_ifExistsInCollectionPoint() {
-        System.out.println(p.getId());
-
-        System.out.println(acp.getParcels().get(0).getId());
-
-        String endpoint = UriComponentsBuilder.newInstance()
-                .scheme("http")
-                .host("localhost")
-                .port(localPort)
-                .pathSegment("api","acp","parcel",p.getId().toString())
-                .build()
-                .toUriString();
-
-        RestAssured.given()
-                .when()
-                    .get(endpoint)
-                .then()
-                    .statusCode(200)
-                    .body("id", is(p.getId()))
-                    .body("status", is("IN_TRANSIT"))
-                    .body("eta", is(5));
     }
 
     //@Test
@@ -370,24 +384,24 @@ class CollectionPointRestControllerTestIT {
     //                .statusCode(400);
     //}
 
-    @Test
-    void checkin_ifParcelExistsInCollectionPoint() {
-        String endpoint = UriComponentsBuilder.newInstance()
-                .scheme("http")
-                .host("localhost")
-                .port(localPort)
-                .pathSegment("api","acp", "parcel","checkin",p.getId().toString())
-                .build()
-                .toUriString();
-
-        RestAssured.given()
-                .when()
-                    .post(endpoint)
-                .then()
-                    .statusCode(200)
-                    .body("id", is(p.getId()))
-                    .body("status", is("DELIVERED"));
-    }
+    //@Test
+    //void checkin_ifParcelExistsInCollectionPoint() {
+    //    String endpoint = UriComponentsBuilder.newInstance()
+    //            .scheme("http")
+    //            .host("localhost")
+    //            .port(localPort)
+    //            .pathSegment("api","acp", "parcel","checkin",p.getId().toString())
+    //            .build()
+    //            .toUriString();
+//
+    //    RestAssured.given()
+    //            .when()
+    //                .post(endpoint)
+    //            .then()
+    //                .statusCode(200)
+    //                .body("id", is(p.getId()))
+    //                .body("status", is("DELIVERED"));
+    //}
 
     //@Test
     //void checkin_ifParcelNotExistsInCollectionPoint() {
@@ -407,60 +421,60 @@ class CollectionPointRestControllerTestIT {
     //                .statusCode(400);
     //}
 
-    @Test
-    void checkin_ifNotInTransit(){
-        String endpoint = UriComponentsBuilder.newInstance()
-                .scheme("http")
-                .host("localhost")
-                .port(localPort)
-                .pathSegment("api","acp", "parcel","checkin",p1.getId().toString())
-                .build()
-                .toUriString();
+    //@Test
+    //void checkin_ifNotInTransit(){
+    //    String endpoint = UriComponentsBuilder.newInstance()
+    //            .scheme("http")
+    //            .host("localhost")
+    //            .port(localPort)
+    //            .pathSegment("api","acp", "parcel","checkin",p1.getId().toString())
+    //            .build()
+    //            .toUriString();
+//
+    //    RestAssured.given()
+    //            .when()
+    //                .post(endpoint)
+    //            .then()
+    //                .statusCode(400);
+    //}
+//
+    //@Test
+    //void checkout_ifTokenIsIncorrect() {
+    //    String endpoint = UriComponentsBuilder.newInstance()
+    //            .scheme("http")
+    //            .host("localhost")
+    //            .port(localPort)
+    //            .pathSegment("api","acp", "parcel","checkout",p1.getId().toString())
+    //            .queryParam("token",1234567)
+    //            .build()
+    //            .toUriString();
+//
+    //    RestAssured.given()
+    //            .when()
+    //                .post(endpoint)
+    //            .then()
+    //                .statusCode(400);
+    //}
 
-        RestAssured.given()
-                .when()
-                    .post(endpoint)
-                .then()
-                    .statusCode(400);
-    }
-
-    @Test
-    void checkout_ifTokenIsIncorrect() {
-        String endpoint = UriComponentsBuilder.newInstance()
-                .scheme("http")
-                .host("localhost")
-                .port(localPort)
-                .pathSegment("api","acp", "parcel","checkout",p1.getId().toString())
-                .queryParam("token",1234567)
-                .build()
-                .toUriString();
-
-        RestAssured.given()
-                .when()
-                    .post(endpoint)
-                .then()
-                    .statusCode(400);
-    }
-
-    @Test
-    void checkout_ifParcelExistsInCollectionPoint() {
-        String endpoint = UriComponentsBuilder.newInstance()
-                .scheme("http")
-                .host("localhost")
-                .port(localPort)
-                .pathSegment("api","acp", "parcel","checkout",p1.getId().toString())
-                .queryParam("token",123456)
-                .build()
-                .toUriString();
-
-        RestAssured.given()
-                .when()
-                    .post(endpoint)
-                .then()
-                    .statusCode(200)
-                    .body("id", is(p1.getId()))
-                    .body("status", is("COLLECTED"));
-    }
+    //@Test
+    //void checkout_ifParcelExistsInCollectionPoint() {
+    //    String endpoint = UriComponentsBuilder.newInstance()
+    //            .scheme("http")
+    //            .host("localhost")
+    //            .port(localPort)
+    //            .pathSegment("api","acp", "parcel","checkout",p1.getId().toString())
+    //            .queryParam("token",123456)
+    //            .build()
+    //            .toUriString();
+//
+    //    RestAssured.given()
+    //            .when()
+    //                .post(endpoint)
+    //            .then()
+    //                .statusCode(200)
+    //                .body("id", is(p1.getId()))
+    //                .body("status", is("COLLECTED"));
+    //}
 
     //@Test
     //void checkout_ifParcelNotExistsInCollectionPoint() {
@@ -481,42 +495,42 @@ class CollectionPointRestControllerTestIT {
     //                .statusCode(400);
     //}
 
-    @Test
-    void checkout_ifNotDelivered() {
-        String endpoint = UriComponentsBuilder.newInstance()
-                .scheme("http")
-                .host("localhost")
-                .port(localPort)
-                .pathSegment("api", "acp", "parcel","checkout",p.getId().toString())
-                .queryParam("token",123456)
-                .build()
-                .toUriString();
+    //@Test
+    //void checkout_ifNotDelivered() {
+    //    String endpoint = UriComponentsBuilder.newInstance()
+    //            .scheme("http")
+    //            .host("localhost")
+    //            .port(localPort)
+    //            .pathSegment("api", "acp", "parcel","checkout",p.getId().toString())
+    //            .queryParam("token",123456)
+    //            .build()
+    //            .toUriString();
+//
+    //    RestAssured.given()
+    //            .when()
+    //            .post(endpoint)
+    //            .then()
+    //            .statusCode(400);
+    //}
 
-        RestAssured.given()
-                .when()
-                .post(endpoint)
-                .then()
-                .statusCode(400);
-    }
-
-    @Test
-    void returnParcel_ifExistsInCollectionPoint() {
-        String endpoint = UriComponentsBuilder.newInstance()
-                .scheme("http")
-                .host("localhost")
-                .port(localPort)
-                .pathSegment("api", "acp", "parcel", "return", p2.getId().toString())
-                .build()
-                .toUriString();
-
-        RestAssured.given()
-                .when()
-                .post(endpoint)
-                .then()
-                .statusCode(200)
-                .body("id", is(p2.getId()))
-                .body("status", is("RETURNED"));
-    }
+    //@Test
+    //void returnParcel_ifExistsInCollectionPoint() {
+    //    String endpoint = UriComponentsBuilder.newInstance()
+    //            .scheme("http")
+    //            .host("localhost")
+    //            .port(localPort)
+    //            .pathSegment("api", "acp", "parcel", "return", p2.getId().toString())
+    //            .build()
+    //            .toUriString();
+//
+    //    RestAssured.given()
+    //            .when()
+    //            .post(endpoint)
+    //            .then()
+    //            .statusCode(200)
+    //            .body("id", is(p2.getId()))
+    //            .body("status", is("RETURNED"));
+    //}
 
     //@Test
     //void returnParcel_ifNotExistsInCollectionPoint() {
@@ -536,21 +550,21 @@ class CollectionPointRestControllerTestIT {
     //            .statusCode(400);
     //}
 
-    @Test
-    void returnParcel_ifNotCollected() {
-        String endpoint = UriComponentsBuilder.newInstance()
-                .scheme("http")
-                .host("localhost")
-                .port(localPort)
-                .pathSegment("api", "acp", "parcel", "return", p.getId().toString())
-                .build()
-                .toUriString();
-
-        RestAssured.given()
-                .when()
-                .post(endpoint)
-                .then()
-                .statusCode(400);
-    }
+    //@Test
+    //void returnParcel_ifNotCollected() {
+    //    String endpoint = UriComponentsBuilder.newInstance()
+    //            .scheme("http")
+    //            .host("localhost")
+    //            .port(localPort)
+    //            .pathSegment("api", "acp", "parcel", "return", p.getId().toString())
+    //            .build()
+    //            .toUriString();
+//
+    //    RestAssured.given()
+    //            .when()
+    //            .post(endpoint)
+    //            .then()
+    //            .statusCode(400);
+    //}
 
 }

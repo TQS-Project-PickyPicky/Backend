@@ -37,6 +37,10 @@ class CollectionPointRestControllerTest {
     void setUp() throws ParcelNotFoundException, InvalidParcelStatusChangeException, IncorrectParcelTokenException {
         RestAssuredMockMvc.mockMvc(mvc);
 
+        // Get CollectionPoint by ID
+        when(collectionPointService.getCP(1)).thenReturn(new CollectionPointRDto(1, "CP1", "Rua 1", 100, "Porto", true));
+        when(collectionPointService.getCP(2)).thenThrow(new CollectionPointNotFoundException(2));
+
         // All CollectionPoints
         when(collectionPointService.getAll()).thenReturn(List.of(
                 new CollectionPointRDto(1, "CP1", "Rua 1", 100, "Porto", true),
@@ -68,33 +72,33 @@ class CollectionPointRestControllerTest {
                 new ParcelMinimal(1, ParcelStatus.IN_TRANSIT),
                 new ParcelMinimal(2, ParcelStatus.PLACED)
                 ));
+    }
 
-        // Parcel
-        when(collectionPointService.getParcel(1)).thenReturn(new ParcelMinimalEta(1, ParcelStatus.IN_TRANSIT, 5L));
-        when(collectionPointService.getParcel(2)).thenThrow(new ParcelNotFoundException(2));
+    @Test
+    void getCollectionPoint() {
+        RestAssuredMockMvc.given()
+                .when()
+                .get("/api/acp/1")
+                .then()
+                .statusCode(200)
+                .body("id", is(1))
+                .body("name", is("CP1"));
+    }
 
-        // Checkin
-        when(collectionPointService.checkIn(1)).thenReturn(new ParcelMinimal(1, ParcelStatus.DELIVERED));
-        when(collectionPointService.checkIn(2)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.DELIVERED));
-        when(collectionPointService.checkIn(3)).thenThrow(new ParcelNotFoundException(3));
-
-        // Checkout
-        when(collectionPointService.checkOut(1, 5)).thenReturn(new ParcelMinimal(1, ParcelStatus.COLLECTED));
-        when(collectionPointService.checkOut(2, 5)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.COLLECTED));
-        when(collectionPointService.checkOut(3, 5)).thenThrow(new ParcelNotFoundException(3));
-        when(collectionPointService.checkOut(1, 6)).thenThrow(new IncorrectParcelTokenException(6, 1));
-
-        // Return
-        when(collectionPointService.returnParcel(1)).thenReturn(new ParcelMinimal(1, ParcelStatus.RETURNED));
-        when(collectionPointService.returnParcel(2)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.RETURNED));
-        when(collectionPointService.returnParcel(3)).thenThrow(new ParcelNotFoundException(3));
+    @Test
+    void getCollectionPointNotFound() {
+        RestAssuredMockMvc.given()
+                .when()
+                .get("/api/acp/2")
+                .then()
+                .statusCode(404);
     }
 
     @Test
     void getAllCollectionPoints() {
         RestAssuredMockMvc.given()
                 .when()
-                .get("/api/acp/all")
+                .get("/api/acp")
                 .then()
                 .statusCode(200)
                 .body("size()", is(2))
@@ -108,7 +112,7 @@ class CollectionPointRestControllerTest {
     void getAllCollectionPointsByLocation() {
         RestAssuredMockMvc.given()
                 .when()
-                .get("/api/acp/all?zip=1111-111")
+                .get("/api/acp?zip=1111-111")
                 .then()
                 .statusCode(200)
                 .body("size()", is(2))
@@ -124,9 +128,9 @@ class CollectionPointRestControllerTest {
                     .contentType("application/json")
                     .body("{\"name\":\"CP3\",\"type\":\"Jogo\",\"capacity\":100,\"address\":\"Rua 3\",\"ownerName\":\"Diogo\",\"ownerEmail\":\"d@ua.pt\",\"ownerGender\":\"Male\",\"ownerPhone\":965833174,\"ownerMobilePhone\":965833174,\"zipcode\":\"1111-111\",\"partner\":{\"username\":\"DiogoPaiva\",\"password\":\"diogo\"}}")
                 .when()
-                    .post("/api/acp/add")
+                    .post("/api/acp")
                 .then()
-                    .statusCode(200)
+                    .statusCode(201)
                     .body("name", is("CP3"));
     }
 
@@ -178,7 +182,7 @@ class CollectionPointRestControllerTest {
     void getAllParcels() {
         RestAssuredMockMvc.given()
                 .when()
-                .get("/api/acp/1")
+                .get("/api/acp/1/parcels")
                 .then()
                 .statusCode(200)
                 .body("size()", is(2))
@@ -186,122 +190,5 @@ class CollectionPointRestControllerTest {
                 .body("[0].status", is("IN_TRANSIT"))
                 .body("[1].id", is(2))
                 .body("[1].status", is("PLACED"));
-    }
-
-    @Test
-    void getParcel_ifExistsInCollectionPoint() {
-        RestAssuredMockMvc.given()
-                .when()
-                .get("/api/acp/parcel/1")
-                .then()
-                .statusCode(200)
-                .body("id", is(1))
-                .body("status", is("IN_TRANSIT"))
-                .body("eta", is(5));
-    }
-
-    @Test
-    void getParcel_ifNotExistsInCollectionPoint() {
-        RestAssuredMockMvc.given()
-                .when()
-                .get("/api/acp/parcel/2")
-                .then()
-                .statusCode(400);
-    }
-
-    @Test
-    void checkin_ifExistsInCollectionPoint() {
-        RestAssuredMockMvc.given()
-                .when()
-                .post("/api/acp/parcel/checkin/1")
-                .then()
-                .statusCode(200)
-                .body("id", is(1))
-                .body("status", is("DELIVERED"));
-    }
-
-    @Test
-    void checkin_ifNotExistsInCollectionPoint() {
-        RestAssuredMockMvc.given()
-                .when()
-                .post("/api/acp/parcel/checkin/2")
-                .then()
-                .statusCode(400);
-    }
-
-    @Test
-    void checkin_ifNotInTransit() {
-        RestAssuredMockMvc.given()
-                .when()
-                .post("/api/acp/parcel/checkin/3")
-                .then()
-                .statusCode(400);
-    }
-
-    @Test
-    void checkout_ifExistsInCollectionPoint() {
-        RestAssuredMockMvc.given()
-                .when()
-                .post("/api/acp/parcel/checkout/1?token=5")
-                .then()
-                .statusCode(200)
-                .body("id", is(1))
-                .body("status", is("COLLECTED"));
-    }
-
-    @Test
-    void checkout_ifNotExistsInCollectionPoint() {
-        RestAssuredMockMvc.given()
-                .when()
-                .post("/api/acp/parcel/checkout/2?token=5")
-                .then()
-                .statusCode(400);
-    }
-
-    @Test
-    void checkout_ifNotDelivered() {
-        RestAssuredMockMvc.given()
-                .when()
-                .post("/api/acp/parcel/checkout/3?token=5")
-                .then()
-                .statusCode(400);
-    }
-
-    @Test
-    void checkout_ifTokenIsIncorrect() {
-        RestAssuredMockMvc.given()
-                .when()
-                .post("/api/acp/parcel/checkout/1?token=6")
-                .then()
-                .statusCode(400);
-    }
-
-    @Test
-    void returnParcel_ifExistsInCollectionPoint() {
-        RestAssuredMockMvc.given()
-                .when()
-                .post("/api/acp/parcel/return/1")
-                .then()
-                .statusCode(200)
-                .body("id", is(1))
-                .body("status", is("RETURNED"));
-    }
-
-    @Test
-    void returnParcel_ifNotExistsInCollectionPoint() {
-        RestAssuredMockMvc.given()
-                .when()
-                .post("/api/acp/parcel/return/2")
-                .then()
-                .statusCode(400);
-    }
-
-    @Test
-    void returnParcel_ifNotCollected() {
-        RestAssuredMockMvc.given()
-                .when()
-                .post("/api/acp/parcel/return/3")
-                .then()
-                .statusCode(400);
     }
 }

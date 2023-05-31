@@ -21,6 +21,7 @@ import tqs.project.backend.data.parcel.ParcelStatus;
 import tqs.project.backend.exception.ParcelNotFoundException;
 import tqs.project.backend.exception.InvalidParcelStatusChangeException;
 import tqs.project.backend.exception.IncorrectParcelTokenException;
+import tqs.project.backend.service.ParcelService;
 
 import java.util.List;
 
@@ -31,6 +32,9 @@ class CollectionPointWebControllerTest {
     private MockMvc mvc;
     @MockBean
     private CollectionPointService collectionPointService;
+
+    @MockBean
+    private ParcelService parcelService;
 
     @BeforeEach
     void setUp() throws InvalidParcelStatusChangeException, IncorrectParcelTokenException, ParcelNotFoundException {
@@ -46,20 +50,20 @@ class CollectionPointWebControllerTest {
         when(collectionPointService.getParcel(2)).thenThrow(new ParcelNotFoundException(2));
 
         // Checkin
-        when(collectionPointService.checkIn(1)).thenReturn(new ParcelMinimal(1, ParcelStatus.DELIVERED));
-        when(collectionPointService.checkIn(2)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.DELIVERED));
-        when(collectionPointService.checkIn(3)).thenThrow(new ParcelNotFoundException(3));
+        when(parcelService.checkIn(1)).thenReturn(new ParcelMinimal(1, ParcelStatus.DELIVERED));
+        when(parcelService.checkIn(2)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.DELIVERED));
+        when(parcelService.checkIn(3)).thenThrow(new ParcelNotFoundException(3));
 
-        // Checkout
-        when(collectionPointService.checkOut(1, 5)).thenReturn(new ParcelMinimal(1, ParcelStatus.COLLECTED));
-        when(collectionPointService.checkOut(2, 5)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.COLLECTED));
-        when(collectionPointService.checkOut(3, 5)).thenThrow(new ParcelNotFoundException(3));
-        when(collectionPointService.checkOut(1, 6)).thenThrow(new IncorrectParcelTokenException(6, 1));
+        // ChparcelService
+        when(parcelService.checkOut(1, 5)).thenReturn(new ParcelMinimal(1, ParcelStatus.COLLECTED));
+        when(parcelService.checkOut(2, 5)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.COLLECTED));
+        when(parcelService.checkOut(3, 5)).thenThrow(new ParcelNotFoundException(3));
+        when(parcelService.checkOut(1, 6)).thenThrow(new IncorrectParcelTokenException(6, 1));
 
         // Return
-        when(collectionPointService.returnParcel(1)).thenReturn(new ParcelMinimal(1, ParcelStatus.RETURNED));
-        when(collectionPointService.returnParcel(2)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.RETURNED));
-        when(collectionPointService.returnParcel(3)).thenThrow(new ParcelNotFoundException(3));
+        when(parcelService.returnParcel(1)).thenReturn(new ParcelMinimal(1, ParcelStatus.RETURNED));
+        when(parcelService.returnParcel(2)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.RETURNED));
+        when(parcelService.returnParcel(3)).thenThrow(new ParcelNotFoundException(3));
     }
 
     @Test

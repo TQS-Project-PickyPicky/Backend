@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.parcel.Parcel;
+import tqs.project.backend.data.parcel.ParcelMinimal;
 import tqs.project.backend.data.parcel.ParcelStatus;
 import tqs.project.backend.data.store.Store;
 import tqs.project.backend.exception.IncorrectParcelTokenException;
@@ -77,6 +78,21 @@ class ParcelRestControllerTest {
                 .thenThrow(new RuntimeException());
         when(parcelService.deleteParcel(3))
                 .thenThrow(new ParcelNotFoundException(3));
+        // Checkin
+        when(parcelService.checkIn(1)).thenReturn(new ParcelMinimal(1, ParcelStatus.DELIVERED));
+        when(parcelService.checkIn(2)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.DELIVERED));
+        when(parcelService.checkIn(3)).thenThrow(new ParcelNotFoundException(3));
+
+        // Checkout
+        when(parcelService.checkOut(1, 5)).thenReturn(new ParcelMinimal(1, ParcelStatus.COLLECTED));
+        when(parcelService.checkOut(2, 5)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.COLLECTED));
+        when(parcelService.checkOut(3, 5)).thenThrow(new ParcelNotFoundException(3));
+        when(parcelService.checkOut(1, 6)).thenThrow(new IncorrectParcelTokenException(6, 1));
+
+        // Return
+        when(parcelService.returnParcel(1)).thenReturn(new ParcelMinimal(1, ParcelStatus.RETURNED));
+        when(parcelService.returnParcel(2)).thenThrow(new InvalidParcelStatusChangeException(ParcelStatus.PLACED, ParcelStatus.RETURNED));
+        when(parcelService.returnParcel(3)).thenThrow(new ParcelNotFoundException(3));
     }
 
     @AfterEach
@@ -296,5 +312,101 @@ class ParcelRestControllerTest {
                 .delete("/api/parcels/3")
             .then()
                 .statusCode(404);
+    }
+
+    @Test
+    void checkin_ifExistsInCollectionPoint() {
+        RestAssuredMockMvc.given()
+                .when()
+                .post("api/parcel/1/checkin")
+                .then()
+                .statusCode(200)
+                .body("id", is(1))
+                .body("status", is("DELIVERED"));
+    }
+
+    @Test
+    void checkin_ifNotExistsInCollectionPoint() {
+        RestAssuredMockMvc.given()
+                .when()
+                .post("api/parcel/2/checkin")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    void checkin_ifNotInTransit() {
+        RestAssuredMockMvc.given()
+                .when()
+                .post("api/parcel/3/checkin")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    void checkout_ifExistsInCollectionPoint() {
+        RestAssuredMockMvc.given()
+                .when()
+                .post("api/parcel/1/checkout?token=5")
+                .then()
+                .statusCode(200)
+                .body("id", is(1))
+                .body("status", is("COLLECTED"));
+    }
+
+    @Test
+    void checkout_ifNotExistsInCollectionPoint() {
+        RestAssuredMockMvc.given()
+                .when()
+                .post("api/parcel/2/checkout?token=5")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    void checkout_ifNotDelivered() {
+        RestAssuredMockMvc.given()
+                .when()
+                .post("api/parcel/3/checkout?token=5")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    void checkout_ifTokenIsIncorrect() {
+        RestAssuredMockMvc.given()
+                .when()
+                .post("api/parcel/1/checkout?token=6")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    void returnParcel_ifExistsInCollectionPoint() {
+        RestAssuredMockMvc.given()
+                .when()
+                .post("api/parcel/1/return")
+                .then()
+                .statusCode(200)
+                .body("id", is(1))
+                .body("status", is("RETURNED"));
+    }
+
+    @Test
+    void returnParcel_ifNotExistsInCollectionPoint() {
+        RestAssuredMockMvc.given()
+                .when()
+                .post("api/parcel/2/return")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    void returnParcel_ifNotCollected() {
+        RestAssuredMockMvc.given()
+                .when()
+                .post("api/parcel/3/return")
+                .then()
+                .statusCode(400);
     }
 }
