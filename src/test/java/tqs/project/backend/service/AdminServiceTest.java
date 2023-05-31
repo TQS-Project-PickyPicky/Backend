@@ -106,13 +106,11 @@ public class AdminServiceTest {
 
     @Test
     public void testDeletePartnerById_ValidId_CallsDeleteByIdMethodInRepository() {
-        // Set up
+
         Integer id = 1;
 
-        // Execute
         adminService.deletePartnerById(id);
 
-        // Verify
         verify(partnerRepository, times(1)).deleteById(id);
     }
 

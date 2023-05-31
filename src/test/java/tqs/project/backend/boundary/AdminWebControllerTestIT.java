@@ -8,87 +8,80 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.collection_point.CollectionPointDDto;
+import tqs.project.backend.data.collection_point.CollectionPointRepository;
 import tqs.project.backend.data.parcel.Parcel;
+import tqs.project.backend.data.parcel.ParcelRepository;
 import tqs.project.backend.data.parcel.ParcelStatus;
 import tqs.project.backend.data.partner.Partner;
+import tqs.project.backend.data.partner.PartnerRepository;
+import tqs.project.backend.data.store.StoreRepository;
 import tqs.project.backend.service.AdminService;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest(AdminWebController.class)
-class AdminWebControllerTest {
-    
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(locations = "application-integrationtest.properties")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@AutoConfigureMockMvc
+class AdminWebControllerTestIT{
+
+    @LocalServerPort
+    int localPort;
+
+    private CollectionPoint cp1;
+    private List<Parcel> parcels;
+
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private CollectionPointRepository collectionPointRepository;
+
+    @Autowired
+    private ParcelRepository parcelRepository;
+
+    @Autowired
+    private StoreRepository storeRepository;
     
-    @MockBean
+    @Autowired 
+    private PartnerRepository partnerRepository;
+
+    @Autowired 
     private AdminService adminService;
-    
-    @Test
-    void testGetAcpPages() throws Exception {
-        
-        List<CollectionPointDDto> cps = new ArrayList<>();
 
-        CollectionPointDDto cp1 = new CollectionPointDDto();
-        cp1.setName("nome1");
-        cp1.setType("library");
-        cp1.setEmail("email1@ua.pt");
+    @BeforeEach
+    void setup(){
+        partnerRepository.deleteAll();
+        collectionPointRepository.deleteAll();
+        parcelRepository.deleteAll();
+        storeRepository.deleteAll();
 
-        CollectionPointDDto cp2 = new CollectionPointDDto();
-        cp2.setName("nome2");
-        cp2.setType("cafe");
-        cp2.setEmail("email2@ua.pt");
-
-        CollectionPointDDto cp3 = new CollectionPointDDto();
-        cp3.setName("nome3");
-        cp3.setType("florist");
-        cp3.setEmail("email3@ua.pt");
-
-        cps.add(cp1);
-        cps.add(cp2);
-        cps.add(cp3);
-        
-        when(adminService.getCollectionPointsDDto(true)).thenReturn(cps);
-
-        mockMvc.perform(get("/admin/acp-pages"))
-            .andExpect(status().isOk())
-            .andExpect(view().name("admin-dashboard"))
-            .andExpect(model().attributeExists("cps"))
-            .andExpect(model().attribute("cps", Matchers.is(cps)));
-        
-        verify(adminService, times(1)).getCollectionPointsDDto(true);
-    }
-    
-    @Test
-    void testDeleteACP() throws Exception {
-        mockMvc.perform(get("/admin/acp-pages/{idACP}/delete", 1))
-            .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrl("/admin/acp-pages"));
-        
-        verify(adminService, times(1)).deleteCollectionPointAndParcels(1);
-    }
-
-    @Test
-    void testGetAcpPagesById() throws Exception {
-
-        Integer idACP = 1;
-        CollectionPoint cp1 = new CollectionPoint();
+        cp1 = new CollectionPoint();
         cp1.setName("nome1");
         cp1.setType("library");
         cp1.setCapacity(100);
@@ -101,7 +94,9 @@ class AdminWebControllerTest {
         cp1.setOwnerPhone(910000000);
         cp1.setStatus(true);
 
-        List<Parcel> parcels = new ArrayList<>();
+        collectionPointRepository.save(cp1);
+
+        parcels = new ArrayList<>();
         Parcel parcel1 = new Parcel();
         parcel1.setToken(123);
         parcel1.setClientName("John Doe");
@@ -153,31 +148,60 @@ class AdminWebControllerTest {
     
         cp1.setPartner(partner1);
 
-        Map<String, Long> charData = parcels.stream().collect(Collectors.groupingBy(parcel -> parcel.getStatus().toString(), Collectors.counting()));
+        partnerRepository.save(partner1);
+        collectionPointRepository.save(cp1);
+        parcelRepository.save(parcel1);
+        parcelRepository.save(parcel2);
+        parcelRepository.save(parcel3);
+        parcelRepository.save(parcel4);
+
+    }
+    
+    
+    @Test
+    void testGetAcpPages() throws Exception {
+        List<CollectionPointDDto> cps = adminService.getCollectionPointsDDto(true);
+        mockMvc.perform(get("/admin/acp-pages"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("admin-dashboard"))
+            .andExpect(model().attributeExists("cps"))
+            .andExpect(model().attribute("cps", hasSize(cps.size())))
+            .andExpect(model().attribute("cps", hasItem(hasProperty("id", equalTo(cps.get(0).getId())))))
+            .andReturn();
+    }
+    
+    @Test
+    void testDeleteACP() throws Exception {
+        mockMvc.perform(get("/admin/acp-pages/" + cp1.getId() +"/delete"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/admin/acp-pages"));
         
+        assertEquals(collectionPointRepository.findById(cp1.getId()), Optional.empty());
+    }
 
-        when(adminService.getCollectionPointById(idACP)).thenReturn(cp1);
-        when(adminService.getStatusParcels(idACP)).thenReturn(charData);
-        when(adminService.getParcelByCollectionPointId(idACP)).thenReturn(parcels);
-
-        mockMvc.perform(get("/admin/acp-pages/{idACP}", idACP))
+    @Test
+    void testGetAcpPagesById() throws Exception {
+        mockMvc.perform(get("/admin/acp-pages/" + cp1.getId()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("acp-info"))
-                .andExpect(model().attribute("cp", Matchers.is(cp1)))
-                .andExpect(model().attribute("chartData", Matchers.is(charData)))
-                .andExpect(model().attribute("parcels", Matchers.is(parcels)));
+                .andExpect(model().attributeExists("cp"))
+                .andExpect(model().attributeExists("chartData"))
+                .andExpect(model().attributeExists("parcels"))
+                .andExpect(result -> {
+                    Object cpObject = result.getModelAndView().getModel().get("cp");
+                    assertEquals(cp1.getId(), ((CollectionPoint) cpObject).getId());
+                });;
     }
 
     @Test
     void testDeleteParcel() throws Exception {
-        Integer idACP = 1;
-        Integer idParcel = 2;
+        Integer idACP = cp1.getId();
+        Integer idParcel = parcels.get(0).getId();
 
         mockMvc.perform(get("/admin/acp-pages/{idACP}/delete/{idParcel}", idACP, idParcel))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/acp-pages/" + idACP));
 
-        verify(adminService, times(1)).deleteParcel(idParcel);
     }
 
         

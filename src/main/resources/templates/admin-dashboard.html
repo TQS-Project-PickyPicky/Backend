@@ -68,7 +68,7 @@
               <td th:text = "${cp.getType()}"></td>
               <td><a th:href="@{/admin/acp-pages/{id}(id=${cp.getId()})}"><i class="fas fa-eye" style="color: #2e3436;"></i></a></td>
               <td>
-                <a class="delete-link" th:href="@{'/admin/acp-candidates/' + ${cp.getId()} + '/delete'}" onclick="return confirm('Are you sure you want to accept this application?')">
+                <a class="delete-link" th:href="@{'/admin/acp-pages/' + ${cp.getId()} + '/delete'}" onclick="return confirm('Are you sure you want to accept this application?')">
                   <i class="fas fa-trash" style="color: #2e3436;"></i>
                 </a>   
               </td>

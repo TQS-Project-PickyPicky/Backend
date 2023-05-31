@@ -40,4 +40,6 @@ public class CollectionPoint {
 
     @OneToMany(mappedBy = "collectionPoint", cascade = CascadeType.REMOVE)
     private List<Parcel> parcels;
+
+    
 }

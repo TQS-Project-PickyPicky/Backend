@@ -35,7 +35,7 @@ public class AdminWebController {
     }
 
     //delete an acp
-    @GetMapping("/acp-candidates/{idACP}/delete")
+    @GetMapping("/acp-pages/{idACP}/delete")
     public String deleteACP(@PathVariable Integer idACP) throws Exception{
         //must delete all associated parcels
         adminService.deleteCollectionPointAndParcels(idACP);

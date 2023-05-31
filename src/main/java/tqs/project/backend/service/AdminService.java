@@ -7,13 +7,16 @@ import tqs.project.backend.data.parcel.*;
 import tqs.project.backend.data.partner.PartnerRepository;
 import tqs.project.backend.exception.CollectionPointNotFoundException;
 import tqs.project.backend.exception.ParcelNotFoundException;
+import tqs.project.backend.util.ConverterUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ch.qos.logback.core.pattern.ConverterUtil;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -41,16 +44,7 @@ public class AdminService {
         List<CollectionPoint> collectionPoints = this.collectionPointRepository.findByStatus(status);
         log.info("" + collectionPoints.size());
     
-        List<CollectionPointDDto> dtoList = collectionPoints.stream()
-            .map(collectionPoint -> {
-                CollectionPointDDto dto = new CollectionPointDDto();
-                dto.setId(collectionPoint.getId());
-                dto.setName(collectionPoint.getName());
-                dto.setType(collectionPoint.getType());
-                dto.setEmail(collectionPoint.getOwnerEmail());
-                return dto;
-            })
-            .collect(Collectors.toList());
+        List<CollectionPointDDto> dtoList = ConverterUtils.fromCollectionPointsToCollectionPointDDto(collectionPoints);
     
         return dtoList;
     }
@@ -60,7 +54,7 @@ public class AdminService {
         CollectionPoint cp = getCollectionPointById(idACP); //metodo ja implementado
         partnerRepository.delete(cp.getPartner());          //elimina partner associado
         parcelRepository.deleteAll(cp.getParcels());        //elimina todas as parcels associadas
-        collectionPointRepository.deleteById(idACP);
+        collectionPointRepository.delete(cp);
         
     }
 
@@ -96,7 +90,7 @@ public class AdminService {
         ).getParcels();
     }
     
-    public static Map<String, Long> countParcelsByStatus(List<Parcel> parcels) {
+    public Map<String, Long> countParcelsByStatus(List<Parcel> parcels) {
         return parcels.stream()
                 .collect(Collectors.groupingBy(parcel -> parcel.getStatus().toString(), Collectors.counting()));
     }
