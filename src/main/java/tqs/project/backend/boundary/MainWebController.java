@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.extern.slf4j.Slf4j;
+import tqs.project.backend.data.admin.Admin;
 import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.collection_point.CollectionPointDto;
 import tqs.project.backend.data.partner.Partner;
@@ -82,12 +83,12 @@ public class MainWebController {
 
     @PostMapping("/login")
     public String loginPost(@RequestParam String username, @RequestParam String password, Model model){
-        if ("admin".equals(username) && "admin".equals(password)) {
+        Admin admin = mainService.findAdmin(username, password);
+        if (admin!=null) {
             return "redirect:/admin/acp-pages";
         } else {
             Partner partner = mainService.findByUsernameAndPassword(username, password);
             if (partner != null) {
-                //esta aqui o id:
                 log.info(partner.getId() + "");
                 return "redirect:/acp/home";
             } else {

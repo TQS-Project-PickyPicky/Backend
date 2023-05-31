@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import tqs.project.backend.data.admin.Admin;
 import tqs.project.backend.data.partner.Partner;
 import tqs.project.backend.service.MainService;
 
@@ -125,6 +126,7 @@ public class MainWebControllerTest {
 
     @Test
     void adminAuthentication() throws Exception {
+        when(mainService.findAdmin(any(), any())).thenReturn(new Admin());
         mvc.perform(post("/main/login")
                 .param("username", "admin")
                 .param("password", "admin"))

@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import tqs.project.backend.data.admin.AdminRepository;
 import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.collection_point.CollectionPointDDto;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
@@ -39,6 +42,9 @@ public class AdminServiceTest {
 
     @Mock(lenient = true)
     private PartnerRepository partnerRepository;
+
+    @Mock(lenient = true)
+    private AdminRepository adminRepository;
 
     @InjectMocks
     private AdminService adminService;
@@ -169,6 +175,29 @@ public class AdminServiceTest {
 
         verify(parcelRepository, times(1)).delete(parcel);
         assertNull(result.getCollectionPoint());
+    }
+
+    @Test
+    public void testInitData() {
+
+        when(adminRepository.count()).thenReturn(0L);
+
+        adminService.initData();
+
+        verify(adminRepository).save(argThat(admin -> {
+            assertEquals("admin", admin.getUsername());
+            assertEquals("admin", admin.getPassword());
+            return true; 
+        }));
+    }
+
+    @Test
+    public void testInitDataFailure() {
+
+        when(adminRepository.count()).thenReturn(1L);
+        adminService.initData();
+
+        verify(adminRepository, times(0)).save(any());
     }
 
 }
