@@ -37,25 +37,28 @@
         </header>
 
         <div class="container col-md-4">
-            <form>
+            <form th:action="@{/main/login}" method="post">
                 <div class="text-center my-5">
                     <h1 class="fw-bolder">Login</h1>
                 </div>
                 <div class="form-outline mb-4">
-                    <label class="form-label" for="username">Username</label>
-                    <input type="text" id="username" class="form-control" />  
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" th:name="username" required>
                 </div>
 
                 <div class="form-outline mb-4">
-                    <label class="form-label" for="password">Password:</label>
-                    <input type="password" id="password" class="form-control" />
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" th:name="password" required>
                 </div>
 
                 <!--Atencao a esta parte -> verificar se admin ou se acp partner-->
-                <button type="button" class="btn btn-primary btn-block mb-4 ">Sign in</button>
+                <button type="submit" class="btn btn-primary btn-block mb-4 ">Sign in</button>
+                <div th:if="${error}" th:utext="${error}" class="alert alert-danger"></div> <!--mensagem de erro caso passes sejam diferentes-->
+
+                </div>
 
                 <div class="text-center mt-5">
-                <p>Not a member? <a href="acp-application.html">Register</a></p>
+                <p>Not a member? <a th:href="@{/main/registerACP}">Register</a></p>
                 </div>
             </form>
         </div>

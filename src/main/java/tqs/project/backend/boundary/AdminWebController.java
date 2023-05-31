@@ -31,6 +31,7 @@ public class AdminWebController {
     public String getAcpPages(Model model){    
         List<CollectionPointDDto> cps = adminService.getCollectionPointsDDto(true);
         model.addAttribute("cps", cps);
+        log.info(cps.get(0).getName() + " ");
         return "admin-dashboard";
     }
 
