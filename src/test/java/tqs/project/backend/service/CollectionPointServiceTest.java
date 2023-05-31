@@ -186,7 +186,6 @@ public class CollectionPointServiceTest {
         //to use in functions inside the service
         CollectionPointDto cp = new CollectionPointDto();
         String zipCode = "3810-193";
-        String city = "Aveiro";
 
         CollectionPoint collectionPoint = ConverterUtils.fromCollectionPointDTOToCollectionPoint(cp);
 
@@ -205,7 +204,6 @@ public class CollectionPointServiceTest {
 
         CollectionPoint cp = new CollectionPoint();
         String zipCode = "";
-        String city = "";
 
         boolean result = collectionPointService.saveCPPoint(cp, zipCode);
         ArrayList<Double> coordinates = ResolveLocation.resolveAddress(zipCode);

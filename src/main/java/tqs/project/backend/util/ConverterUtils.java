@@ -140,6 +140,14 @@ public class ConverterUtils {
             collectionPoint.getStatus());
     }
 
+    public static CollectionPointDDto fromCollectionPointToCollectionPoint(CollectionPoint collectionPoint){
+        return new CollectionPointDDto(
+            collectionPoint.getId(), 
+            collectionPoint.getName(),
+            collectionPoint.getType(),
+            collectionPoint.getOwnerEmail());
+    }
+
     public static CollectionPoint fromCollectionPointUpdateDtoToCollectionPoint(CollectionPointUpdateDto collectionPointUpdateDto){
         return new CollectionPoint(
             null,

@@ -1,0 +1,39 @@
+.image-blog{
+    overflow-y: hidden ! important;
+    overflow-x: hidden ! important;
+    background-image: url("parcel-img.jpg");
+    background-size: cover;                     
+    background-repeat: no-repeat;
+    background-position: center center; 
+    background-attachment: fixed;
+}
+
+.content-container {
+    margin-top: 80px;
+}
+
+.label-container {
+    display: flex;
+    align-items: center;
+}
+
+.bold-label {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.label-container {
+    display: flex;
+    align-items: center;
+}
+.fw-bold {
+    font-weight: bold;
+    margin-right: 5px;
+}
+.info-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+.statistics-container {
+    margin-top: 10px;
+}
