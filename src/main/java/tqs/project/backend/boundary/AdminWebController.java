@@ -61,13 +61,6 @@ public class AdminWebController {
         return "redirect:/admin/acp-pages/" + idACP;
     }
 
-    //get acps candidate
-    @GetMapping("/acp-candidates")
-    public String getCandidateAcp(Model model){
-        List<CollectionPointDDto> cps = adminService.getCollectionPointsDDto(false);//not yet accepted
-        log.info(""+cps);
-        model.addAttribute("cps", cps);
-        return "admin-applications";
-    }
+
     
 }
