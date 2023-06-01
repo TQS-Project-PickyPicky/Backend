@@ -20,6 +20,9 @@ import java.util.List;
 @RequestMapping("/acp-page")
 public class CollectionPointWebController {
 
+    private static final String URL1 = "redirect:/acp-page/acp/parcel?id=";
+    private static final String URL2 = "redirect:/acp-page/acp?id=";
+    private static final String URL3 = "&acp=";
     private final CollectionPointService collectionPointService;
     private final ParcelService parcelService;
 
@@ -33,15 +36,17 @@ public class CollectionPointWebController {
         // TODO - Change to ask for id of logged in user
         List<ParcelMinimal> parcels = collectionPointService.getAllParcels(id);
         model.addAttribute("parcels", parcels);
+        model.addAttribute("acp", id);
         return "acp";
     }
 
     @GetMapping("/acp/parcel")
-    public String parcel(@RequestParam(value="id") Integer id, Model model) throws ParcelNotFoundException {
+    public String parcel(@RequestParam(value="id") Integer id, @RequestParam(value = "acp") Integer acp,Model model) throws ParcelNotFoundException {
         try{
             ParcelMinimalEta parcel = collectionPointService.getParcel(id);
             model.addAttribute("parcel", parcel);
             model.addAttribute("collectionPointService", collectionPointService);
+            model.addAttribute("acp", acp);
             return "parcelib";
         } catch (ParcelNotFoundException e) {
             return "redirect:/acp-page/acp";
@@ -50,32 +55,44 @@ public class CollectionPointWebController {
     }
 
     @PostMapping("/acp/parcel/checkin")
-    public String parcelCheckIn(@RequestParam(value="id") Integer id, Model model) {
+    public String parcelCheckIn(@RequestParam(value="id") Integer id, @RequestParam(value="acp") Integer acp, Model model) {
         try{
             parcelService.checkIn(id);
+<<<<<<< HEAD
             return "redirect:/acp-page/acp";
+=======
+            return URL2 + acp;
+>>>>>>> d19509d792dc30898f61775b7a08ead04eb47b97
         } catch (ParcelNotFoundException | InvalidParcelStatusChangeException e) {
-            return "redirect:/acp-page/acp/parcel?id=" + id;
+            return URL1 + id + URL3 + acp;
         }
     }
 
     @PostMapping("/acp/parcel/checkout")
-    public String parcelCheckOut(@RequestParam(value="id") Integer id, @RequestParam(value="token") Integer token, Model model) {
+    public String parcelCheckOut(@RequestParam(value="id") Integer id, @RequestParam(value="token") Integer token, @RequestParam(value="acp") Integer acp, Model model) {
         try {
             parcelService.checkOut(id, token);
+<<<<<<< HEAD
             return "redirect:/acp-page/acp";
+=======
+            return URL2 + acp;
+>>>>>>> d19509d792dc30898f61775b7a08ead04eb47b97
         } catch (IncorrectParcelTokenException | ParcelNotFoundException | InvalidParcelStatusChangeException e) {
-            return "redirect:/acp-page/acp/parcel?id=" + id;
+            return URL1 + id + URL3 + acp;
         }
     }
 
     @PostMapping("/acp/parcel/return")
-    public String parcelReturn(@RequestParam(value="id") Integer id, Model model) {
+    public String parcelReturn(@RequestParam(value="id") Integer id, @RequestParam(value="acp") Integer acp,Model model) {
         try {
             parcelService.returnParcel(id);
+<<<<<<< HEAD
             return "redirect:/acp-page/acp";
+=======
+            return URL2 + acp;
+>>>>>>> d19509d792dc30898f61775b7a08ead04eb47b97
         } catch (ParcelNotFoundException | InvalidParcelStatusChangeException e) {
-            return "redirect:/acp-page/acp/parcel?id=" + id;
+            return URL1 + id + URL3 + acp;
         }
     }
 }

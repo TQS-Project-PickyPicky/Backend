@@ -5,16 +5,27 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+<<<<<<< HEAD
 import lombok.extern.slf4j.Slf4j;
 import tqs.project.backend.data.admin.AdminRepository;
 import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
+=======
+import tqs.project.backend.data.admin.Admin;
+import tqs.project.backend.data.admin.AdminRepository;
+import tqs.project.backend.data.collection_point.CollectionPoint;
+import tqs.project.backend.data.collection_point.CollectionPointRepository;
+import tqs.project.backend.data.partner.Partner;
+>>>>>>> d19509d792dc30898f61775b7a08ead04eb47b97
 import tqs.project.backend.data.partner.PartnerRepository;
 import tqs.project.backend.data.user.User;
 import tqs.project.backend.util.ResolveLocation;
 
 @Service
+<<<<<<< HEAD
 @Slf4j
+=======
+>>>>>>> d19509d792dc30898f61775b7a08ead04eb47b97
 public class MainService {
 
     private final PartnerRepository partnerRepository;

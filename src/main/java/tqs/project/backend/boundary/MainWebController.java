@@ -2,6 +2,7 @@ package tqs.project.backend.boundary;
 
 import javax.validation.Valid;
 
+import org.hamcrest.core.IsInstanceOf;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -73,8 +74,13 @@ public class MainWebController {
             model.addAttribute("errorCoordinates", "Couldn't get that address... Try again.");
             return "acp-application";
         }
+<<<<<<< HEAD
         redirectAttributes.addFlashAttribute("message", "Success");
         redirectAttributes.addFlashAttribute("alertClass", "alert-success");
+=======
+
+        model.addAttribute("showModal", true);
+>>>>>>> d19509d792dc30898f61775b7a08ead04eb47b97
         return "redirect:/main/login";
     
     }

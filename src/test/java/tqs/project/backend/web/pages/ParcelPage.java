@@ -9,10 +9,10 @@ public class ParcelPage {
 
     private WebDriver driver;
 
-    @FindBy(xpath = "/html/body/div[1]/p[2]/button")
+    @FindBy(xpath = "/html/body/div[1]/p[1]/button")
     private WebElement statusButton;
 
-    @FindBy(xpath = "/html/body/div[1]/div/div/form/input")
+    @FindBy(xpath = "/html/body/div[1]/div/div/form/input[3]")
     private WebElement actionButton;
 
     public ParcelPage(WebDriver driver) {

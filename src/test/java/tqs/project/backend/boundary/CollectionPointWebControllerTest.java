@@ -76,7 +76,7 @@ class CollectionPointWebControllerTest {
 
     @Test
     void getParcel_ifExistsInCollectionPoint() throws Exception {
-        mvc.perform(get("/acp-page/acp/parcel?id=1").contentType(MediaType.TEXT_HTML))
+        mvc.perform(get("/acp-page/acp/parcel?id=1&acp=1").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().isOk())
                 .andExpect(view().name("parcelib"))
                 .andExpect(model().attributeExists("parcel"))
@@ -85,78 +85,78 @@ class CollectionPointWebControllerTest {
 
     @Test
     void getParcel_ifNotExistsInCollectionPoint() throws Exception {
-        mvc.perform(get("/acp-page/acp/parcel?id=2").contentType(MediaType.TEXT_HTML))
+        mvc.perform(get("/acp-page/acp/parcel?id=2&acp=1").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/acp-page/acp"));
     }
 
     @Test
     void checkIn_ifExistsInCollectionPoint() throws Exception {
-        mvc.perform(post("/acp-page/acp/parcel/checkin?id=1").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/checkin?id=1&acp=1").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp-page/acp"));
+                .andExpect(redirectedUrl("/acp-page/acp?id=1"));
     }
 
     @Test
     void checkIn_ifNotExistsInCollectionPoint() throws Exception {
-        mvc.perform(post("/acp-page/acp/parcel/checkin?id=2").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/checkin?id=2&acp=1").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=2"));
+                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=2&acp=1"));
     }
 
     @Test
     void checkIn_ifNotInTransit() throws Exception {
-        mvc.perform(post("/acp-page/acp/parcel/checkin?id=3").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/checkin?id=3&acp=1").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=3"));
+                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=3&acp=1"));
     }
 
     @Test
     void checkOut_ifExistsInCollectionPoint() throws Exception {
-        mvc.perform(post("/acp-page/acp/parcel/checkout?id=1&token=5").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/checkout?id=1&token=5&acp=1").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp-page/acp"));
+                .andExpect(redirectedUrl("/acp-page/acp?id=1"));
     }
 
     @Test
     void checkOut_ifNotExistsInCollectionPoint() throws Exception {
-        mvc.perform(post("/acp-page/acp/parcel/checkout?id=2&token=5").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/checkout?id=2&token=5&acp=1").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=2"));
+                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=2&acp=1"));
     }
 
     @Test
     void checkOut_ifNotDelivered() throws Exception {
-        mvc.perform(post("/acp-page/acp/parcel/checkout?id=3&token=5").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/checkout?id=3&token=5&acp=1").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=3"));
+                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=3&acp=1"));
     }
 
     @Test
     void checkOut_ifTokenIsIncorrect() throws Exception {
-        mvc.perform(post("/acp-page/acp/parcel/checkout?id=1&token=6").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/checkout?id=1&token=6&acp=1").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=1"));
+                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=1&acp=1"));
     }
 
     @Test
     void returnParcel_ifExistsInCollectionPoint() throws Exception {
-        mvc.perform(post("/acp-page/acp/parcel/return?id=1").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/return?id=1&acp=1").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp-page/acp"));
+                .andExpect(redirectedUrl("/acp-page/acp?id=1"));
     }
 
     @Test
     void returnParcel_ifNotExistsInCollectionPoint() throws Exception {
-        mvc.perform(post("/acp-page/acp/parcel/return?id=2").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/return?id=2&acp=1").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=2"));
+                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=2&acp=1"));
     }
 
     @Test
     void returnParcel_ifNotCollected() throws Exception {
-        mvc.perform(post("/acp-page/acp/parcel/return?id=3").contentType(MediaType.TEXT_HTML))
+        mvc.perform(post("/acp-page/acp/parcel/return?id=3&acp=1").contentType(MediaType.TEXT_HTML))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=3"));
+                .andExpect(redirectedUrl("/acp-page/acp/parcel?id=3&acp=1"));
     }
 }
