@@ -20,6 +20,9 @@ import java.util.List;
 @RequestMapping("/acp-page")
 public class CollectionPointWebController {
 
+    private static final String URL1 = "redirect:/acp-page/acp/parcel?id=";
+    private static final String URL2 = "redirect:/acp-page/acp?id=";
+    private static final String URL3 = "&acp=";
     private final CollectionPointService collectionPointService;
     private final ParcelService parcelService;
 
@@ -55,9 +58,9 @@ public class CollectionPointWebController {
     public String parcelCheckIn(@RequestParam(value="id") Integer id, @RequestParam(value="acp") Integer acp, Model model) {
         try{
             parcelService.checkIn(id);
-            return "redirect:/acp-page/acp?id=" + acp;
+            return URL2 + acp;
         } catch (ParcelNotFoundException | InvalidParcelStatusChangeException e) {
-            return "redirect:/acp-page/acp/parcel?id=" + id + "&acp=" + acp;
+            return URL1 + id + URL3 + acp;
         }
     }
 
@@ -65,9 +68,9 @@ public class CollectionPointWebController {
     public String parcelCheckOut(@RequestParam(value="id") Integer id, @RequestParam(value="token") Integer token, @RequestParam(value="acp") Integer acp, Model model) {
         try {
             parcelService.checkOut(id, token);
-            return "redirect:/acp-page/acp?id=" + acp;
+            return URL2 + acp;
         } catch (IncorrectParcelTokenException | ParcelNotFoundException | InvalidParcelStatusChangeException e) {
-            return "redirect:/acp-page/acp/parcel?id=" + id + "&acp=" + acp;
+            return URL1 + id + URL3 + acp;
         }
     }
 
@@ -75,9 +78,9 @@ public class CollectionPointWebController {
     public String parcelReturn(@RequestParam(value="id") Integer id, @RequestParam(value="acp") Integer acp,Model model) {
         try {
             parcelService.returnParcel(id);
-            return "redirect:/acp-page/acp?id=" + acp;
+            return URL2 + acp;
         } catch (ParcelNotFoundException | InvalidParcelStatusChangeException e) {
-            return "redirect:/acp-page/acp/parcel?id=" + id + "&acp=" + acp;
+            return URL1 + id + URL3 + acp;
         }
     }
 }
