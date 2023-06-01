@@ -35,9 +35,12 @@ public class CollectionPoint {
     private Boolean status;
 
     @Valid
-    @OneToOne(mappedBy = "collectionPoint")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "partner_id", referencedColumnName = "id")
     private Partner partner;
 
     @OneToMany(mappedBy = "collectionPoint", cascade = CascadeType.REMOVE)
     private List<Parcel> parcels;
+
+    
 }

@@ -6,22 +6,22 @@
         <meta name="description" content="" />
         <meta name="author" content="" />
         <title>Picky Platform</title>
-        <link rel="stylesheet" href="css/style.css"> 
+        <link rel="stylesheet" th:href="@{/css/style.css}">  
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
     </head>
     <body>
         <nav class="navbar navbar-dark bg-dark fixed-top">
             <div class="container">
-                <a class="navbar-brand" href="home-picky.html">PickyPicky</a>
+                <a class="navbar-brand" href="@{/main/login}">PickyPicky</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav">
                         <li class="nav-item active">
-                          <a class="nav-link" href="home-picky.html">Home</a>
+                          <a class="nav-link" th:href="@{/main/login}">Home</a>
                         </li>
                         <li class="nav-item">
-                          <a class="nav-link" href="acp-application.html">Submit an application</a>
+                          <a class="nav-link" th:href="@{/main/registerACP}">Submit an application</a>
                         </li>
                     </ul>
                 </div>
@@ -37,25 +37,28 @@
         </header>
 
         <div class="container col-md-4">
-            <form>
+            <form th:action="@{/main/login}" method="post">
                 <div class="text-center my-5">
                     <h1 class="fw-bolder">Login</h1>
                 </div>
                 <div class="form-outline mb-4">
-                    <label class="form-label" for="username">Username</label>
-                    <input type="text" id="username" class="form-control" />  
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" th:name="username" required>
                 </div>
 
                 <div class="form-outline mb-4">
-                    <label class="form-label" for="password">Password:</label>
-                    <input type="password" id="password" class="form-control" />
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" th:name="password" required>
                 </div>
 
                 <!--Atencao a esta parte -> verificar se admin ou se acp partner-->
-                <button type="button" class="btn btn-primary btn-block mb-4 ">Sign in</button>
+                <button type="submit" class="btn btn-primary btn-block mb-4 ">Sign in</button>
+                <div th:if="${error}" th:utext="${error}" class="alert alert-danger"></div> <!--mensagem de erro caso passes sejam diferentes-->
+
+                </div>
 
                 <div class="text-center mt-5">
-                <p>Not a member? <a href="acp-application.html">Register</a></p>
+                <p>Not a member? <a th:href="@{/main/registerACP}">Register</a></p>
                 </div>
             </form>
         </div>

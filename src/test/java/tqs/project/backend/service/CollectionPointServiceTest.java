@@ -1,12 +1,11 @@
 package tqs.project.backend.service;
 
-import tqs.project.backend.data.collection_point.CollectionPoint;
-import tqs.project.backend.data.collection_point.CollectionPointDto;
-import tqs.project.backend.data.collection_point.CollectionPointRepository;
+import tqs.project.backend.data.collection_point.*;
 import tqs.project.backend.data.parcel.*;
 import tqs.project.backend.data.partner.Partner;
 import tqs.project.backend.data.partner.PartnerRepository;
 import tqs.project.backend.data.store.Store;
+import tqs.project.backend.exception.CollectionPointNotFoundException;
 import tqs.project.backend.exception.ParcelNotFoundException;
 import tqs.project.backend.util.ConverterUtils;
 import tqs.project.backend.util.ResolveLocation;
@@ -26,8 +25,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.time.temporal.ChronoUnit.DAYS;
-import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CollectionPointServiceTest {
@@ -69,6 +69,7 @@ public class CollectionPointServiceTest {
         when(partnerRepository.save(Mockito.any(Partner.class))).thenReturn(partner);
 
         CollectionPoint collectionPoint = new CollectionPoint();
+        collectionPoint.setId(1);
         collectionPoint.setName("Collection Point 1");
         collectionPoint.setType("Collection Point");
         collectionPoint.setCapacity(100);
@@ -80,6 +81,22 @@ public class CollectionPointServiceTest {
         collectionPoint.setOwnerGender("M");
         collectionPoint.setOwnerPhone(123456789);
         collectionPoint.setOwnerMobilePhone(987654321);
+        collectionPoint.setStatus(true);
+
+        CollectionPoint collectionPoint2 = new CollectionPoint();
+        collectionPoint2.setId(2);
+        collectionPoint2.setName("Collection Point 2");
+        collectionPoint2.setType("Collection Point");
+        collectionPoint2.setCapacity(100);
+        collectionPoint2.setAddress("Rua do Prof António");
+        collectionPoint2.setLatitude(41.174660);
+        collectionPoint2.setLongitude(-8.588069);
+        collectionPoint2.setOwnerName("João");
+        collectionPoint2.setStatus(true);
+        collectionPoint2.setOwnerEmail("joao@ua.pt");
+        collectionPoint2.setOwnerGender("M");
+        collectionPoint2.setOwnerPhone(123456789);
+        collectionPoint2.setOwnerMobilePhone(987654321);
 
         Store store = new Store();
         store.setName("Store 1");
@@ -143,7 +160,38 @@ public class CollectionPointServiceTest {
 
         when(parcelRepository.findById(6))
                 .thenReturn(Optional.of(parcel3));
+        when(collectionPointRepository.findAll())
+                .thenReturn(List.of(collectionPoint, collectionPoint2));
+    }
 
+    @Test
+    void getCollectionPointById() {
+        CollectionPointRDto collectionPoint = collectionPointService.getCP(1);
+        assertEquals(1, collectionPoint.getId());
+        assertEquals("Collection Point 1", collectionPoint.getName());
+    }
+
+    @Test
+    void getCollectionPointByIdNotFound() {
+        assertThrows(CollectionPointNotFoundException.class, () -> collectionPointService.getCP(3));
+    }
+
+    @Test
+    void getAllCollectionPoints() {
+        List<CollectionPointRDto> collectionPoints = collectionPointService.getAll();
+        assertEquals(2, collectionPoints.size());
+        assertEquals(1, collectionPoints.get(0).getId());
+        assertEquals(2, collectionPoints.get(1).getId());
+        assertEquals("Collection Point 1", collectionPoints.get(0).getName());
+        assertEquals("Collection Point 2", collectionPoints.get(1).getName());
+    }
+
+    @Test
+    void getAllCollectionPointsByLocation() {
+        List<CollectionPointRDto> collectionPoints = collectionPointService.getAll("4435-677");
+        assertEquals(2, collectionPoints.size());
+        assertEquals(2, collectionPoints.get(0).getId());
+        assertEquals(1, collectionPoints.get(1).getId());
     }
 
     @Test
@@ -152,11 +200,10 @@ public class CollectionPointServiceTest {
         //to use in functions inside the service
         CollectionPointDto cp = new CollectionPointDto();
         String zipCode = "3810-193";
-        String city = "Aveiro";
 
         CollectionPoint collectionPoint = ConverterUtils.fromCollectionPointDTOToCollectionPoint(cp);
 
-        boolean result = collectionPointService.saveCPPoint(collectionPoint, zipCode, city);
+        boolean result = collectionPointService.saveCPPoint(collectionPoint, zipCode);
         ArrayList<Double> coordinates = ResolveLocation.resolveAddress(zipCode);
 
         assertTrue(result);
@@ -171,9 +218,8 @@ public class CollectionPointServiceTest {
 
         CollectionPoint cp = new CollectionPoint();
         String zipCode = "";
-        String city = "";
 
-        boolean result = collectionPointService.saveCPPoint(cp, zipCode, city);
+        boolean result = collectionPointService.saveCPPoint(cp, zipCode);
         ArrayList<Double> coordinates = ResolveLocation.resolveAddress(zipCode);
 
         assertFalse(result);
@@ -183,6 +229,42 @@ public class CollectionPointServiceTest {
         assertEquals(coordinates.size(), 0);
         assertEquals(null, cp.getLatitude());
         assertEquals(null, cp.getLongitude());
+    }
+
+    @Test
+    void updateCPPointSuccess_Test(){
+        CollectionPointUpdateDto cp = new CollectionPointUpdateDto("Collection Point 1", "Lavandaria", 50, 965833174, 965833174,true);
+
+        CollectionPointRDto cop = collectionPointService.updateCPPoint(1,ConverterUtils.fromCollectionPointUpdateDtoToCollectionPoint(cp));
+
+        assertEquals(cop.getName(), cp.getName());
+        assertEquals(cop.getType(), cp.getType());
+        assertEquals(cop.getCapacity(), cp.getCapacity());
+    }
+
+    @Test
+    void updateCPPointFailure_Test(){
+        CollectionPointUpdateDto cp = new CollectionPointUpdateDto("Collection Point 1", "Lavandaria", 50, 965833174, 965833174,true);
+
+        assertThrows(CollectionPointNotFoundException.class, () -> {
+            collectionPointService.updateCPPoint(3,ConverterUtils.fromCollectionPointUpdateDtoToCollectionPoint(cp));
+        });
+    }
+
+    @Test
+    void deleteCPPointSuccess_Test(){
+        CollectionPointRDto result = collectionPointService.deleteCPPoint(1);
+
+        assertThat(result).isNotNull();
+        assertEquals(result.getId(), 1);
+        verify(collectionPointRepository, times(1)).delete(any());
+    }
+
+    @Test
+    void deleteCPPointFailure_Test(){
+        assertThrows(CollectionPointNotFoundException.class, () -> {
+            collectionPointService.deleteCPPoint(3);
+        });
     }
 
     @Test
@@ -221,83 +303,4 @@ public class CollectionPointServiceTest {
     //        collectionPointService.getParcel(5);
     //    });
     //}
-
-    @Test
-    void checkinParcel_ifParcelExistsCollectionPoint() throws ParcelNotFoundException, InvalidParcelStatusChangeException {
-        ParcelMinimal parcel = collectionPointService.checkIn(3);
-
-        ParcelMinimal parcelCheck = new ParcelMinimal(3, ParcelStatus.DELIVERED);
-
-        assertEquals(parcelCheck.getId(), parcel.getId());
-        assertEquals(parcelCheck.getStatus(), parcel.getStatus());
-    }
-
-    //@Test
-    //void checkinParcel_ifParcelDoesNotExistCollectionPoint() {
-    //    assertThrows(ParcelNotFoundException.class, () -> {
-    //        collectionPointService.checkIn(5);
-    //    });
-    //}
-
-    @Test
-    void checkinParcel_ifParcelDoesNotHaveStateInTransit() {
-        assertThrows(InvalidParcelStatusChangeException.class, () -> {
-            collectionPointService.checkIn(4);
-        });
-    }
-
-    @Test
-    void checkoutParcel_ifParcelExistsCollectionPoint() throws ParcelNotFoundException, InvalidParcelStatusChangeException, IncorrectParcelTokenException {
-        ParcelMinimal parcel = collectionPointService.checkOut(4, 123456);
-
-        ParcelMinimal parcelCheck = new ParcelMinimal(4, ParcelStatus.COLLECTED);
-
-        assertEquals(parcelCheck.getId(), parcel.getId());
-        assertEquals(parcelCheck.getStatus(), parcel.getStatus());
-    }
-
-    //@Test
-    //void checkoutParcel_ifParcelDoesNotExistCollectionPoint() {
-    //    assertThrows(ParcelNotFoundException.class, () -> {
-    //        collectionPointService.checkOut(5,123456);
-    //    });
-    //}
-
-    @Test
-    void checkoutParcel_ifParcelDoesNotHaveStateDelivered() {
-        assertThrows(InvalidParcelStatusChangeException.class, () -> {
-            collectionPointService.checkOut(3, 123456);
-        });
-    }
-
-    @Test
-    void checkoutParcel_ifParcelDoesNotHaveCorrectToken() {
-        assertThrows(IncorrectParcelTokenException.class, () -> {
-            collectionPointService.checkOut(4, 1234567);
-        });
-    }
-
-    @Test
-    void returnParcel__ifParcelExistsCollectionPoint() throws InvalidParcelStatusChangeException, ParcelNotFoundException {
-        ParcelMinimal parcel = collectionPointService.returnParcel(6);
-
-        ParcelMinimal parcelCheck = new ParcelMinimal(6, ParcelStatus.RETURNED);
-
-        assertEquals(parcelCheck.getId(), parcel.getId());
-        assertEquals(parcelCheck.getStatus(), parcel.getStatus());
-    }
-
-    //@Test
-    //void returnParcel_ifParcelDoesNotExistCollectionPoint() {
-    //    assertThrows(ParcelNotFoundException.class, () -> {
-    //        collectionPointService.returnParcel(5);
-    //    });
-    //}
-
-    @Test
-    void returnParcel_ifParcelDoesNotHaveStateCollected() {
-        assertThrows(InvalidParcelStatusChangeException.class, () -> {
-            collectionPointService.returnParcel(3);
-        });
-    }
 }

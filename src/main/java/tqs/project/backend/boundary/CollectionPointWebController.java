@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
+import tqs.project.backend.service.ParcelService;
 import java.util.List;
 
 
@@ -21,9 +21,11 @@ import java.util.List;
 public class CollectionPointWebController {
 
     private final CollectionPointService collectionPointService;
+    private final ParcelService parcelService;
 
-    public CollectionPointWebController(CollectionPointService collectionPointService) {
+    public CollectionPointWebController(CollectionPointService collectionPointService, ParcelService parcelService) {
         this.collectionPointService = collectionPointService;
+        this.parcelService = parcelService;
     }
 
     @GetMapping("/acp")
@@ -50,7 +52,7 @@ public class CollectionPointWebController {
     @PostMapping("/acp/parcel/checkin")
     public String parcelCheckIn(@RequestParam(value="id") Integer id, Model model) {
         try{
-            collectionPointService.checkIn(id);
+            parcelService.checkIn(id);
             return "redirect:/acp-page/acp";
         } catch (ParcelNotFoundException | InvalidParcelStatusChangeException e) {
             return "redirect:/acp-page/acp/parcel?id=" + id;
@@ -60,7 +62,7 @@ public class CollectionPointWebController {
     @PostMapping("/acp/parcel/checkout")
     public String parcelCheckOut(@RequestParam(value="id") Integer id, @RequestParam(value="token") Integer token, Model model) {
         try {
-            collectionPointService.checkOut(id, token);
+            parcelService.checkOut(id, token);
             return "redirect:/acp-page/acp";
         } catch (IncorrectParcelTokenException | ParcelNotFoundException | InvalidParcelStatusChangeException e) {
             return "redirect:/acp-page/acp/parcel?id=" + id;
@@ -70,7 +72,7 @@ public class CollectionPointWebController {
     @PostMapping("/acp/parcel/return")
     public String parcelReturn(@RequestParam(value="id") Integer id, Model model) {
         try {
-            collectionPointService.returnParcel(id);
+            parcelService.returnParcel(id);
             return "redirect:/acp-page/acp";
         } catch (ParcelNotFoundException | InvalidParcelStatusChangeException e) {
             return "redirect:/acp-page/acp/parcel?id=" + id;
