@@ -11,7 +11,7 @@
     <header class="p-3 mb-3 border-bottom">
         <div class="container">
           <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-            <div onclick="Clicked()" class="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none">
+            <div class="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none">
               <h2>ACP Page</h2>
             </div>
 
@@ -28,13 +28,13 @@
 
             <div class="dropdown text-end">
               <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="mdo" width="32" height="32" class="rounded-circle">
               </a>
               <ul class="dropdown-menu text-small" style="">
-                <li><a class="dropdown-item" href="#">Settings</a></li>
-                <li><a class="dropdown-item" href="#">Profile</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#">Sign out</a></li>
+                <li onclick="function logoutClicked() {
+                    window.location.href = '/main/login';
+                }
+                logoutClicked()"><a class="dropdown-item" href="#">Sign out</a></li>
               </ul>
             </div>
           </div>
@@ -43,16 +43,6 @@
 
     <h2 th:text="'Parcel ' + ${parcel.id}" style="text-align: center;padding-top: 30px;"></h2>
     <div style="width: 1000px; margin: 0 auto;">
-      <p style="text-align: justify; padding-top: 50px;"><b>Description:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia,
-        molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum
-        numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium
-        optio, eaque rerum! Provident similique accusantium nemo autem. Veritatis
-        obcaecati tenetur iure eius earum ut molestias architecto voluptate aliquam
-        nihil, eveniet aliquid culpa officia aut! Impedit sit sunt quaerat, odit,
-        tenetur error, harum nesciunt ipsum debitis quas aliquid. Reprehenderit,
-        quia. Quo neque error repudiandae fuga? Ipsa laudantium molestias eos 
-        sapiente officiis modi at sunt excepturi expedita sint? Sed quibusdam
-        recusandae alias error harum maxime adipisci amet laborum.</p>
       <p th:switch="${parcel.status.toString()}"><b>Status: </b>
         <button th:case="IN_TRANSIT" class="btn btn-primary rounded-pill" style="width: 105px;" type="button">In Transit</button>
         <button th:case="DELIVERED" class="btn btn-success rounded-pill" style="width: 105px;" type="button">Delivered</button>
@@ -62,6 +52,7 @@
       </p>
       <p th:if="${parcel.status.toString() == 'IN_TRANSIT'}"><b>ETA:</b>
         <span th:if="${parcel.eta == 0}">Today</span>
+        <span th:if="${parcel.eta < 0}" th:text="Delivered"></span>
         <span th:unless="${parcel.eta == 0}" th:text="${parcel.id} + ' days'"></span>
       </p>
       <div th:switch="${parcel.status.toString()}">
@@ -72,12 +63,16 @@
       margin-left:45%;
       margin-right:45%;">Check-In</button>-->
         <div th:case="IN_TRANSIT">
-          <form method="POST" th:action="@{/acp/parcel/checkin(id=${parcel.id})}">
-              <input type="submit" style="width:10%;margin-left:45%;margin-right:45%;" value="Check-In" class="btn btn-outline-secondary" />
+          <form method="POST" th:action="@{/acp-page/acp/parcel/checkin}">
+            <input type="hidden" th:value="${acp}" name="acp" />
+            <input type="hidden" th:value="${parcel.id}" name="id" />
+            <input type="submit" style="width:10%;margin-left:45%;margin-right:45%;" value="Check-In" class="btn btn-outline-secondary" />
           </form>
         </div>
         <div th:case="COLLECTED">
-          <form method="POST" th:action="@{/acp/parcel/return(id=${parcel.id})}">
+          <form method="POST" th:action="@{/acp-page/acp/parcel/return}">
+            <input type="hidden" th:value="${acp}" name="acp" />
+            <input type="hidden" th:value="${parcel.id}" name="id" />
             <button class="btn btn-outline-secondary" type="submit" style="width:10%;margin-left:45%;margin-right:45%;">Return</button>
           </form>
         </div>
@@ -93,10 +88,11 @@
               <span aria-hidden="true">X</span>
             </button>
           </div>
-          <form method="POST" th:action="@{/acp/parcel/checkout}">
+          <form method="POST" th:action="@{/acp-page/acp/parcel/checkout}">
             <div class="modal-body">
               <p>
                 <label for="name">Token: </label>
+                <input type="hidden" th:value="${acp}" name="acp" />
                 <input type="text" name="name" id="name" th:name="token"/>
                 <input hidden type="text" name="name" id="id" th:name="id" th:value="${parcel.id}"/>
               </p>

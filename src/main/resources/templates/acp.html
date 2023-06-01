@@ -34,13 +34,13 @@
 
             <div class="dropdown text-end">
               <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png" alt="mdo" width="32" height="32" class="rounded-circle">
               </a>
               <ul class="dropdown-menu text-small" style="">
-                <li><a class="dropdown-item" href="#">Settings</a></li>
-                <li><a class="dropdown-item" href="#">Profile</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#">Sign out</a></li>
+                <li onclick="function logoutClicked() {
+                    window.location.href = '/main/login';
+                }
+                logoutClicked()"><a class="dropdown-item" href="#">Sign out</a></li>
               </ul>
             </div>
           </div>
@@ -66,7 +66,7 @@
                       <td th:case="PLACED" style="text-align:center; vertical-align: middle;"><button class="btn btn-secondary rounded-pill" style="width: 105px;" type="button">Placed</button></td>
                       <td th:case="RETURNED" style="text-align:center; vertical-align: middle;"><button class="btn btn-danger rounded-pill" style="width: 105px;" type="button">Returned</button></td>
                   </div>
-                  <td style="text-align:center; vertical-align: middle;"><button th:some-field="${item.id}" onclick="rowClicked(this.getAttribute('some-field'))" type="button" class="btn btn-secondary"><i class="bi bi-eye"></i></button></td>
+                  <td style="text-align:center; vertical-align: middle;"><button th:some-field="${item.id}" th:somef="${acp}" onclick="rowClicked(this.getAttribute('some-field'),this.getAttribute('somef'))" type="button" class="btn btn-secondary"><i class="bi bi-eye"></i></button></td>
               </tr>
 
               <!--  <td style="text-align:center; vertical-align: middle;"><a href="parcelir.html" style="text-decoration: none; color: black;">HFAS31294120</a></td>
@@ -91,8 +91,8 @@
 </body>
 
 <script>
-    function rowClicked(id) {
-        window.location.href = "/acp-page/acp/parcel?id=" + id;
+    function rowClicked(id,acp) {
+        window.location.href = "/acp-page/acp/parcel?id=" + id + "&acp=" + acp;
     }
 </script>
 </html>

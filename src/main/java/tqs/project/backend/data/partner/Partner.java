@@ -20,8 +20,7 @@ import javax.persistence.Table;
 @AllArgsConstructor
 public class Partner extends User {
 
-    @OneToOne
-    @JoinColumn(name = "collectionPoint_id")
+    @OneToOne(mappedBy = "partner")
     private CollectionPoint collectionPoint;
 
     @Override

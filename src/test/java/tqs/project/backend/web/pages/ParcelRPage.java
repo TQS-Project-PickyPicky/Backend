@@ -9,7 +9,7 @@ public class ParcelRPage {
 
     private WebDriver driver;
 
-    @FindBy(xpath = "/html/body/div[1]/p[2]/button")
+    @FindBy(xpath = "/html/body/div[1]/p/button")
     private WebElement statusButton;
 
     public ParcelRPage(WebDriver driver) {
