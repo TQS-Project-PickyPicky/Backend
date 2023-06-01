@@ -30,15 +30,10 @@ public class AdminWebController {
     @GetMapping("/acp-pages")
     public String getAcpPages(Model model){    
         List<CollectionPointDDto> cps = adminService.getCollectionPointsDDto(true);
-<<<<<<< HEAD
         if (cps.size()>0){
             model.addAttribute("cps", cps);
             log.info(cps.get(0).getName() + " ");
         }
-=======
-        model.addAttribute("cps", cps);
-        log.info(cps.get(0).getName() + " ");
->>>>>>> d19509d792dc30898f61775b7a08ead04eb47b97
         return "admin-dashboard";
     }
 
@@ -69,7 +64,6 @@ public class AdminWebController {
         return "redirect:/admin/acp-pages/" + idACP;
     }
 
-<<<<<<< HEAD
      //get acps candidate
     @GetMapping("/acp-candidates")
     public String getCandidateAcp(Model model){
@@ -100,8 +94,6 @@ public class AdminWebController {
         return "admin-acpdetails-cand";
     }
 
-=======
->>>>>>> d19509d792dc30898f61775b7a08ead04eb47b97
 
     
 }

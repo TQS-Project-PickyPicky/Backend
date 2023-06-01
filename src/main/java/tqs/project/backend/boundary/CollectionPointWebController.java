@@ -58,11 +58,7 @@ public class CollectionPointWebController {
     public String parcelCheckIn(@RequestParam(value="id") Integer id, @RequestParam(value="acp") Integer acp, Model model) {
         try{
             parcelService.checkIn(id);
-<<<<<<< HEAD
-            return "redirect:/acp-page/acp";
-=======
             return URL2 + acp;
->>>>>>> d19509d792dc30898f61775b7a08ead04eb47b97
         } catch (ParcelNotFoundException | InvalidParcelStatusChangeException e) {
             return URL1 + id + URL3 + acp;
         }
@@ -72,11 +68,7 @@ public class CollectionPointWebController {
     public String parcelCheckOut(@RequestParam(value="id") Integer id, @RequestParam(value="token") Integer token, @RequestParam(value="acp") Integer acp, Model model) {
         try {
             parcelService.checkOut(id, token);
-<<<<<<< HEAD
-            return "redirect:/acp-page/acp";
-=======
             return URL2 + acp;
->>>>>>> d19509d792dc30898f61775b7a08ead04eb47b97
         } catch (IncorrectParcelTokenException | ParcelNotFoundException | InvalidParcelStatusChangeException e) {
             return URL1 + id + URL3 + acp;
         }
@@ -86,11 +78,7 @@ public class CollectionPointWebController {
     public String parcelReturn(@RequestParam(value="id") Integer id, @RequestParam(value="acp") Integer acp,Model model) {
         try {
             parcelService.returnParcel(id);
-<<<<<<< HEAD
-            return "redirect:/acp-page/acp";
-=======
             return URL2 + acp;
->>>>>>> d19509d792dc30898f61775b7a08ead04eb47b97
         } catch (ParcelNotFoundException | InvalidParcelStatusChangeException e) {
             return URL1 + id + URL3 + acp;
         }
