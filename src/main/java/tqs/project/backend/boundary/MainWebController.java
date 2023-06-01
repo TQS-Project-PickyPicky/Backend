@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.extern.slf4j.Slf4j;
 import tqs.project.backend.data.admin.Admin;
@@ -49,6 +50,7 @@ public class MainWebController {
     @PostMapping("/registerACP")
     public String registerACP(@Valid @ModelAttribute("cp") CollectionPointDto cpDto,
                             BindingResult result,
+                            RedirectAttributes redirectAttributes,
                             @RequestParam("passwordCheck") String passwordCheck, 
                             @RequestParam("zipcode") String zipcode, 
                             @RequestParam("city") String city, 
@@ -72,8 +74,8 @@ public class MainWebController {
             model.addAttribute("errorCoordinates", "Couldn't get that address... Try again.");
             return "acp-application";
         }
-
-        model.addAttribute("showModal", true);
+        redirectAttributes.addFlashAttribute("message", "Success");
+        redirectAttributes.addFlashAttribute("alertClass", "alert-success");
         return "redirect:/main/login";
     
     }

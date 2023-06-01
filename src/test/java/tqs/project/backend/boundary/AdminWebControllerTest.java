@@ -1,5 +1,6 @@
 package tqs.project.backend.boundary;
 
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -177,6 +178,93 @@ class AdminWebControllerTest {
                 .andExpect(redirectedUrl("/admin/acp-pages/" + idACP));
 
         verify(adminService, times(1)).deleteParcel(idParcel);
+    }
+
+    @Test
+    public void testGetCandidateAcp() throws Exception {
+
+        List<CollectionPointDDto> cps = new ArrayList<>();
+
+        CollectionPointDDto cp1 = new CollectionPointDDto();
+        cp1.setName("nome1");
+        cp1.setType("library");
+        cp1.setEmail("email1@ua.pt");
+
+        CollectionPointDDto cp2 = new CollectionPointDDto();
+        cp2.setName("nome2");
+        cp2.setType("cafe");
+        cp2.setEmail("email2@ua.pt");
+
+        CollectionPointDDto cp3 = new CollectionPointDDto();
+        cp3.setName("nome3");
+        cp3.setType("florist");
+        cp3.setEmail("email3@ua.pt");
+
+        cps.add(cp1);
+        cps.add(cp2);
+        cps.add(cp3);
+
+        when(adminService.getCollectionPointsDDto(anyBoolean())).thenReturn(cps);
+
+        mockMvc.perform(get("/admin/acp-candidates"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin-applications"))
+                .andExpect(model().attribute("cps", cps));
+    }
+
+    @Test
+    public void testAcceptCandidateAcp() throws Exception {
+
+        CollectionPoint cp = new CollectionPoint();
+        cp.setName("nome1");
+        cp.setType("library");
+        cp.setCapacity(100);
+        cp.setAddress("Some address 1");
+        cp.setLatitude(-8.1);
+        cp.setLongitude(42.0);
+        cp.setOwnerName("Matilde");
+        cp.setOwnerEmail("email1@ua.pt");
+        cp.setOwnerGender("Female");
+        cp.setOwnerPhone(910000000);
+        cp.setStatus(true);
+
+        when(adminService.getCollectionPointById(1)).thenReturn(cp);
+
+        mockMvc.perform(get("/admin/acp-candidates/{idACP}/{bool}", 1, true))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/acp-candidates"));
+
+    }
+
+    @Test
+    public void testGetInformationAcp() throws Exception {
+
+        CollectionPoint cp = new CollectionPoint();
+        cp.setName("nome1");
+        cp.setType("library");
+        cp.setCapacity(100);
+        cp.setAddress("Some address 1");
+        cp.setLatitude(-8.1);
+        cp.setLongitude(42.0);
+        cp.setOwnerName("Matilde");
+        cp.setOwnerEmail("email1@ua.pt");
+        cp.setOwnerGender("Female");
+        cp.setOwnerPhone(910000000);
+        cp.setStatus(true);
+
+        Partner partner1 = new Partner();
+        partner1.setPassword("pass123");
+        partner1.setUsername("username1");
+        partner1.setCollectionPoint(cp);
+    
+        cp.setPartner(partner1);
+        
+        when(adminService.getCollectionPointById(1)).thenReturn(cp);
+
+        mockMvc.perform(get("/admin/acp-candidates/{id}", 1))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin-acpdetails-cand"))
+                .andExpect(model().attribute("cp", cp));
     }
 
         

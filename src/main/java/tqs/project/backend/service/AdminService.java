@@ -6,6 +6,7 @@ import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.collection_point.CollectionPointDDto;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
 import tqs.project.backend.data.parcel.*;
+import tqs.project.backend.data.partner.Partner;
 import tqs.project.backend.data.partner.PartnerRepository;
 import tqs.project.backend.exception.CollectionPointNotFoundException;
 import tqs.project.backend.exception.ParcelNotFoundException;
@@ -50,7 +51,8 @@ public class AdminService {
     }
 
     public CollectionPoint getCollectionPointById(Integer id) throws Exception{
-        return collectionPointRepository.findById(id).orElseThrow( () -> new Exception("Collection point with id: " + id + " not found."));
+        CollectionPoint cp = collectionPointRepository.findById(id).orElseThrow( () -> new Exception("Collection point with id: " + id + " not found."));
+        return cp;
     }
 
     public List<CollectionPointDDto> getCollectionPointsDDto(Boolean status) {

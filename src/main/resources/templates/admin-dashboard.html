@@ -15,7 +15,7 @@
     <body>
         <nav class="navbar navbar-dark bg-dark fixed-top">
             <div class="container">
-                <a class="navbar-brand" href="home-picky.html">PickyPicky</a>
+                <a class="navbar-brand" th:href="@{/admin/acp-pages}">PickyPicky</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav">
@@ -24,6 +24,9 @@
                         </li>
                         <li class="nav-item">
                           <a class="nav-link" th:href="@{/admin/acp-candidates}">Accept/Deny application</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" th:href="@{/main/login}">Logout</a>
                         </li>
                     </ul>
                 </div>
@@ -68,7 +71,11 @@
               <td th:text = "${cp.getType()}"></td>
               <td><a th:href="@{/admin/acp-pages/{id}(id=${cp.getId()})}"><i class="fas fa-eye" style="color: #2e3436;"></i></a></td>
               <td>
+<<<<<<< HEAD
+                <a class="delete-link" th:href="@{'/admin/acp-pages/' + ${cp.getId()} + '/delete'}">
+=======
                 <a class="delete-link" th:href="@{'/admin/acp-pages/' + ${cp.getId()} + '/delete'}" onclick="return confirm('Are you sure you want to accept this application?')">
+>>>>>>> d19509d792dc30898f61775b7a08ead04eb47b97
                   <i class="fas fa-trash" style="color: #2e3436;"></i>
                 </a>   
               </td>
