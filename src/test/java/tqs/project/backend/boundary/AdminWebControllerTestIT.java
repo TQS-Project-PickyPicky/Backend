@@ -31,6 +31,7 @@ import tqs.project.backend.data.partner.Partner;
 import tqs.project.backend.data.partner.PartnerRepository;
 import tqs.project.backend.data.store.StoreRepository;
 import tqs.project.backend.service.AdminService;
+import tqs.project.backend.util.ConverterUtils;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -44,7 +45,7 @@ class AdminWebControllerTestIT{
     @LocalServerPort
     int localPort;
 
-    private CollectionPoint cp1;
+    private CollectionPoint cp1, cp2;
     private List<Parcel> parcels;
 
     @Autowired
@@ -85,7 +86,21 @@ class AdminWebControllerTestIT{
         cp1.setOwnerPhone(910000000);
         cp1.setStatus(true);
 
+        cp2 = new CollectionPoint();
+        cp2.setName("nome1");
+        cp2.setType("library");
+        cp2.setCapacity(100);
+        cp2.setAddress("Some address 1");
+        cp2.setLatitude(-8.1);
+        cp2.setLongitude(42.0);
+        cp2.setOwnerName("Matilde");
+        cp2.setOwnerEmail("email1@ua.pt");
+        cp2.setOwnerGender("Female");
+        cp2.setOwnerPhone(910000000);
+        cp2.setStatus(false);
+
         collectionPointRepository.save(cp1);
+        collectionPointRepository.save(cp2);
 
         parcels = new ArrayList<>();
         Parcel parcel1 = new Parcel();
@@ -136,11 +151,19 @@ class AdminWebControllerTestIT{
         partner1.setPassword("pass123");
         partner1.setUsername("username1");
         partner1.setCollectionPoint(cp1);
+
+        Partner partner2 = new Partner();
+        partner2.setPassword("pass123");
+        partner2.setUsername("username1");
+        partner2.setCollectionPoint(cp2);
     
         cp1.setPartner(partner1);
+        cp2.setPartner(partner2);
 
         partnerRepository.save(partner1);
+        partnerRepository.save(partner2);
         collectionPointRepository.save(cp1);
+        collectionPointRepository.save(cp2);
         parcelRepository.save(parcel1);
         parcelRepository.save(parcel2);
         parcelRepository.save(parcel3);
@@ -192,6 +215,38 @@ class AdminWebControllerTestIT{
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/acp-pages/" + idACP));
 
+    }
+
+    @Test
+    public void testGetCandidateAcp() throws Exception {
+
+        List<CollectionPoint> cps = new ArrayList<>();
+        cps.add(cp2); 
+
+        mockMvc.perform(get("/admin/acp-candidates"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin-applications"))
+                .andExpect(model().attributeExists("cps"))
+                .andExpect(model().attribute("cps", hasItem(hasProperty("id", equalTo(cps.get(0).getId())))));
+    }
+
+    @Test
+    public void testAcceptCandidateAcp() throws Exception {
+
+        mockMvc.perform(get("/admin/acp-candidates/{idACP}/{bool}", cp2.getId(), true))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/acp-candidates"));
+
+    }
+
+    @Test
+    public void testGetInformationAcp() throws Exception {
+        
+        mockMvc.perform(get("/admin/acp-candidates/{id}", cp2.getId()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin-acpdetails-cand"))
+                .andExpect(model().attributeExists("cp"))
+                .andExpect(model().attribute("cp", hasProperty("id", equalTo(cp2.getId()))));
     }
 
         

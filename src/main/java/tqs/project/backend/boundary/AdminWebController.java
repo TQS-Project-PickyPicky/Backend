@@ -30,8 +30,10 @@ public class AdminWebController {
     @GetMapping("/acp-pages")
     public String getAcpPages(Model model){    
         List<CollectionPointDDto> cps = adminService.getCollectionPointsDDto(true);
-        model.addAttribute("cps", cps);
-        log.info(cps.get(0).getName() + " ");
+        if (cps.size()>0){
+            model.addAttribute("cps", cps);
+            log.info(cps.get(0).getName() + " ");
+        }
         return "admin-dashboard";
     }
 
@@ -60,6 +62,36 @@ public class AdminWebController {
     public String deleteParcel(@PathVariable(value="idACP") Integer idACP, @PathVariable(value="idParcel") Integer idParcel, Model model) throws Exception{
         adminService.deleteParcel(idParcel);
         return "redirect:/admin/acp-pages/" + idACP;
+    }
+
+     //get acps candidate
+    @GetMapping("/acp-candidates")
+    public String getCandidateAcp(Model model){
+        List<CollectionPointDDto> cps = adminService.getCollectionPointsDDto(false);//not yet accepted
+        log.info(""+cps);
+        model.addAttribute("cps", cps);
+        return "admin-applications";
+    }
+
+    //accept/refuse application
+    @GetMapping("/acp-candidates/{idACP}/{bool}")
+    public String acceptCandidateAcp(@PathVariable(value="idACP") Integer idACP,@PathVariable(value="bool") Boolean bool, Model model) throws Exception{
+        if (bool){ //acp candidate accepted
+            CollectionPoint point = adminService.getCollectionPointById(idACP);
+            point.setStatus(true);
+            adminService.saveACPoint(point);
+        } else{
+            adminService.deleteCPPoint(idACP); //remove everything from db
+        }
+        return "redirect:/admin/acp-candidates"; //go back to where we were
+    }
+
+    //get information acp candidate
+    @GetMapping("/acp-candidates/{id}")
+    public String getInformationAcp(@PathVariable(value="id") Integer idACP, Model model) throws Exception{
+        CollectionPoint cp = adminService.getCollectionPointById(idACP);
+        model.addAttribute("cp", cp);
+        return "admin-acpdetails-cand";
     }
 
 
