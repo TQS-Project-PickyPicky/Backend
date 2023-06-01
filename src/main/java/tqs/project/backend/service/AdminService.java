@@ -68,7 +68,7 @@ public class AdminService {
         //must delete partner and parcels associated 
         CollectionPoint cp = getCollectionPointById(idACP); //metodo ja implementado
         partnerRepository.delete(cp.getPartner());          //elimina partner associado
-        parcelRepository.deleteAll(cp.getParcels());        //elimina todas as parcels associadas
+        //parcelRepository.deleteAll(cp.getParcels());        //elimina todas as parcels associadas
         collectionPointRepository.delete(cp);
         
     }
