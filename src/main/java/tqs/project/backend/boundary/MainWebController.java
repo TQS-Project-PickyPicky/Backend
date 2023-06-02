@@ -70,7 +70,7 @@ public class MainWebController {
 
         CollectionPoint cp = ConverterUtils.fromCollectionPointDTOToCollectionPoint(cpDto);
 
-        if (!mainService.saveCPPoint(cp, zipcode)){ //was able to retreive data
+        if (mainService.saveCPPoint(cp, zipcode) == null){ //was able to retreive data
             model.addAttribute("errorCoordinates", "Couldn't get that address... Try again.");
             return "acp-application";
         }
@@ -86,14 +86,13 @@ public class MainWebController {
     }
 
     @PostMapping("/login")
-    public String loginPost(@RequestParam String username, @RequestParam String password, Model model){
+    public String loginPost(@RequestParam String username, @RequestParam String password, Model model) throws Exception{
         User user = mainService.findByUsernameAndPassword(username, password);
         if (user instanceof Admin) {
             return "redirect:/admin/acp-pages";
         } else {
             if (user instanceof Partner) {
-                log.info(user.getId() + "");
-                return "redirect:/acp/home";
+                return "redirect:/acp-page/acp?id=" + mainService.getCollectionPointByPartnerId(user.getId());
             } else {
                 model.addAttribute("error", "Username or password incorrect");
                 return "home-picky";

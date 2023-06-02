@@ -1,12 +1,17 @@
 package tqs.project.backend.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -44,11 +49,11 @@ public class MainServiceTest {
         String zipCode = "3105-325";
 
         when(partnerRepository.save(any())).thenReturn(null);
-        when(collectionPointRepository.save(any())).thenReturn(null);
+        when(collectionPointRepository.save(any())).thenReturn(point);
 
-        boolean result = mainService.saveCPPoint(point, zipCode);
+        CollectionPoint cp = mainService.saveCPPoint(point, zipCode);
 
-        Assertions.assertTrue(result);
+        Assertions.assertNotNull(cp);
         verify(partnerRepository, times(1)).save(any());
         verify(collectionPointRepository, times(1)).save(any());
     }
@@ -58,9 +63,9 @@ public class MainServiceTest {
         CollectionPoint point = new CollectionPoint();
         String zipCode = "0"; //invalid zipcode
 
-        boolean result = mainService.saveCPPoint(point, zipCode);
+        CollectionPoint cp = mainService.saveCPPoint(point, zipCode);
 
-        Assertions.assertFalse(result);
+        Assertions.assertNull(cp);
         verify(partnerRepository, never()).save(any());
         verify(collectionPointRepository, never()).save(any());
     }
@@ -93,5 +98,30 @@ public class MainServiceTest {
         Assertions.assertEquals(expectedPartner, result);
         assert(result instanceof Partner);
         verify(partnerRepository, times(1)).findByUsernameAndPassword(username, password);
+    }
+
+    @Test
+    public void testGetCollectionPointByPartnerId() throws Exception {
+        Integer partnerId = 1;
+        Integer collectionPointId = 123;
+
+        Partner partner = new Partner();
+        CollectionPoint collectionPoint = new CollectionPoint();
+        collectionPoint.setId(collectionPointId);
+        partner.setCollectionPoint(collectionPoint);
+
+        when(partnerRepository.findById(anyInt())).thenReturn(Optional.of(partner));
+
+        Integer result = mainService.getCollectionPointByPartnerId(partnerId);
+
+        assertEquals(collectionPointId, result);
+    }
+
+    @Test
+    public void testGetCollectionPointByPartnerId_PartnerNotFound() throws Exception {
+
+        when(partnerRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+        assertThrows(Exception.class, () -> mainService.getCollectionPointByPartnerId(1));
     }
 }

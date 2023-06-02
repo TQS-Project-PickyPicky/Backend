@@ -9,12 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import tqs.project.backend.data.admin.AdminRepository;
 import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
+import tqs.project.backend.data.partner.Partner;
 import tqs.project.backend.data.partner.PartnerRepository;
 import tqs.project.backend.data.user.User;
 import tqs.project.backend.util.ResolveLocation;
 
 @Service
-@Slf4j
 public class MainService {
 
     private final PartnerRepository partnerRepository;
@@ -28,22 +28,22 @@ public class MainService {
         this.adminRepository = adminRepository;
     }
 
-    public boolean saveCPPoint(CollectionPoint point, String zipCode) {
+    public CollectionPoint saveCPPoint(CollectionPoint point, String zipCode) {
     
         point.setStatus(false);
     
         ArrayList<Double> latlon = ResolveLocation.resolveAddress(zipCode);
         if (latlon.isEmpty()) {
-            return false;
+            return null;
         }
     
         point.setLatitude(latlon.get(0));
         point.setLongitude(latlon.get(1));
     
         partnerRepository.save(point.getPartner());
-        collectionPointRepository.save(point);
+        CollectionPoint cp1 = collectionPointRepository.save(point);
     
-        return true;
+        return cp1;
     }
 
     public User findByUsernameAndPassword(String username, String password){
@@ -51,6 +51,11 @@ public class MainService {
             ? adminRepository.findByUsernameAndPassword(username, password)
             : partnerRepository.findByUsernameAndPassword(username, password);
 
+    }
+
+    public Integer getCollectionPointByPartnerId(Integer id) throws Exception{
+        Partner part = partnerRepository.findById(id).orElseThrow( () -> new Exception("Partner with id: " + id + " not found"));
+        return part.getCollectionPoint().getId();
     }
 
 }

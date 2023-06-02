@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import tqs.project.backend.data.admin.Admin;
+import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.partner.Partner;
 import tqs.project.backend.service.MainService;
 
@@ -45,7 +46,7 @@ public class MainWebControllerTest {
     @Test
     void registerACP_ValidForm_Success() throws Exception {
 
-        when(mainService.saveCPPoint(any(), anyString())).thenReturn(true);
+        when(mainService.saveCPPoint(any(), anyString())).thenReturn(new CollectionPoint());
 
         mvc.perform(post("/main/registerACP")
                 .param("name", "cp1")
