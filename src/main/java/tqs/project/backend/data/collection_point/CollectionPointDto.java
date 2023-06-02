@@ -2,6 +2,8 @@ package tqs.project.backend.data.collection_point;
 
 import lombok.NoArgsConstructor;
 
+import javax.persistence.CascadeType;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.validation.Valid;
 
@@ -26,6 +28,7 @@ public class CollectionPointDto {
     private Integer ownerMobilePhone;
 
     @Valid
-    @OneToOne(mappedBy = "collectionPoint")
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "partner_id", referencedColumnName = "id")
     private Partner partner;
 }

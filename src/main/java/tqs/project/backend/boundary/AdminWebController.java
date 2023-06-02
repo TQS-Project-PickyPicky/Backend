@@ -30,7 +30,7 @@ public class AdminWebController {
     @GetMapping("/acp-pages")
     public String getAcpPages(Model model){    
         List<CollectionPointDDto> cps = adminService.getCollectionPointsDDto(true);
-        if (cps.size()>0){
+        if (!cps.isEmpty()){
             model.addAttribute("cps", cps);
             log.info(cps.get(0).getName() + " ");
         }

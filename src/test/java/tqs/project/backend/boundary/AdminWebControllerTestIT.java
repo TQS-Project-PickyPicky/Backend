@@ -31,7 +31,6 @@ import tqs.project.backend.data.partner.Partner;
 import tqs.project.backend.data.partner.PartnerRepository;
 import tqs.project.backend.data.store.StoreRepository;
 import tqs.project.backend.service.AdminService;
-import tqs.project.backend.util.ConverterUtils;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;

@@ -66,9 +66,9 @@ public class AdminService {
 
     public void deleteCollectionPointAndParcels(Integer idACP) throws Exception{
         //must delete partner and parcels associated 
-        CollectionPoint cp = getCollectionPointById(idACP); //metodo ja implementado
-        partnerRepository.delete(cp.getPartner());          //elimina partner associado
-        //parcelRepository.deleteAll(cp.getParcels());        //elimina todas as parcels associadas
+        CollectionPoint cp = getCollectionPointById(idACP); 
+        partnerRepository.delete(cp.getPartner());          
+        parcelRepository.deleteAll(cp.getParcels());        
         collectionPointRepository.delete(cp);
         
     }

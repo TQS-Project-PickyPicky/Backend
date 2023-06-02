@@ -27,7 +27,6 @@ import tqs.project.backend.data.parcel.ParcelStatus;
 import tqs.project.backend.data.partner.Partner;
 import tqs.project.backend.data.partner.PartnerRepository;
 import tqs.project.backend.data.store.StoreRepository;
-import tqs.project.backend.service.MainService;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "application-integrationtest.properties")
@@ -54,9 +53,6 @@ public class MainWebControllerTestIT {
     
     @Autowired 
     private PartnerRepository partnerRepository;
-
-    @Autowired 
-    private MainService mainService;
     
     @BeforeEach
     void setup(){
