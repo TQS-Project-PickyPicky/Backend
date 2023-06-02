@@ -26,9 +26,9 @@ public class Parcel {
     private LocalDate expectedArrival;
     private ParcelStatus status;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     private Store store;
     
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     private CollectionPoint collectionPoint;
 }

@@ -4,9 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tqs.project.backend.data.parcel.*;
-import tqs.project.backend.exception.IncorrectParcelTokenException;
-import tqs.project.backend.exception.InvalidParcelStatusChangeException;
-import tqs.project.backend.exception.ParcelNotFoundException;
+import tqs.project.backend.data.store.Store;
+import tqs.project.backend.exception.*;
 import tqs.project.backend.service.ParcelService;
 import tqs.project.backend.util.ConverterUtils;
 
@@ -53,6 +52,8 @@ public class ParcelRestController {
             Parcel parcel = parcelService.createParcel(parcelCreateDto.getClientName(), parcelCreateDto.getClientEmail(), parcelCreateDto.getClientPhone(), parcelCreateDto.getClientMobilePhone(), parcelCreateDto.getStoreId(), parcelCreateDto.getCollectionPointId());
             ParcelDto parcelDto = ConverterUtils.fromParcelToParcelDto(parcel);
             return new ResponseEntity<>(parcelDto, HttpStatus.CREATED);
+        } catch (StoreNotFoundException | CollectionPointNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

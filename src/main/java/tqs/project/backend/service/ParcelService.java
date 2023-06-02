@@ -8,9 +8,7 @@ import tqs.project.backend.data.parcel.ParcelMinimal;
 import tqs.project.backend.data.parcel.ParcelRepository;
 import tqs.project.backend.data.parcel.ParcelStatus;
 import tqs.project.backend.data.store.StoreRepository;
-import tqs.project.backend.exception.IncorrectParcelTokenException;
-import tqs.project.backend.exception.InvalidParcelStatusChangeException;
-import tqs.project.backend.exception.ParcelNotFoundException;
+import tqs.project.backend.exception.*;
 import tqs.project.backend.util.ConverterUtils;
 import tqs.project.backend.util.TokenUtils;
 
@@ -38,7 +36,7 @@ public class ParcelService {
         return parcelRepository.findAll();
     }
 
-    public Parcel createParcel(String clientName, String clientEmail, Integer clientPhone, Integer clientMobilePhone, Integer storeId, Integer collectionPointId) {
+    public Parcel createParcel(String clientName, String clientEmail, Integer clientPhone, Integer clientMobilePhone, Integer storeId, Integer collectionPointId) throws StoreNotFoundException, CollectionPointNotFoundException {
         Parcel parcel = new Parcel();
         parcel.setToken(TokenUtils.generateParcelToken());
         parcel.setClientName(clientName);
@@ -47,8 +45,8 @@ public class ParcelService {
         parcel.setClientMobilePhone(clientMobilePhone);
         parcel.setExpectedArrival(LocalDate.now().plusDays(7));
         parcel.setStatus(ParcelStatus.PLACED);
-        parcel.setStore(storeRepository.findById(storeId).orElse(null));
-        parcel.setCollectionPoint(collectionPointRepository.findById(collectionPointId).orElse(null));
+        parcel.setStore(storeRepository.findById(storeId).orElseThrow(() -> new StoreNotFoundException(storeId)));
+        parcel.setCollectionPoint(collectionPointRepository.findById(collectionPointId).orElseThrow(() -> new CollectionPointNotFoundException(collectionPointId)));
         return parcelRepository.save(parcel);
     }
 
@@ -80,6 +78,10 @@ public class ParcelService {
 
     public Parcel deleteParcel(Integer id) throws ParcelNotFoundException {
         Parcel parcel = parcelRepository.findById(id).orElseThrow(() -> new ParcelNotFoundException(id));
+
+        parcel.setStore(null);
+        parcel.setCollectionPoint(null);
+
         parcelRepository.delete(parcel);
         return parcel;
     }

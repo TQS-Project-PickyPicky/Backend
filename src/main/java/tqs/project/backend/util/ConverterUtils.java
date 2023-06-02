@@ -27,8 +27,8 @@ public class ConverterUtils {
                 parcel.getClientMobilePhone(),
                 parcel.getExpectedArrival().toString(),
                 parcel.getStatus().toString(),
-                parcel.getStore().getId(),
-                parcel.getCollectionPoint().getId());
+                (parcel.getStore())!=null ? parcel.getStore().getId() : null,
+                (parcel.getCollectionPoint()) != null ? parcel.getCollectionPoint().getId() : null);
     }
 
     public static ParcelMinimal fromParcelToParcelMinimal(Parcel parcel) {
