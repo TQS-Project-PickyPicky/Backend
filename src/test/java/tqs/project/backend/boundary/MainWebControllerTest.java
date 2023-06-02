@@ -143,7 +143,7 @@ public class MainWebControllerTest {
         mvc.perform(post("/main/login")
                 .param("username", "partner")
                 .param("password", "password"))
-                .andExpect(redirectedUrl("/acp/home"));
+                .andExpect(redirectedUrl("/acp-page/acp?id=0"));
     }
 
 }
