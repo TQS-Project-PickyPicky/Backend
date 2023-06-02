@@ -28,6 +28,7 @@ public class WebTest {
 
     @LocalServerPort
     int localPort;
+    
     private WebDriver driver;
 
     @Autowired
