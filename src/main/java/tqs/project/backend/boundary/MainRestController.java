@@ -40,6 +40,10 @@ public class MainRestController {
 
         CollectionPoint cp = ConverterUtils.fromCollectionPointDTOToCollectionPoint(cpDto);
 
+        if(mainService.findPartnerByUsername(cp.getPartner().getUsername())!= null){
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
         CollectionPoint cp1 = mainService.saveCPPoint(cp, zipcode);
 
         if (cp1 == null){

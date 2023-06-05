@@ -36,6 +36,10 @@ public class MainService {
         if (latlon.isEmpty()) {
             return null;
         }
+
+        if (partnerRepository.findByUsername(point.getPartner())){
+            return null;
+        }
     
         point.setLatitude(latlon.get(0));
         point.setLongitude(latlon.get(1));
@@ -44,6 +48,11 @@ public class MainService {
         CollectionPoint cp1 = collectionPointRepository.save(point);
     
         return cp1;
+    }
+
+    public Partner findPartnerByUsername(String username){
+        Partner partner = partnerRepository.findByUsername(username);
+        return partner;
     }
 
     public User findByUsernameAndPassword(String username, String password){
