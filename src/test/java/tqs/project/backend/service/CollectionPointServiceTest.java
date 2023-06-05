@@ -9,8 +9,6 @@ import tqs.project.backend.exception.CollectionPointNotFoundException;
 import tqs.project.backend.exception.ParcelNotFoundException;
 import tqs.project.backend.util.ConverterUtils;
 import tqs.project.backend.util.ResolveLocation;
-import tqs.project.backend.exception.InvalidParcelStatusChangeException;
-import tqs.project.backend.exception.IncorrectParcelTokenException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

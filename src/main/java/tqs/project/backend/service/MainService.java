@@ -12,6 +12,7 @@ import tqs.project.backend.data.collection_point.CollectionPointRepository;
 import tqs.project.backend.data.partner.Partner;
 import tqs.project.backend.data.partner.PartnerRepository;
 import tqs.project.backend.data.user.User;
+import tqs.project.backend.data.user.UserRepository;
 import tqs.project.backend.util.ResolveLocation;
 
 @Service
@@ -36,10 +37,6 @@ public class MainService {
         if (latlon.isEmpty()) {
             return null;
         }
-
-        if (partnerRepository.findByUsername(point.getPartner())){
-            return null;
-        }
     
         point.setLatitude(latlon.get(0));
         point.setLongitude(latlon.get(1));
@@ -51,6 +48,9 @@ public class MainService {
     }
 
     public Partner findPartnerByUsername(String username){
+        if (adminRepository.findByUsername(username)!=null){
+            return null;
+        }
         Partner partner = partnerRepository.findByUsername(username);
         return partner;
     }
