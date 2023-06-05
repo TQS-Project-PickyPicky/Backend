@@ -1,16 +1,17 @@
 package tqs.project.backend.service;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
@@ -68,6 +69,36 @@ public class MainServiceTest {
         Assertions.assertNull(cp);
         verify(partnerRepository, never()).save(any());
         verify(collectionPointRepository, never()).save(any());
+    }
+
+    @Test
+    void testFindPartnerByUsernamePartnerExists(){
+        Partner partner = new Partner();
+        partner.setUsername("username1");
+        
+        when(partnerRepository.findByUsername(partner.getUsername())).thenReturn(partner);
+        when(adminRepository.findByUsername(partner.getUsername())).thenReturn(null);
+
+        Partner result = mainService.findPartnerByUsername("username1");
+
+        assertNotNull(result);
+        assertEquals(result.getUsername(), partner.getUsername());
+        verify(partnerRepository, times(1)).findByUsername(anyString());
+        verify(adminRepository, times(1)).findByUsername(anyString());
+    }
+
+    @Test
+    void testFindPartnerByUsernameAdminExists(){
+        Admin admin = new Admin();
+        admin.setUsername("admin");
+        
+        when(adminRepository.findByUsername(admin.getUsername())).thenReturn(admin);
+
+        Partner result = mainService.findPartnerByUsername("admin");
+
+        assertNull(result);
+        verify(partnerRepository, never()).findByUsername(anyString());
+        verify(adminRepository, times(1)).findByUsername(anyString());
     }
 
     @Test

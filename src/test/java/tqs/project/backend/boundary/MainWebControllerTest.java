@@ -10,6 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -46,7 +47,9 @@ public class MainWebControllerTest {
     @Test
     void registerACP_ValidForm_Success() throws Exception {
 
-        when(mainService.saveCPPoint(any(), anyString())).thenReturn(new CollectionPoint());
+        when(mainService.findPartnerByUsername(anyString())).thenReturn(null);
+        when(mainService.saveCPPoint(any(CollectionPoint.class), anyString())).thenReturn(new CollectionPoint());
+
 
         mvc.perform(post("/main/registerACP")
                 .param("name", "cp1")
@@ -112,6 +115,33 @@ public class MainWebControllerTest {
                 .andExpect(model().attributeDoesNotExist("errorCoordinates"));
 
         verifyNoInteractions(mainService);
+    }
+
+    @Test
+    void registerACP_UserExists_Error() throws Exception {
+
+        when(mainService.findPartnerByUsername(anyString())).thenReturn(new Partner());
+
+        mvc.perform(post("/main/registerACP")
+                .param("name", "cp1")
+                .param("type", "Library")
+                .param("capacity", "100")
+                .param("address", "Rua do ISEP")
+                .param("ownerName", "João")
+                .param("ownerEmail", "joao@ua.pt")
+                .param("ownerPhone", "910000000")
+                .param("passwordCheck", "pass1")
+                .param("partner.username", "username1")
+                .param("partner.password", "pass1")
+                .param("zipcode", "12345")
+                .param("city", "Aveiro"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("acp-application"))
+                .andExpect(model().attributeExists("cp"))
+                .andExpect(model().attributeExists("error"))
+                .andExpect(model().attributeDoesNotExist("errorCoordinates"));
+
+        verify(mainService, times(1)).findPartnerByUsername(anyString());
     }
 
     @Test

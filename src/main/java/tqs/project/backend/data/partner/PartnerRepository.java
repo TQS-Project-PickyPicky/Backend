@@ -7,4 +7,8 @@ public interface PartnerRepository extends JpaRepository<Partner, Integer> {
     Partner findByUsernameAndPassword(String username, String password);
 
     Partner findByCollectionPointId(Integer id);
+
+    boolean findByUsername(Partner partner);
+
+    Partner findByUsername(String username);
 }

@@ -6,7 +6,6 @@ import tqs.project.backend.data.collection_point.CollectionPoint;
 import tqs.project.backend.data.collection_point.CollectionPointDDto;
 import tqs.project.backend.data.collection_point.CollectionPointRepository;
 import tqs.project.backend.data.parcel.*;
-import tqs.project.backend.data.partner.Partner;
 import tqs.project.backend.data.partner.PartnerRepository;
 import tqs.project.backend.exception.CollectionPointNotFoundException;
 import tqs.project.backend.exception.ParcelNotFoundException;
@@ -68,7 +67,7 @@ public class AdminService {
         //must delete partner and parcels associated 
         CollectionPoint cp = getCollectionPointById(idACP); 
         partnerRepository.delete(cp.getPartner());          
-        parcelRepository.deleteAll(cp.getParcels());        
+        //parcelRepository.deleteAll(cp.getParcels());        
         collectionPointRepository.delete(cp);
         
     }

@@ -60,6 +60,59 @@ public class MainWebRestControllerTest {
     }
 
     @Test
+    public void testRegisterACPPasswordMissmatch() throws Exception {
+        Partner partner = new Partner();
+        partner.setUsername("username");
+        partner.setPassword("password");
+        String passwordCheck = "password1";
+        String zipcode = "12345";
+        String city = "city123";
+
+        CollectionPointDto cpDto = new CollectionPointDto();
+        cpDto.setPartner(partner);
+
+        CollectionPoint cp = new CollectionPoint();
+        cp.setPartner(partner);
+
+        when(mainService.saveCPPoint(any(CollectionPoint.class), anyString())).thenReturn(cp);
+
+        mockMvc.perform(post("/api/main/registerACP")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJsonString(cpDto))
+                .param("passwordCheck", passwordCheck)
+                .param("zipcode", zipcode)
+                .param("city", city))
+                .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    public void testRegisterACPUserExists() throws Exception {
+        Partner partner = new Partner();
+        partner.setUsername("username");
+        partner.setPassword("password");
+        String passwordCheck = "password";
+        String zipcode = "12345";
+        String city = "city123";
+
+        CollectionPointDto cpDto = new CollectionPointDto();
+        cpDto.setPartner(partner);
+
+        CollectionPoint cp = new CollectionPoint();
+        cp.setPartner(partner);
+
+        when(mainService.saveCPPoint(any(CollectionPoint.class), anyString())).thenReturn(cp);
+        when(mainService.findPartnerByUsername(anyString())).thenReturn(partner); //return something is found -> not null
+
+        mockMvc.perform(post("/api/main/registerACP")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJsonString(cpDto))
+                .param("passwordCheck", passwordCheck)
+                .param("zipcode", zipcode)
+                .param("city", city))
+                .andExpect(status().is5xxServerError());
+    }
+
+    @Test
     public void testLogin() throws Exception {
         String username = "testuser";
         String password = "testpassword";

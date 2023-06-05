@@ -12,6 +12,7 @@ import tqs.project.backend.data.collection_point.CollectionPointRepository;
 import tqs.project.backend.data.partner.Partner;
 import tqs.project.backend.data.partner.PartnerRepository;
 import tqs.project.backend.data.user.User;
+import tqs.project.backend.data.user.UserRepository;
 import tqs.project.backend.util.ResolveLocation;
 
 @Service
@@ -44,6 +45,14 @@ public class MainService {
         CollectionPoint cp1 = collectionPointRepository.save(point);
     
         return cp1;
+    }
+
+    public Partner findPartnerByUsername(String username){
+        if (adminRepository.findByUsername(username)!=null){
+            return null;
+        }
+        Partner partner = partnerRepository.findByUsername(username);
+        return partner;
     }
 
     public User findByUsernameAndPassword(String username, String password){

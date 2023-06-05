@@ -2,7 +2,6 @@ package tqs.project.backend.boundary;
 
 import javax.validation.Valid;
 
-import org.hamcrest.core.IsInstanceOf;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -69,6 +68,11 @@ public class MainWebController {
         }
 
         CollectionPoint cp = ConverterUtils.fromCollectionPointDTOToCollectionPoint(cpDto);
+
+        if(mainService.findPartnerByUsername(cp.getPartner().getUsername())!= null){
+            model.addAttribute("error", "Username already exists");
+            return "acp-application";
+        }
 
         if (mainService.saveCPPoint(cp, zipcode) == null){ //was able to retreive data
             model.addAttribute("errorCoordinates", "Couldn't get that address... Try again.");

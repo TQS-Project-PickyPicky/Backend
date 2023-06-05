@@ -159,7 +159,7 @@ public class MainWebControllerTestIT {
                 .param("zipcode", "3810-193")
                 .param("city", "Aveiro")
                 .param("address", "Rua do ISEP")
-                .param("partner.username", "username1")
+                .param("partner.username", "username2")
                 .param("partner.password", "pass1"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/main/login"))
@@ -182,7 +182,7 @@ public class MainWebControllerTestIT {
                 .param("zipcode", "0")
                 .param("city", "Aveiro")
                 .param("address", "Rua do ISEP")
-                .param("partner.username", "username1")
+                .param("partner.username", "username2")
                 .param("partner.password", "pass1"))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("errorCoordinates"))
@@ -220,6 +220,29 @@ public class MainWebControllerTestIT {
                 .param("ownerEmail", "joao@ua.pt")
                 .param("ownerPhone", "910000000")
                 .param("passwordCheck", "mismatched_password")
+                .param("partner.username", "username2")
+                .param("partner.password", "pass1")
+                .param("zipcode", "12345")
+                .param("city", "Aveiro"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("acp-application"))
+                .andExpect(model().attributeExists("cp"))
+                .andExpect(model().attributeExists("error"))
+                .andExpect(model().attributeDoesNotExist("errorCoordinates"));
+    }
+
+    @Test
+    void registerACP_UserExists_Error() throws Exception {
+
+        mockMvc.perform(post("/main/registerACP")
+                .param("name", "cp1")
+                .param("type", "Library")
+                .param("capacity", "100")
+                .param("address", "Rua do ISEP")
+                .param("ownerName", "João")
+                .param("ownerEmail", "joao@ua.pt")
+                .param("ownerPhone", "910000000")
+                .param("passwordCheck", "pass1")
                 .param("partner.username", "username1")
                 .param("partner.password", "pass1")
                 .param("zipcode", "12345")
@@ -229,6 +252,7 @@ public class MainWebControllerTestIT {
                 .andExpect(model().attributeExists("cp"))
                 .andExpect(model().attributeExists("error"))
                 .andExpect(model().attributeDoesNotExist("errorCoordinates"));
+
     }
 
     @Test
@@ -255,6 +279,6 @@ public class MainWebControllerTestIT {
         mockMvc.perform(post("/main/login")
                 .param("username", "username1")
                 .param("password", "pass123"))
-                .andExpect(redirectedUrl("/acp/home"));
+                .andExpect(redirectedUrl("/acp-page/acp?id=" + cp1.getId()));
     }
 }

@@ -3,6 +3,8 @@ package tqs.project.backend.data.collection_point;
 import javax.persistence.*;
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import tqs.project.backend.data.parcel.Parcel;
 import lombok.*;
 import tqs.project.backend.data.partner.Partner;
@@ -39,6 +41,7 @@ public class CollectionPoint {
     @JoinColumn(name = "partner_id", referencedColumnName = "id")
     private Partner partner;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "collectionPoint", cascade = CascadeType.REMOVE)
     private List<Parcel> parcels;
 
